@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Clear — Product Specification v3.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a2744;
+    --teal: #2a9d8f;
+    --teal-light: #3db89a;
+    --cream: #f8f6f1;
+    --dark: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --gold: #d4a017;
+    --tag-bg: #e6f4f2;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    background: var(--navy);
+    color: white;
+    min-height: 100vh;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 6px; height: 100%;
+    background: var(--teal);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 220px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a2f50 100%);
+  }
+  .cover-top { position: relative; z-index: 2; }
+  .cover-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 80px;
+  }
+  .logo-circle {
+    width: 48px; height: 48px;
+    background: var(--teal);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 800;
+    color: white;
+  }
+  .logo-text h1 { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; color: white; }
+  .logo-text p { font-size: 12px; color: #8ab5b0; margin-top: 1px; }
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: white;
+    margin-bottom: 20px;
+  }
+  .cover-version {
+    display: inline-flex;
+    align-items: center;
+    background: var(--teal);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .cover-subtitle {
+    color: #a8c8c4;
+    font-size: 15px;
+    margin-top: 8px;
+    max-width: 520px;
+  }
+  .cover-divider {
+    border: none;
+    border-top: 1px solid #2e4a6e;
+    margin: 40px 0;
+  }
+  .cover-facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+  .cover-fact-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #5a8f8a;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .cover-fact-value { font-size: 13px; color: white; font-weight: 500; }
+  .cover-footer {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: #5a8f8a;
+  }
+
+  /* ── Page Layout ── */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 60px;
+    background: white;
+    min-height: 100vh;
+  }
+
+  /* ── Header/Footer (print) ── */
+  @media print {
+    .cover { page-break-after: always; min-height: 100vh; }
+    .page-section { page-break-before: auto; }
+    .page-break { page-break-before: always; }
+    body { background: white; }
+    .page { box-shadow: none; max-width: 100%; padding: 40px 50px; }
+    .print-btn { display: none; }
+  }
+
+  /* ── Print Button ── */
+  .print-btn {
+    position: fixed;
+    top: 20px; right: 20px;
+    background: var(--teal);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(42,157,143,0.4);
+    z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .print-btn:hover { background: var(--teal-light); }
+
+  /* ── TOC ── */
+  .toc-section { margin-bottom: 48px; }
+  .toc-h1 { font-weight: 700; font-size: 14px; color: var(--navy); padding: 4px 0; }
+  .toc-h2 { font-size: 13px; color: var(--muted); padding: 2px 0 2px 20px; }
+  .toc-h2::before { content: "·  "; color: var(--teal); }
+  .toc-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+  /* ── Typography ── */
+  h2.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 40px 0 6px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--teal);
+  }
+  h3.sub-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teal);
+    margin: 24px 0 8px;
+  }
+  h4.sub-sub-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 16px 0 6px;
+  }
+  p { margin-bottom: 10px; }
+  ul { margin: 8px 0 12px 20px; }
+  li { margin-bottom: 5px; line-height: 1.6; }
+  li::marker { color: var(--teal); }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 13px;
+  }
+  th {
+    background: var(--navy);
+    color: white;
+    font-weight: 700;
+    padding: 10px 12px;
+    text-align: left;
+  }
+  tr:nth-child(even) td { background: var(--cream); }
+  tr:nth-child(odd) td { background: white; }
+  td { padding: 8px 12px; border: 0.5px solid var(--border); vertical-align: top; }
+  td:first-child { font-weight: 600; color: var(--teal); }
+
+  /* ── Info boxes ── */
+  .info-box {
+    background: var(--tag-bg);
+    border: 1px solid #c8e6e2;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .info-box-title {
+    font-weight: 700;
+    color: var(--teal);
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .info-box ul { margin-left: 16px; }
+  .info-box li { font-size: 13px; }
+
+  /* ── Commentary box ── */
+  .commentary-box {
+    background: var(--tag-bg);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+  }
+  .commentary-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .commentary-box p { font-style: italic; font-size: 13px; color: var(--dark); margin-bottom: 6px; }
+
+  /* ── Code / Mono ── */
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #f3f4f6;
+    padding: 3px 7px;
+    border-radius: 4px;
+    color: var(--navy);
+  }
+  .endpoint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #f3f4f6;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin: 4px 0;
+    display: block;
+    color: var(--navy);
+  }
+
+  /* ── Color swatches ── */
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+    margin: 12px 0 20px;
+  }
+  .swatch { text-align: center; }
+  .swatch-color {
+    height: 40px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    border: 1px solid var(--border);
+  }
+  .swatch-name { font-size: 10px; font-weight: 700; color: var(--dark); }
+  .swatch-hex { font-size: 9px; color: var(--muted); font-family: monospace; }
+
+  /* ── Version badge ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-teal { background: var(--teal); color: white; }
+  .badge-navy { background: var(--navy); color: white; }
+  .badge-outline { border: 1px solid var(--teal); color: var(--teal); }
+
+  hr.section-rule {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 6px 0 20px;
+  }
+
+  .page-break { page-break-before: always; height: 1px; }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">
+  🖨️ Save as PDF
+</button>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo">
+      <div class="logo-circle">C</div>
+      <div class="logo-text">
+        <h1>Career Clear</h1>
+        <p>Education Technology Platform</p>
+      </div>
+    </div>
+    <div class="cover-title">Product<br>Specification<br>Document</div>
+    <div class="cover-version">Version 3.0 — MVP</div>
+    <p class="cover-subtitle">Comprehensive specification for Claude Code implementation. Includes Design System, UI Patterns, and all component specs.</p>
+    <hr class="cover-divider">
+    <div class="cover-facts">
+      <div><div class="cover-fact-label">Platform</div><div class="cover-fact-value">Web &amp; Mobile (Responsive)</div></div>
+      <div><div class="cover-fact-label">Auth</div><div class="cover-fact-value">Name-based MVP</div></div>
+      <div><div class="cover-fact-label">Simulations</div><div class="cover-fact-value">4 Fully Developed Roles</div></div>
+      <div><div class="cover-fact-label">Duration Tiers</div><div class="cover-fact-value">10 min / 30 min / 2 hr / 5 hr</div></div>
+    </div>
+  </div>
+  <div class="cover-footer">
+    <span>Date: March 2026 &nbsp;|&nbsp; Prepared for: Claude Code Implementation &nbsp;|&nbsp; Author: Collin / Career Clear</span>
+    <span style="color: var(--teal); font-weight:700;">v3.0</span>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="page">
+
+<!-- TOC -->
+<h2 class="section-title">Table of Contents</h2>
+<hr class="section-rule">
+<div class="toc-section">
+  <div class="toc-h1">1. Executive Summary</div>
+  <div class="toc-h1">2. Problem Statement</div>
+  <div class="toc-h2">2.1 Limited Career Awareness &nbsp;·&nbsp; 2.2 Superficial Understanding</div>
+  <div class="toc-h1">3. Solution Overview</div>
+  <div class="toc-h2">3.1 Exploration Level &nbsp;·&nbsp; 3.2 Exploitation Level</div>
+  <div class="toc-h1">4. Target Users</div>
+  <div class="toc-h1">5. Core Features &amp; Functionality</div>
+  <div class="toc-h2">5.1 Authentication · 5.2 Landing Page · 5.3 Questionnaire · 5.4 Career Card · 5.5 Simulation Interface · 5.6 Feedback &amp; Rating · 5.7 Dashboard · 5.8 Returning User</div>
+  <div class="toc-h1">6. Content Requirements</div>
+  <div class="toc-h1">7. User Interface Requirements ⭐ <span class="badge badge-teal">New in v3</span></div>
+  <div class="toc-h2">7.1 Platform · 7.2 Design Principles · 7.3 Navigation · 7.4 Responsive Breakpoints · 7.5 Design System · 7.6 Key UI Patterns &amp; Component Specs</div>
+  <div class="toc-h1">8. Technical Architecture</div>
+  <div class="toc-h2">8.1 Technology Stack · 8.2 Data Models · 8.3 API Endpoints</div>
+  <div class="toc-h1">9. Success Metrics</div>
+  <div class="toc-h1">10. Future Enhancements</div>
+  <div class="toc-h1">11. Development Approach</div>
+  <div class="toc-h1">12. Appendix</div>
+  <div class="toc-h2">12.1 Sample Career Card · 12.2 Sample Time Block · 12.3 Glossary · 12.4 Version History</div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 1. EXECUTIVE SUMMARY -->
+<h2 class="section-title">1. Executive Summary</h2>
+<hr class="section-rule">
+<p>Career Clear is an education technology platform designed to help college-age students, high school students, and young professionals discover and deeply understand career opportunities. The platform directly addresses two critical, validated problems: users' limited awareness of the full range of available roles, and their lack of experiential understanding of day-to-day realities within specific roles.</p>
+<p>The platform features two levels of engagement:</p>
+<ul>
+  <li><strong>Exploration:</strong> Browse career overviews — role descriptions, required skills, typical education backgrounds, AI impact outlook, and sample workday summaries.</li>
+  <li><strong>Exploitation (Simulation):</strong> Immersive 5-day work week simulations where users virtually shadow a professional through authentic, time-blocked experiences across four selectable duration tiers.</li>
+</ul>
+<p>The MVP targets web and mobile interfaces with simplified name-based authentication and four fully-developed career simulations: Investment Banking Analyst, Management Consultant, Law Associate, and Product Manager.</p>
+
+<div class="info-box">
+  <div class="info-box-title">⭐ V3 Key Changes from V2</div>
+  <ul>
+    <li>Added comprehensive Design System (§7.5) with exact color palette, typography, spacing, and component specs</li>
+    <li>Added Key UI Patterns (§7.6): simulation calendar, time block interaction, mobile nav, empty states, loading states</li>
+    <li>Defined hero section layout and career card grid spec for landing page</li>
+    <li>Specified calendar time block color-coding system by activity type</li>
+    <li>Added responsive breakpoint definitions (§7.4)</li>
+    <li>Updated sample companies — removed Credit Suisse (acquired by UBS 2023)</li>
+    <li>Clarified authentication UX flow</li>
+    <li>Added hover/interactive states for all key components</li>
+  </ul>
+</div>
+
+<!-- 2. PROBLEM STATEMENT -->
+<h2 class="section-title">2. Problem Statement</h2>
+<hr class="section-rule">
+<h3 class="sub-title">2.1 Limited Career Awareness</h3>
+<p>Users rely on fragmented sources — personal networks, Google searches, scattered online platforms — that fail to provide comprehensive visibility into available career paths. Students frequently report not knowing what roles exist, or how roles within the same industry differ meaningfully from one another. This leads to significant opportunity cost: students miss roles that would be strong fits simply due to lack of exposure.</p>
+<h3 class="sub-title">2.2 Superficial Understanding</h3>
+<p>Even when users identify potential career paths, they lack detailed insight into day-to-day realities. Generic job descriptions fail to capture what it actually feels like to perform a role — the cadence, the pressures, the interactions, and the decision-making moments. This gap leads to poor career choices and post-hire dissatisfaction. Career Clear's simulation layer directly addresses this by providing authentic, immersive work experiences before any commitment is made.</p>
+
+<!-- 3. SOLUTION OVERVIEW -->
+<h2 class="section-title">3. Solution Overview</h2>
+<hr class="section-rule">
+<h3 class="sub-title">3.1 Exploration Level</h3>
+<p>A consolidated, searchable platform displaying careers organized by industry and function. Each career card presents: brief role description, required skills, typical educational backgrounds, high-level sample workday, AI impact and growth outlook, and sample companies.</p>
+<h3 class="sub-title">3.2 Exploitation Level (Simulation)</h3>
+<p>Immersive 5-day work week simulations with varying detail based on selected duration tier:</p>
+<table>
+  <tr><th>Duration</th><th>Label</th><th>Description</th></tr>
+  <tr><td>10 minutes</td><td>Key highlights</td><td>Most impactful moments only — 4–6 time blocks</td></tr>
+  <tr><td>30 minutes</td><td>Main activities</td><td>Core activities across the week — 8–12 time blocks</td></tr>
+  <tr><td>2 hours</td><td>Detailed view</td><td>2–3 representative days in moderate detail</td></tr>
+  <tr><td>5 hours</td><td>Full immersion</td><td>Complete 5-day work week — all time blocks</td></tr>
+</table>
+
+<!-- 4. TARGET USERS -->
+<h2 class="section-title">4. Target Users</h2>
+<hr class="section-rule">
+<h3 class="sub-title">4.1 Primary Audience</h3>
+<ul>
+  <li>College students (undergraduate and graduate) actively exploring career paths</li>
+  <li>High school students beginning early career research</li>
+  <li>Young professionals (0–3 years experience) considering career pivots</li>
+</ul>
+<h3 class="sub-title">4.2 User Needs</h3>
+<ul>
+  <li>Comprehensive, consolidated overview of available career options</li>
+  <li>Realistic preview of daily work experiences beyond generic job descriptions</li>
+  <li>Self-assessment tools to evaluate personal role fit</li>
+  <li>Confidence in career decisions before investing significant time or resources</li>
+  <li>A structured way to compare multiple careers over time</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- 5. CORE FEATURES -->
+<h2 class="section-title">5. Core Features &amp; Functionality</h2>
+<hr class="section-rule">
+
+<h3 class="sub-title">5.1 User Authentication</h3>
+<h4 class="sub-sub-title">5.1.1 MVP Approach</h4>
+<p>Simple name-based account creation — no email or password required for V1. On first visit, a centered modal appears prompting the user to enter their name. The modal has a single text input, a teal "Get Started" CTA, and a brief value proposition line ("Track your career exploration journey"). Returning users are recognized via localStorage and taken directly to the landing page.</p>
+<ul>
+  <li>User enters their name to create or access their account</li>
+  <li>Account persists progress, favorites, and simulation completions</li>
+  <li>No password reset, no email verification — intentionally frictionless for MVP</li>
+  <li>Future: migrate to Auth0 or Firebase Auth with email/social login</li>
+</ul>
+
+<h3 class="sub-title">5.2 Landing Page</h3>
+<h4 class="sub-sub-title">5.2.1 Hero Section</h4>
+<p>Full-width hero with a deep navy-to-teal gradient background (<span class="mono">#1a2744 → #2a9d8f</span>). Contains: large serif headline ("Discover Your Future Career"), 2-line subtitle in muted teal, and a primary CTA button ("Take Career Quiz") in teal with white text and a sparkle icon. Hero height: 340px desktop / 280px mobile.</p>
+<h4 class="sub-sub-title">5.2.2 Career Grid</h4>
+<ul>
+  <li>Full-width search bar with placeholder "Search careers..." and magnifier icon</li>
+  <li>Horizontal filter pill row: Industry (Finance, Consulting, Legal, Technology, Marketing, Sales) and Function (Analytical, Client-Facing, Creative, Technical)</li>
+  <li>Results count label ("10 careers found")</li>
+  <li>3-column grid on desktop, 2-column on tablet, 1-column on mobile</li>
+  <li>Each card: white bg, teal top border (4px), icon top-left, heart favorite top-right, title, 2-sentence description, skill tags, industry + Simulation badges, "Explore →" link</li>
+</ul>
+
+<h3 class="sub-title">5.3 Onboarding Questionnaire</h3>
+<p>Typeform-style one-question-at-a-time flow with animated transitions. Maximum 20 questions across: work style preferences, location preferences, industry interests, education level, and skills/strengths. Results displayed as personalized career cards and saved to Dashboard for comparison across retakes.</p>
+
+<h3 class="sub-title">5.4 Career Card — Summary Level</h3>
+<p>Full detail page with: 2–3 paragraph description, required skills list, educational backgrounds (majors + graduate degrees), sample workday overview, AI impact & growth outlook, sample companies (secondary, non-prominent), and prominent "Explore Detailed Simulation →" CTA at bottom.</p>
+
+<h3 class="sub-title">5.5 Simulation Interface</h3>
+<h4 class="sub-sub-title">5.5.1 Overview Section</h4>
+<p>Simulation title (serif headline), scenario context paragraph, and duration selector component above the calendar.</p>
+<h4 class="sub-sub-title">5.5.2 Duration Selector</h4>
+<p>Four equal-width pill buttons. Each pill shows duration (bold) on line 1 and label (muted) on line 2. Selected state: filled navy/teal bg with white text. Selection dynamically updates calendar view.</p>
+<h4 class="sub-sub-title">5.5.3 Weekly Calendar View</h4>
+<ul>
+  <li>5-column grid (Mon–Fri), each column: day name header + "Day N" subtitle</li>
+  <li>Time block cards: colored left-border accent, play icon, time range (muted), activity title (bold)</li>
+  <li>Active block: teal border highlight, "You are here" pill badge</li>
+  <li>Completed blocks: checkmark icon, reduced opacity</li>
+  <li>Hover: shadow elevation + 2px translateY</li>
+  <li>Progress bar above calendar: "X of Y activities completed" + % right-aligned</li>
+</ul>
+<h4 class="sub-sub-title">5.5.4 Time Block Experience</h4>
+<p>Click opens a right-side panel (desktop, 480px wide) or full-screen modal (mobile). Three sections:</p>
+<ul>
+  <li><strong>Before:</strong> context explaining what's about to happen</li>
+  <li><strong>During:</strong> Simulated Work (standard text) + Over-the-Shoulder Commentary (teal-bordered box, italic, "Commentary" badge)</li>
+  <li><strong>After:</strong> summary + transition to next activity</li>
+  <li>Footer: "Mark Complete" CTA + "Next Activity →" link</li>
+</ul>
+
+<h3 class="sub-title">5.6 Feedback &amp; Rating System</h3>
+<p>Post-simulation 1–10 rating modal with anchor labels (1 = "not for me" / 10 = "perfect fit"). Optional text feedback via templates: What I liked, What I didn't like, Questions I still have, How this compares. Each duration tier tracked separately; dashboard shows rating evolution.</p>
+
+<h3 class="sub-title">5.7 User Dashboard</h3>
+<ul>
+  <li><strong>Main view:</strong> completed simulations with ratings, completed duration indicators, favorites</li>
+  <li><strong>Detailed role view:</strong> all ratings, text feedback, timestamps, re-take link</li>
+  <li><strong>Questionnaire tab:</strong> all attempts, recommended roles, retake option</li>
+  <li><strong>Favorites:</strong> "Saved to Try" (not yet simulated) vs. "Actively Pursuing" (post-positive simulation)</li>
+</ul>
+
+<h3 class="sub-title">5.8 Returning User Experience</h3>
+<ul>
+  <li>Land on career exploration page (not dashboard)</li>
+  <li>Career cards show visual "explored" indicators (completed badge or muted overlay)</li>
+  <li>Resume simulation prompt if in-progress simulation exists</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- 6. CONTENT REQUIREMENTS -->
+<h2 class="section-title">6. Content Requirements</h2>
+<hr class="section-rule">
+<h3 class="sub-title">6.1 V1 Career Roles — Fully Developed</h3>
+<table>
+  <tr><th>#</th><th>Role</th><th>Industry</th><th>Function</th></tr>
+  <tr><td>1</td><td>Investment Banking Analyst</td><td>Finance</td><td>Analytical</td></tr>
+  <tr><td>2</td><td>Management Consultant</td><td>Consulting</td><td>Analytical / Client-Facing</td></tr>
+  <tr><td>3</td><td>Law Associate</td><td>Legal</td><td>Analytical / Client-Facing</td></tr>
+  <tr><td>4</td><td>Product Manager</td><td>Technology</td><td>Creative / Analytical</td></tr>
+</table>
+
+<h3 class="sub-title">6.2 Additional Demonstration Roles</h3>
+<p>Complete summary-level content; simplified or placeholder simulation content:</p>
+<ul>
+  <li>Software Engineer</li><li>Marketing Manager</li><li>Financial Analyst</li>
+  <li>Data Scientist</li><li>UX Designer</li><li>Sales Representative</li>
+</ul>
+
+<h3 class="sub-title">6.3 Career Taxonomy</h3>
+<ul>
+  <li><strong>Industry:</strong> Finance, Technology, Legal, Healthcare, Consulting, Marketing, Sales</li>
+  <li><strong>Function:</strong> Analytical, Creative, Client-Facing, Technical</li>
+  <li><strong>Education:</strong> Bachelor's Required, Master's Preferred, JD/MD Required</li>
+</ul>
+
+<h3 class="sub-title">6.4 Simulation Content Generation</h3>
+<h4 class="sub-sub-title">6.4.1 Narrative Text</h4>
+<p>Realistic dialogue and scenarios showing professional interactions, independent work, meetings, and decision-making moments.</p>
+<h4 class="sub-sub-title">6.4.2 Over-the-Shoulder Commentary</h4>
+<p>Visually distinct italicized text block with teal left border and "Commentary" badge label. Should explain what happened, why it matters, insider tips, and skills demonstrated.</p>
+<h4 class="sub-sub-title">6.4.3 Video Content</h4>
+<p>For V1: video player components with clear <span class="mono">[Video content will be uploaded here]</span> placeholders. Founder replaces with final videos post-V1 launch.</p>
+
+<div class="page-break"></div>
+
+<!-- 7. UI REQUIREMENTS -->
+<h2 class="section-title">7. User Interface Requirements</h2>
+<hr class="section-rule">
+
+<h3 class="sub-title">7.1 Platform Requirements</h3>
+<ul>
+  <li>Web-responsive (desktop and tablet)</li>
+  <li>Mobile-responsive (smartphone)</li>
+  <li>Modern, clean, professional design aesthetic</li>
+  <li>WCAG AA accessibility compliance</li>
+  <li>Fast loading — lazy load images and simulation content</li>
+</ul>
+
+<h3 class="sub-title">7.2 Design Principles</h3>
+<ul>
+  <li>Minimalist — every element serves a purpose</li>
+  <li>Clear visual hierarchy — serif display headlines, clean sans-serif body</li>
+  <li>Consistent color and type system applied uniformly</li>
+  <li>Confidence-inspiring — design should feel professional and trustworthy to a college student</li>
+</ul>
+
+<h3 class="sub-title">7.3 Navigation Structure</h3>
+<ul>
+  <li>Logo (left): "C" circle icon + "Career Clear" wordmark</li>
+  <li>Center: Explore Careers | Questionnaire | My Dashboard</li>
+  <li>Right: "Hi, [Name]" + Sign Out</li>
+  <li>Sticky; on scroll: subtle shadow appears</li>
+  <li>Mobile: hamburger → full-width drawer</li>
+</ul>
+
+<h3 class="sub-title">7.4 Responsive Breakpoints</h3>
+<table>
+  <tr><th>Breakpoint</th><th>Width</th><th>Layout Changes</th></tr>
+  <tr><td>Desktop</td><td>≥ 1024px</td><td>3-col career grid, side panel for time blocks, full 5-col calendar</td></tr>
+  <tr><td>Tablet</td><td>768px–1023px</td><td>2-col career grid, modal for time blocks, 5-col calendar (scrollable)</td></tr>
+  <tr><td>Mobile</td><td>&lt; 768px</td><td>1-col grid, full-screen modal, day-tab switcher for calendar</td></tr>
+</table>
+
+<h3 class="sub-title">7.5 Design System <span class="badge badge-teal" style="font-size:11px; vertical-align:middle;">New in v3</span></h3>
+
+<h4 class="sub-sub-title">7.5.1 Color Palette</h4>
+<div class="swatches">
+  <div class="swatch"><div class="swatch-color" style="background:#1a2744;"></div><div class="swatch-name">Navy</div><div class="swatch-hex">#1a2744</div></div>
+  <div class="swatch"><div class="swatch-color" style="background:#2a9d8f;"></div><div class="swatch-name">Teal</div><div class="swatch-hex">#2a9d8f</div></div>
+  <div class="swatch"><div class="swatch-color" style="background:#3db89a;"></div><div class="swatch-name">Teal Lt</div><div class="swatch-hex">#3db89a</div></div>
+  <div class="swatch"><div class="swatch-color" style="background:#f8f6f1; border:1px solid #e5e7eb;"></div><div class="swatch-name">Cream</div><div class="swatch-hex">#f8f6f1</div></div>
+  <div class="swatch"><div class="swatch-color" style="background:#111827;"></div><div class="swatch-name">Dark</div><div class="swatch-hex">#111827</div></div>
+  <div class="swatch"><div class="swatch-color" style="background:#6b7280;"></div><div class="swatch-name">Muted</div><div class="swatch-hex">#6b7280</div></div>
+  <div class="swatch"><div class="swatch-color" style="background:#e5e7eb; border:1px solid #d1d5db;"></div><div class="swatch-name">Border</div><div class="swatch-hex">#e5e7eb</div></div>
+  <div class="swatch"><div class="swatch-color" style="background:#d4a017;"></div><div class="swatch-name">Gold</div><div class="swatch-hex">#d4a017</div></div>
+</div>
+<table>
+  <tr><th>Token</th><th>Hex</th><th>Usage</th></tr>
+  <tr><td>--color-navy</td><td><span class="mono">#1a2744</span></td><td>Hero background, nav, table headers, h1 text</td></tr>
+  <tr><td>--color-teal</td><td><span class="mono">#2a9d8f</span></td><td>Primary CTAs, links, active states, left border accents</td></tr>
+  <tr><td>--color-teal-light</td><td><span class="mono">#3db89a</span></td><td>Hero gradient end, hover states, tag fills</td></tr>
+  <tr><td>--color-cream</td><td><span class="mono">#f8f6f1</span></td><td>Main page background, alternating table rows</td></tr>
+  <tr><td>--color-dark-text</td><td><span class="mono">#111827</span></td><td>All primary body text, card titles</td></tr>
+  <tr><td>--color-muted</td><td><span class="mono">#6b7280</span></td><td>Secondary text, timestamps, subtitles, placeholders</td></tr>
+  <tr><td>--color-border</td><td><span class="mono">#e5e7eb</span></td><td>Card borders, dividers, input borders</td></tr>
+  <tr><td>--color-gold</td><td><span class="mono">#d4a017</span></td><td>Time block left-border accent for team/sync activities</td></tr>
+  <tr><td>--color-white</td><td><span class="mono">#ffffff</span></td><td>Card backgrounds, button text on filled backgrounds</td></tr>
+  <tr><td>--color-tag-bg</td><td><span class="mono">#e6f4f2</span></td><td>Skill tag background (light teal fill)</td></tr>
+</table>
+
+<h4 class="sub-sub-title">7.5.2 Typography</h4>
+<table>
+  <tr><th>Element</th><th>Font</th><th>Size</th><th>Weight</th><th>Color</th></tr>
+  <tr><td>Hero Headline</td><td>Playfair Display</td><td>40px</td><td>Bold</td><td>White</td></tr>
+  <tr><td>Section H1</td><td>Playfair Display</td><td>32px</td><td>Bold</td><td>Navy</td></tr>
+  <tr><td>Subheading H2</td><td>Inter</td><td>20px</td><td>SemiBold</td><td>Navy</td></tr>
+  <tr><td>Card Title</td><td>Inter</td><td>16px</td><td>Bold</td><td>Dark</td></tr>
+  <tr><td>Body Text</td><td>Inter</td><td>15px</td><td>Regular</td><td>Dark</td></tr>
+  <tr><td>Secondary/Caption</td><td>Inter</td><td>13px</td><td>Regular</td><td>Muted</td></tr>
+  <tr><td>Nav Links</td><td>Inter</td><td>14px</td><td>Medium</td><td>Dark</td></tr>
+  <tr><td>Button Text</td><td>Inter</td><td>14px</td><td>SemiBold</td><td>White/Teal</td></tr>
+  <tr><td>Tag / Badge</td><td>Inter</td><td>12px</td><td>Medium</td><td>Teal/White</td></tr>
+  <tr><td>Mono / Code</td><td>JetBrains Mono</td><td>13px</td><td>Regular</td><td>Dark</td></tr>
+</table>
+
+<h4 class="sub-sub-title">7.5.3 Spacing System (Base unit: 4px)</h4>
+<table>
+  <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+  <tr><td>space-1</td><td>4px</td><td>Micro gaps, icon padding</td></tr>
+  <tr><td>space-2</td><td>8px</td><td>Inner element spacing</td></tr>
+  <tr><td>space-4</td><td>16px</td><td>Standard padding, card inner padding</td></tr>
+  <tr><td>space-6</td><td>24px</td><td>Section spacing, card gaps</td></tr>
+  <tr><td>space-8</td><td>32px</td><td>Large section gaps</td></tr>
+  <tr><td>space-12</td><td>48px</td><td>Hero internal padding</td></tr>
+  <tr><td>space-16</td><td>64px</td><td>Between major page sections</td></tr>
+</table>
+
+<h4 class="sub-sub-title">7.5.4 Border Radius</h4>
+<ul>
+  <li>Cards: <span class="mono">12px</span> (rounded-xl)</li>
+  <li>Buttons: <span class="mono">8px</span> (rounded-lg)</li>
+  <li>Pill tags/badges: <span class="mono">9999px</span> (fully rounded)</li>
+  <li>Input fields: <span class="mono">8px</span></li>
+  <li>Modal/Panel: <span class="mono">16px</span> (top corners only for mobile bottom-sheet)</li>
+</ul>
+
+<h4 class="sub-sub-title">7.5.5 Shadows &amp; Elevation</h4>
+<ul>
+  <li>Cards (default): <span class="mono">0 1px 3px rgba(0,0,0,0.08)</span></li>
+  <li>Cards (hover): <span class="mono">0 4px 16px rgba(0,0,0,0.12)</span> + <span class="mono">translateY(-2px)</span></li>
+  <li>Modal/Panel: <span class="mono">0 20px 60px rgba(0,0,0,0.20)</span></li>
+  <li>Nav (on scroll): <span class="mono">0 2px 8px rgba(0,0,0,0.08)</span></li>
+</ul>
+
+<div class="page-break"></div>
+
+<h3 class="sub-title">7.6 Key UI Patterns &amp; Component Specs <span class="badge badge-teal" style="font-size:11px; vertical-align:middle;">New in v3</span></h3>
+
+<h4 class="sub-sub-title">7.6.1 Career Card Component</h4>
+<p>White card, 12px border radius, 1px <span class="mono">#e5e7eb</span> border, 4px teal top accent border, 20px internal padding.</p>
+<ul>
+  <li>Top row: emoji/icon (32px) left-aligned, heart favorite icon right-aligned</li>
+  <li>Title: 16px bold Inter, #111827, margin-top 12px</li>
+  <li>Description: 14px regular, #6b7280, 2–3 lines</li>
+  <li>Skill tags: teal filled pills (#2a9d8f bg, white text, 12px), flex-wrap</li>
+  <li>Bottom row: industry badge (outline pill) + Simulation badge (teal filled) left / "Explore →" right</li>
+  <li>Hover: shadow elevation + translateY(-2px), 200ms ease</li>
+  <li>Completed state: teal checkmark badge top-right, slightly muted card</li>
+</ul>
+
+<h4 class="sub-sub-title">7.6.2 Simulation Calendar — Time Block Color System</h4>
+<table>
+  <tr><th>Color</th><th>Hex</th><th>Activity Type</th></tr>
+  <tr><td>Teal</td><td><span class="mono">#2a9d8f</span></td><td>Meetings and client interactions</td></tr>
+  <tr><td>Navy Blue</td><td><span class="mono">#1a2744</span></td><td>Focused independent work (modeling, writing, research)</td></tr>
+  <tr><td>Gold / Amber</td><td><span class="mono">#d4a017</span></td><td>Internal team activities, syncs, retrospectives</td></tr>
+  <tr><td>Green</td><td><span class="mono">#22c55e</span></td><td>Presentations and high-stakes deliverables</td></tr>
+  <tr><td>Purple</td><td><span class="mono">#8b5cf6</span></td><td>Learning, training, or personal development</td></tr>
+</table>
+
+<h4 class="sub-sub-title">7.6.3 Time Block Panel — Desktop (Right Slide-In)</h4>
+<ul>
+  <li>Width: 480px, fixed right, full viewport height, z-index above calendar</li>
+  <li>Backdrop: semi-transparent overlay on calendar (<span class="mono">rgba(0,0,0,0.3)</span>)</li>
+  <li>Header: activity title + time range + close (×) button</li>
+  <li>Scrollable content area with Before / During / After sections, separated by subtle dividers</li>
+  <li>Commentary block: teal left border (3px), light teal bg (#e6f4f2), "Commentary" badge, italic text</li>
+  <li>Footer: "Mark Complete" teal CTA + "Next Activity →" text link</li>
+  <li>Animation: slides in from right (300ms ease-out)</li>
+</ul>
+
+<h4 class="sub-sub-title">7.6.4 Mobile Calendar — Day Tab Switcher</h4>
+<ul>
+  <li>5 tabs at top: Mon / Tue / Wed / Thu / Fri</li>
+  <li>Active tab: teal underline, bold text</li>
+  <li>One column of time blocks shown at a time</li>
+  <li>Swipe gesture support between days</li>
+  <li>Time block click → full-screen modal (bottom-sheet style, slides up)</li>
+</ul>
+
+<h4 class="sub-sub-title">7.6.5 Duration Selector Component</h4>
+<ul>
+  <li>4 equal-width pill buttons in a horizontal row</li>
+  <li>Each pill: duration (bold, 14px) on line 1, label (12px muted) on line 2</li>
+  <li>Selected: navy background, white text, teal border</li>
+  <li>Unselected: white background, dark text, #e5e7eb border</li>
+  <li>Transition: 150ms ease for bg/color change on selection</li>
+</ul>
+
+<h4 class="sub-sub-title">7.6.6 Empty States</h4>
+<ul>
+  <li>No simulations completed: centered illustration + "Start your first simulation" + teal CTA</li>
+  <li>No search results: "No careers match your search" + "Clear filters" link</li>
+  <li>No favorites: "Save careers you're interested in" + heart icon illustration</li>
+  <li>No questionnaire: "Discover careers matched to you" + "Take Quiz" CTA</li>
+</ul>
+
+<h4 class="sub-sub-title">7.6.7 Loading States (Skeleton Screens)</h4>
+<ul>
+  <li>Career grid: skeleton cards matching card dimensions, grey shimmer animation</li>
+  <li>Simulation calendar: skeleton column blocks with shimmer</li>
+  <li>Time block panel: skeleton text lines with shimmer</li>
+  <li>CSS shimmer: <span class="mono">background-position</span> transition on gradient</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- 8. TECHNICAL ARCHITECTURE -->
+<h2 class="section-title">8. Technical Architecture</h2>
+<hr class="section-rule">
+<h3 class="sub-title">8.1 Technology Stack</h3>
+<table>
+  <tr><th>Layer</th><th>Recommended</th><th>Notes</th></tr>
+  <tr><td>Frontend</td><td>Next.js 14 (App Router)</td><td>React-based, SSR, excellent DX</td></tr>
+  <tr><td>Styling</td><td>Tailwind CSS</td><td>Utility-first, maps to design tokens</td></tr>
+  <tr><td>Fonts</td><td>Playfair Display + Inter (Google Fonts)</td><td>Matches approved typography spec</td></tr>
+  <tr><td>Icons</td><td>Lucide React</td><td>Clean, consistent icon library</td></tr>
+  <tr><td>Animations</td><td>Framer Motion</td><td>Panel slides, card hovers, transitions</td></tr>
+  <tr><td>Backend</td><td>Node.js + Express or Python + FastAPI</td><td>Node preferred for JS-first team</td></tr>
+  <tr><td>Database</td><td>PostgreSQL</td><td>Structured relational data; Prisma ORM recommended</td></tr>
+  <tr><td>Media Storage</td><td>AWS S3 or Cloudinary</td><td>Video placeholders + eventual real content</td></tr>
+  <tr><td>Auth (MVP)</td><td>localStorage / session-based</td><td>Name-only; migrate to Auth0 post-MVP</td></tr>
+  <tr><td>Deployment</td><td>Vercel (frontend) + Railway (backend)</td><td>Fast setup, free tiers available</td></tr>
+</table>
+
+<h3 class="sub-title">8.2 Data Models</h3>
+<h4 class="sub-sub-title">User</h4>
+<p><span class="mono">user_id</span> · <span class="mono">name</span> · <span class="mono">created_at</span> · <span class="mono">last_login</span></p>
+<h4 class="sub-sub-title">Career</h4>
+<p><span class="mono">career_id</span> · <span class="mono">title</span> · <span class="mono">brief_description</span> · <span class="mono">detailed_description</span> · <span class="mono">skills[]</span> · <span class="mono">typical_majors[]</span> · <span class="mono">graduate_degrees[]</span> · <span class="mono">sample_workday_overview</span> · <span class="mono">ai_impact_summary</span> · <span class="mono">growth_outlook</span> · <span class="mono">sample_companies[]</span> · <span class="mono">industry_category</span> · <span class="mono">function_category</span></p>
+<h4 class="sub-sub-title">Simulation</h4>
+<p><span class="mono">simulation_id</span> · <span class="mono">career_id (FK)</span> · <span class="mono">project_context</span> · <span class="mono">detailed_role_description</span></p>
+<h4 class="sub-sub-title">TimeBlock</h4>
+<p><span class="mono">timeblock_id</span> · <span class="mono">simulation_id (FK)</span> · <span class="mono">day_number (1–5)</span> · <span class="mono">start_time</span> · <span class="mono">end_time</span> · <span class="mono">activity_title</span> · <span class="mono">activity_type</span> (for color system) · <span class="mono">before_context</span> · <span class="mono">during_content</span> · <span class="mono">during_commentary</span> · <span class="mono">video_url?</span> · <span class="mono">image_urls[]?</span> · <span class="mono">after_context</span> · <span class="mono">duration_tiers[]</span></p>
+<h4 class="sub-sub-title">UserProgress</h4>
+<p><span class="mono">progress_id</span> · <span class="mono">user_id (FK)</span> · <span class="mono">simulation_id (FK)</span> · <span class="mono">duration_type</span> · <span class="mono">current_day</span> · <span class="mono">current_timeblock_id</span> · <span class="mono">completed_blocks[]</span> · <span class="mono">is_completed</span> · <span class="mono">completed_at</span></p>
+<h4 class="sub-sub-title">Rating</h4>
+<p><span class="mono">rating_id</span> · <span class="mono">user_id (FK)</span> · <span class="mono">career_id (FK)</span> · <span class="mono">simulation_id (FK)</span> · <span class="mono">duration_type</span> · <span class="mono">score (1–10)</span> · <span class="mono">text_feedback_liked?</span> · <span class="mono">text_feedback_disliked?</span> · <span class="mono">text_feedback_questions?</span> · <span class="mono">text_feedback_comparison?</span> · <span class="mono">created_at</span></p>
+<h4 class="sub-sub-title">Favorite</h4>
+<p><span class="mono">favorite_id</span> · <span class="mono">user_id (FK)</span> · <span class="mono">career_id (FK)</span> · <span class="mono">favorite_type ('saved_to_try' | 'actively_pursuing')</span> · <span class="mono">created_at</span></p>
+<h4 class="sub-sub-title">Questionnaire / QuestionnaireResponse</h4>
+<p><span class="mono">questionnaire_id</span> · <span class="mono">version_number</span> · <span class="mono">questions (JSON)</span> — / — <span class="mono">response_id</span> · <span class="mono">user_id (FK)</span> · <span class="mono">questionnaire_id (FK)</span> · <span class="mono">answers (JSON)</span> · <span class="mono">recommended_careers[]</span> · <span class="mono">completed_at</span></p>
+
+<h3 class="sub-title">8.3 API Endpoints</h3>
+<h4 class="sub-sub-title">Authentication</h4>
+<span class="endpoint">POST /api/auth/login — Simple name-based login</span>
+<span class="endpoint">GET  /api/auth/session — Check current session</span>
+<h4 class="sub-sub-title">Careers</h4>
+<span class="endpoint">GET  /api/careers — List all careers with filters</span>
+<span class="endpoint">GET  /api/careers/:id — Get single career details</span>
+<span class="endpoint">GET  /api/careers/search?q={query} — Search careers</span>
+<h4 class="sub-sub-title">Simulations</h4>
+<span class="endpoint">GET  /api/simulations/:career_id — Get simulation for career</span>
+<span class="endpoint">GET  /api/simulations/:id/timeblocks?duration={type} — Get timeblocks for duration tier</span>
+<span class="endpoint">GET  /api/timeblocks/:id — Get specific timeblock content</span>
+<h4 class="sub-sub-title">User Progress</h4>
+<span class="endpoint">GET  /api/users/:user_id/progress — Get all user progress</span>
+<span class="endpoint">POST /api/users/:user_id/progress — Save progress</span>
+<span class="endpoint">PUT  /api/users/:user_id/progress/:progress_id — Update progress</span>
+<h4 class="sub-sub-title">Ratings &amp; Feedback</h4>
+<span class="endpoint">POST /api/ratings — Submit rating and feedback</span>
+<span class="endpoint">GET  /api/users/:user_id/ratings — Get all user ratings</span>
+<span class="endpoint">GET  /api/users/:user_id/ratings/:career_id — Get ratings for specific career</span>
+<h4 class="sub-sub-title">Favorites</h4>
+<span class="endpoint">POST   /api/users/:user_id/favorites — Add favorite</span>
+<span class="endpoint">DELETE /api/users/:user_id/favorites/:favorite_id — Remove favorite</span>
+<span class="endpoint">GET    /api/users/:user_id/favorites — Get all favorites</span>
+<h4 class="sub-sub-title">Questionnaire</h4>
+<span class="endpoint">GET  /api/questionnaire — Get current questionnaire</span>
+<span class="endpoint">POST /api/questionnaire/submit — Submit responses</span>
+<span class="endpoint">GET  /api/users/:user_id/questionnaire-history — Get all responses</span>
+
+<div class="page-break"></div>
+
+<!-- 9. SUCCESS METRICS -->
+<h2 class="section-title">9. Success Metrics</h2>
+<hr class="section-rule">
+<h3 class="sub-title">9.1 Primary Metrics</h3>
+<ul>
+  <li>Simulation completion rate (% completing at least one simulation)</li>
+  <li>Average rating score across all simulations</li>
+  <li>Number of simulations completed per user</li>
+  <li>% of users who favorite at least one role as "Actively Pursuing"</li>
+</ul>
+<h3 class="sub-title">9.2 Engagement Metrics</h3>
+<ul>
+  <li>Time spent in simulations</li>
+  <li>Number of different duration tiers completed per role</li>
+  <li>Questionnaire completion rate</li>
+  <li>Return user rate (users who log in more than once)</li>
+</ul>
+<h3 class="sub-title">9.3 Quality Metrics</h3>
+<ul>
+  <li>Text feedback completion rate</li>
+  <li>Rating evolution as users complete longer simulations</li>
+  <li>Career exploration breadth (number of different careers viewed per user)</li>
+</ul>
+
+<!-- 10. FUTURE ENHANCEMENTS -->
+<h2 class="section-title">10. Future Enhancements (Post-V1)</h2>
+<hr class="section-rule">
+<ul>
+  <li>Robust authentication (email/password, social login via Auth0 or Firebase)</li>
+  <li>Expanded career library (50+ roles)</li>
+  <li>User-generated content from working professionals</li>
+  <li>AI-powered recommendation engine based on user behavior</li>
+  <li>Career comparison tool (side-by-side role analysis)</li>
+  <li>Social features (share experiences, discussion forums)</li>
+  <li>Integration with job boards and recruiting platforms</li>
+  <li>Advanced analytics dashboard for users</li>
+  <li>Native mobile apps (iOS and Android)</li>
+  <li>Mentor matching feature</li>
+  <li>University career center B2B portal and admin dashboard</li>
+</ul>
+
+<!-- 11. DEVELOPMENT APPROACH -->
+<h2 class="section-title">11. Development Approach for V1</h2>
+<hr class="section-rule">
+<table>
+  <tr><th>Phase</th><th>Name</th><th>Key Deliverables</th></tr>
+  <tr><td>Phase 1</td><td>Core Infrastructure</td><td>Project setup, name-based auth, database schema, basic API endpoints</td></tr>
+  <tr><td>Phase 2</td><td>Career Exploration</td><td>Hero + career grid, search/filter, career detail pages, content for 4 core + 6 demo roles</td></tr>
+  <tr><td>Phase 3</td><td>Questionnaire</td><td>Typeform-style flow, recommendation algorithm, results display</td></tr>
+  <tr><td>Phase 4</td><td>Simulation Interface</td><td>5-col calendar, time block panel, duration selector, progress bar</td></tr>
+  <tr><td>Phase 5</td><td>Simulation Content</td><td>AI-generated narrative for 4 core roles, all 5 days, duration filtering, video placeholders</td></tr>
+  <tr><td>Phase 6</td><td>Feedback &amp; Dashboard</td><td>Rating modal, text feedback, user dashboard, favorites system</td></tr>
+  <tr><td>Phase 7</td><td>Polish &amp; Testing</td><td>Empty/loading states, mobile audit, WCAG review, performance optimization, QA</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- 12. APPENDIX -->
+<h2 class="section-title">12. Appendix</h2>
+<hr class="section-rule">
+<h3 class="sub-title">12.1 Sample Career Card Content — Investment Banking Analyst</h3>
+<h4 class="sub-sub-title">Brief Description</h4>
+<p>Investment Banking Analysts support senior bankers in executing financial transactions including mergers and acquisitions, initial public offerings, and debt/equity raises. The role involves extensive financial modeling, research, and creation of presentation materials for clients.</p>
+<h4 class="sub-sub-title">Required Skills</h4>
+<ul>
+  <li>Advanced Excel and financial modeling</li>
+  <li>PowerPoint and presentation creation</li>
+  <li>Attention to detail and accuracy</li>
+  <li>Strong analytical thinking</li>
+  <li>Ability to work under pressure and tight deadlines</li>
+  <li>Communication and interpersonal skills</li>
+</ul>
+<h4 class="sub-sub-title">Educational Backgrounds</h4>
+<p><strong>Common Majors:</strong> Finance, Economics, Accounting, Business Administration, Mathematics</p>
+<p><strong>Graduate Degrees:</strong> MBA (not required for analyst positions)</p>
+<h4 class="sub-sub-title">Sample Companies</h4>
+<p>Goldman Sachs, Morgan Stanley, J.P. Morgan, Bank of America, Citigroup, UBS, Deutsche Bank, Barclays, Lazard, Evercore, Jefferies, Houlihan Lokey</p>
+
+<h3 class="sub-title">12.2 Sample Time Block — Investment Banking</h3>
+<p><strong>Monday, 10:00 AM – 12:00 PM: Client Pitch Preparation</strong></p>
+<h4 class="sub-sub-title">Before Activity Context</h4>
+<p>You're working on a pitch book for a potential M&A advisory engagement. The client is a mid-sized retail company considering acquiring a smaller competitor. The Vice President asked you to refine the financial analysis and update valuation models based on the latest comparable transactions. The pitch meeting is tomorrow afternoon.</p>
+<h4 class="sub-sub-title">During Activity — Simulated Work</h4>
+<p><em>[Scene: Analyst working at desk with dual monitors showing Excel and PowerPoint]</em></p>
+<p>Analyst (internal monologue): "Need to update the comparable company analysis with last night's earnings releases. Two of our comps reported, which could shift the valuation multiples."</p>
+<p><em>[Phone rings — VP calling]</em></p>
+<p>VP: "Hey, quick question on the pitch deck. Can you walk me through the synergy assumptions on slide 15? The MD wants to make sure we're being conservative."</p>
+<p>Analyst: "Sure. I assumed 15% cost synergies based on the overlap in their distribution networks and back-office functions. I cross-referenced this with the three most recent retail M&A transactions, which averaged between 12–18%."</p>
+<p>VP: "Good. Can you also add a sensitivity table showing how the valuation changes if synergies come in at 10% or 20%? Client will want to see the range."</p>
+<p>Analyst: "Absolutely. I'll have that to you by end of day."</p>
+
+<div class="commentary-box">
+  <div class="commentary-label">Commentary</div>
+  <p>What just happened: The VP is quality-checking the analysis before it goes to the MD and ultimately to the client. This is typical — every assumption needs to be defensible and benchmarked against real market data. The sensitivity analysis request is standard practice to show clients multiple scenarios.</p>
+  <p>Key skills in action: You need to be able to quickly explain your work, defend your assumptions with data, and adapt to feedback in real-time. Building credibility with senior bankers requires being thorough and responsive.</p>
+</div>
+
+<h4 class="sub-sub-title">After Activity Context</h4>
+<p>You spend the rest of the morning updating the Excel model with the sensitivity analysis and refreshing the PowerPoint slides. The updated deck needs review by the VP by 6 PM. Next: a team lunch meeting to discuss the broader pitch strategy and prepare for potential client questions.</p>
+
+<h3 class="sub-title">12.3 Glossary</h3>
+<table>
+  <tr><th>Term</th><th>Definition</th></tr>
+  <tr><td>MVP</td><td>Minimum Viable Product — initial version with core features only</td></tr>
+  <tr><td>Time Block</td><td>A segment of time in the simulation representing a specific work activity</td></tr>
+  <tr><td>Over-the-Shoulder</td><td>Explanatory narrative from the professional to the user, distinct from simulated dialogue</td></tr>
+  <tr><td>Duration Tier</td><td>One of four simulation lengths: 10-min, 30-min, 2-hour, or 5-hour</td></tr>
+  <tr><td>Exploration Level</td><td>The browsing phase where users review career overviews</td></tr>
+  <tr><td>Exploitation Level</td><td>The deep-dive phase where users experience immersive simulations</td></tr>
+  <tr><td>Simulated Work</td><td>Realistic dialogue and actions between the professional and colleagues/clients</td></tr>
+  <tr><td>Activity Type</td><td>Classification of a time block (meeting, solo work, presentation, etc.) used for color-coding</td></tr>
+  <tr><td>Saved to Try</td><td>A favorited role that has not yet been simulated</td></tr>
+  <tr><td>Actively Pursuing</td><td>A favorited role after a positive simulation experience</td></tr>
+</table>
+
+<h3 class="sub-title">12.4 Version History</h3>
+<table>
+  <tr><th>Version</th><th>Date</th><th>Author</th><th>Changes</th></tr>
+  <tr><td>1.0</td><td>Feb 2026</td><td>Product Team</td><td>Initial specification document</td></tr>
+  <tr><td>2.0</td><td>Feb 2026</td><td>Collin / Claude</td><td>Full data models, API endpoints, phased dev plan, simulation content guidelines</td></tr>
+  <tr><td>3.0</td><td>Mar 2026</td><td>Collin / Claude</td><td>Added Design System (§7.5), UI Patterns (§7.6), responsive breakpoints (§7.4), calendar color-coding, component interaction specs, loading/empty states, auth UX flow, updated sample companies</td></tr>
+</table>
+
+<div style="margin-top: 48px; text-align: center; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); padding-top: 20px;">
+  — End of Document — &nbsp;|&nbsp; Career Clear Product Specification v3.0 &nbsp;|&nbsp; March 2026
+</div>
+
+</div><!-- end .page -->
+</body>
+</html>

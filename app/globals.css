@@ -2,26 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── §7.5.1 CSS Custom Properties ─────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color palette */
+  --color-navy:       #1a2744;
+  --color-teal:       #2a9d8f;
+  --color-teal-light: #3db89a;
+  --color-cream:      #f8f6f1;
+  --color-dark-text:  #111827;
+  --color-dark:       #111827;
+  --color-muted:      #6b7280;
+  --color-border:     #e5e7eb;
+  --color-gold:       #d4a017;
+  --color-white:      #ffffff;
+  --color-tag-bg:     #e6f4f2;
+
+  /* Time block color coding (§7.6.2) */
+  --color-block-teal:   #2a9d8f;
+  --color-block-navy:   #1a2744;
+  --color-block-gold:   #d4a017;
+  --color-block-green:  #22c55e;
+  --color-block-purple: #8b5cf6;
+
+  /* Shadows (§7.5.5) */
+  --shadow-card:       0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-panel:      0 20px 60px rgba(0, 0, 0, 0.20);
+  --shadow-nav:        0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Base Styles ────────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-inter), system-ui, sans-serif;
+    background-color: var(--color-cream);
+    color: var(--color-dark-text);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Default heading hierarchy matching §7.5.2 */
+  h1, h2 {
+    font-family: var(--font-playfair), Georgia, serif;
+    color: var(--color-navy);
+  }
+
+  h3, h4, h5, h6 {
+    font-family: var(--font-inter), system-ui, sans-serif;
+    color: var(--color-navy);
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Shimmer animation for skeleton screens (§7.6.7) ───────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 50%,
+    #e5e7eb 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
 }
+
+/* ── Scrollbar styling (subtle) ─────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--color-border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
