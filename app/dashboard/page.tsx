@@ -346,7 +346,7 @@ function AttemptCard({ attempt, attemptNumber }: { attempt: QuizAttempt; attempt
           Recommended Careers
         </p>
         <div className="flex flex-wrap gap-2">
-          {topResults.map((result, i) => {
+          {topResults.map((result, _i) => {
             const career = CAREERS.find((c) => c.id === result.careerId)
             if (!career) return null
             return (
