@@ -27,7 +27,7 @@ export default function HeroSection() {
         {/* §7.5.2: Hero Headline — Playfair Display, 40px, Bold, White */}
         {/* Responsive: 32px on mobile, 40px on md+ to fit the reduced height */}
         <h1 className="font-serif text-[32px] md:text-[40px] font-bold text-white leading-tight mb-4">
-          Discover Your Future Career
+          Discover Your Future Career Today
         </h1>
 
         {/* §5.2.1: 2-line subtitle in muted teal */}
