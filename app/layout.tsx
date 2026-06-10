@@ -4,7 +4,6 @@ import { JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth'
 import Navbar from '@/components/Navbar'
-import AuthModal from '@/components/AuthModal'
 
 // ── §7.5.2 Google Fonts via next/font/google ─────────────────────────────────
 // Decision: using next/font/google rather than a raw <link> CDN tag.
@@ -50,8 +49,7 @@ export default function RootLayout({
     >
       <body className="font-sans bg-cream text-dark antialiased">
         <AuthProvider>
-          {/* AuthModal gates access until name is entered (§5.1) */}
-          <AuthModal />
+          {/* Identity is requested only at simulation entry (SimulationClient) */}
           {/* Sticky nav renders above all page content (§7.3) */}
           <Navbar />
           <main>{children}</main>

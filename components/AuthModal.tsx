@@ -1,11 +1,21 @@
 'use client'
 
 import { useState, useEffect, FormEvent } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
-export default function AuthModal() {
+interface AuthModalProps {
+  /**
+   * Where the "Go back" escape link leads (e.g. the career detail page).
+   * The modal is mounted on demand — currently only by the simulation
+   * screen, the one place progress tracking needs an identity.
+   */
+  backHref: string
+}
+
+export default function AuthModal({ backHref }: AuthModalProps) {
   const { userName, isLoading, login } = useAuth()
   const [name, setName] = useState('')
   const [error, setError] = useState('')
@@ -118,6 +128,18 @@ export default function AuthModal() {
 
           <p className="mt-4 text-center text-[12px] text-muted">
             No account required — your progress saves automatically.
+          </p>
+
+          {/* Escape hatch — visitors who don't want to give a name yet */}
+          <p className="mt-3 text-center">
+            <Link
+              href={backHref}
+              className="inline-flex items-center gap-1.5 font-sans text-[13px] font-medium
+                text-muted hover:text-dark transition-colors duration-150"
+            >
+              <ArrowLeft size={14} />
+              Go back
+            </Link>
           </p>
         </motion.div>
       </motion.div>

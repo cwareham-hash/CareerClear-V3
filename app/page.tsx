@@ -1,13 +1,21 @@
-// Server component — HeroSection is server, CareerGrid is client.
-// App Router handles the boundary automatically.
-import HeroSection from '@/components/HeroSection'
-import CareerGrid from '@/components/CareerGrid'
+// Landing page — public marketing page, zero friction (no auth gate).
+// The career grid experience lives at /explore.
+import LandingHero from '@/components/landing/LandingHero'
+import ProblemSection from '@/components/landing/ProblemSection'
+import HowItWorks from '@/components/landing/HowItWorks'
+import DifferentiationStrip from '@/components/landing/DifferentiationStrip'
+import FinalCTA from '@/components/landing/FinalCTA'
+import SiteFooter from '@/components/landing/SiteFooter'
 
 export default function HomePage() {
   return (
     <>
-      <HeroSection />
-      <CareerGrid />
+      <LandingHero />
+      <ProblemSection />
+      <HowItWorks />
+      <DifferentiationStrip />
+      <FinalCTA />
+      <SiteFooter />
     </>
   )
 }

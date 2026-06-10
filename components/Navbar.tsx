@@ -8,8 +8,9 @@ import { Menu, X, LogOut } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 
 const NAV_LINKS = [
-  { href: '/',          label: 'Explore Careers' },
-  { href: '/dashboard', label: 'My Dashboard'    },
+  { href: '/explore',       label: 'Explore Careers' },
+  { href: '/questionnaire', label: 'Career Quiz'     },
+  { href: '/dashboard',     label: 'My Dashboard'    },
 ]
 
 export default function Navbar() {

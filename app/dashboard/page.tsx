@@ -523,7 +523,7 @@ export default function DashboardPage() {
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
-                  href="/"
+                  href="/explore"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
                     font-sans font-semibold text-[14px] text-white transition-colors duration-150"
                   style={{ backgroundColor: 'var(--color-teal)' }}
@@ -576,7 +576,7 @@ export default function DashboardPage() {
                 Start a simulation to track your progress and feedback here.
               </p>
               <Link
-                href="/"
+                href="/explore"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
                   font-sans font-semibold text-[14px] text-white transition-colors duration-150"
                 style={{ backgroundColor: 'var(--color-teal)' }}
@@ -623,7 +623,7 @@ export default function DashboardPage() {
                 Heart a career to save it!
               </p>
               <Link
-                href="/"
+                href="/explore"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
                   font-sans font-semibold text-[14px] text-white transition-colors duration-150"
                 style={{ backgroundColor: 'var(--color-teal)' }}

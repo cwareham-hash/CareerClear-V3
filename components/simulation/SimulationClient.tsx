@@ -5,6 +5,7 @@ import { type Simulation, type TimeBlock, type DurationOption } from '@/lib/simu
 import { CAREERS } from '@/lib/careers'
 import { useAuth } from '@/lib/auth'
 import { useFavorites } from '@/lib/useFavorites'
+import AuthModal from '@/components/AuthModal'
 import { saveRating, type SimulationFeedback } from '@/lib/userProgress'
 import DurationSelector from './DurationSelector'
 import SimulationCalendar from './SimulationCalendar'
@@ -20,7 +21,7 @@ const STORAGE_KEY = (careerId: string) => `cc_sim_${careerId}_completed`
 
 export default function SimulationClient({ simulation }: Props) {
   const { careerId, title, scenario, project, timeBlocks } = simulation
-  const { userName } = useAuth()
+  const { userName, isLoading: authLoading } = useAuth()
   const { isFavorite, upgradeToActively } = useFavorites()
 
   // Career metadata for rating modal
@@ -160,6 +161,12 @@ export default function SimulationClient({ simulation }: Props) {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-cream">
+      {/* Identity gate — progress tracking needs a name; browsing never does.
+          Appears only here, when an anonymous visitor opens a simulation. */}
+      {!authLoading && !userName && (
+        <AuthModal backHref={`/careers/${simulation.slug}`} />
+      )}
+
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
 
         {/* ── Overview section ─────────────────────────────────────────────── */}
