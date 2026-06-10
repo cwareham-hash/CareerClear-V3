@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
@@ -64,12 +65,13 @@ export default function AuthModal({ backHref }: AuthModalProps) {
         >
           {/* Logo mark */}
           <div className="flex items-center gap-3 mb-6">
-            <div
-              className="flex items-center justify-center w-10 h-10 rounded-card text-white font-serif font-bold text-lg"
-              style={{ backgroundColor: 'var(--color-teal)' }}
-            >
-              C
-            </div>
+            <Image
+              src="/logo-mark.png"
+              alt="Career Clear logo"
+              width={62}
+              height={40}
+              className="h-10 w-auto"
+            />
             <span className="font-sans font-bold text-navy text-lg">
               Career Clear
             </span>

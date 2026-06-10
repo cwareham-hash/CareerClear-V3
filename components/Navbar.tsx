@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, LogOut } from 'lucide-react'
@@ -48,24 +49,19 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
-          {/* Left — Logo (§7.3) */}
+          {/* Left — Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0">
-            {/* "C" circle — teal 48×48 rounded-card per §7.3 */}
-            <div
-              className="flex items-center justify-center w-12 h-12 rounded-card
-                text-white font-serif font-extrabold text-[22px] select-none"
-              style={{ backgroundColor: 'var(--color-teal)' }}
-            >
-              C
-            </div>
-            <div>
-              <p className="font-sans font-bold text-[15px] text-dark leading-tight">
-                Career Clear
-              </p>
-              <p className="font-sans text-[11px] text-muted leading-tight">
-                Education Technology Platform
-              </p>
-            </div>
+            <Image
+              src="/logo-mark.png"
+              alt="Career Clear logo"
+              width={74}
+              height={48}
+              priority
+              className="h-12 w-auto"
+            />
+            <span className="font-sans font-bold text-[15px] text-dark leading-tight">
+              Career Clear
+            </span>
           </Link>
 
           {/* Center — Nav links (desktop, §7.3) */}

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 /**
  * Site footer — navy, wordmark + tagline + placeholder contact line.
@@ -10,12 +11,13 @@ export default function SiteFooter() {
       <div className="max-w-5xl mx-auto px-6 py-12 text-center">
         {/* Wordmark */}
         <Link href="/" className="inline-flex items-center gap-3 mb-4">
-          <span
-            className="flex items-center justify-center w-10 h-10 rounded-card bg-teal
-              text-white font-serif font-bold text-lg select-none"
-          >
-            C
-          </span>
+          <Image
+            src="/logo-mark.png"
+            alt="Career Clear logo"
+            width={62}
+            height={40}
+            className="h-10 w-auto"
+          />
           <span className="font-sans font-bold text-white text-[16px]">
             Career Clear
           </span>
