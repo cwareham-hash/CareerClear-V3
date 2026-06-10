@@ -33,7 +33,7 @@ const jetbrains = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Career Clear — Discover Your Future Career',
+  title: 'Career Clear — Discover Your Future Career v3.1',
   description:
     'An education technology platform helping students and young professionals explore careers through immersive simulations.',
 }
