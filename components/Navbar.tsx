@@ -15,7 +15,7 @@ const NAV_LINKS = [
 ]
 
 export default function Navbar() {
-  const { userName, logout } = useAuth()
+  const { userName, signOut, openAuthModal, isLoading } = useAuth()
   const pathname = usePathname()
   const [scrolled, setScrolled]       = useState(false)
   const [drawerOpen, setDrawerOpen]   = useState(false)
@@ -84,15 +84,15 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Right — Greeting + Sign Out (desktop, §7.3) */}
+          {/* Right — Greeting + Sign Out, or Log in / Sign up (desktop, §7.3) */}
           <div className="hidden md:flex items-center gap-4">
-            {userName && (
+            {userName ? (
               <>
                 <span className="font-sans text-[14px] font-medium text-dark">
                   Hi, <span className="text-teal">{userName}</span>
                 </span>
                 <button
-                  onClick={logout}
+                  onClick={() => void signOut()}
                   className="flex items-center gap-1.5 font-sans text-[13px] font-medium
                     text-muted hover:text-dark transition-colors duration-150"
                   aria-label="Sign out"
@@ -101,7 +101,24 @@ export default function Navbar() {
                   Sign Out
                 </button>
               </>
-            )}
+            ) : !isLoading ? (
+              <>
+                <button
+                  onClick={() => openAuthModal('login')}
+                  className="font-sans text-[14px] font-medium text-dark
+                    hover:text-teal transition-colors duration-150"
+                >
+                  Log in
+                </button>
+                <button
+                  onClick={() => openAuthModal('signup')}
+                  className="px-4 py-2 rounded-btn bg-teal text-white font-sans
+                    font-semibold text-[14px] transition-colors duration-150 hover:bg-teal-light"
+                >
+                  Sign up
+                </button>
+              </>
+            ) : null}
           </div>
 
           {/* Hamburger — mobile only (§7.3) */}
@@ -156,14 +173,14 @@ export default function Navbar() {
                   )
                 })}
 
-                {/* Greeting + sign out row in drawer */}
-                {userName && (
+                {/* Greeting + sign out, or Log in / Sign up row in drawer */}
+                {userName ? (
                   <div className="px-6 py-4 flex items-center justify-between">
                     <span className="font-sans text-[14px] text-dark">
                       Hi, <span className="text-teal font-medium">{userName}</span>
                     </span>
                     <button
-                      onClick={logout}
+                      onClick={() => void signOut()}
                       className="flex items-center gap-1.5 font-sans text-[13px]
                         text-muted hover:text-dark transition-colors"
                     >
@@ -171,7 +188,26 @@ export default function Navbar() {
                       Sign Out
                     </button>
                   </div>
-                )}
+                ) : !isLoading ? (
+                  <div className="px-6 py-4 flex items-center gap-3">
+                    <button
+                      onClick={() => openAuthModal('login')}
+                      className="flex-1 px-4 py-2.5 rounded-btn border border-border
+                        font-sans text-[14px] font-medium text-dark hover:border-teal
+                        hover:text-teal transition-colors duration-150"
+                    >
+                      Log in
+                    </button>
+                    <button
+                      onClick={() => openAuthModal('signup')}
+                      className="flex-1 px-4 py-2.5 rounded-btn bg-teal text-white
+                        font-sans font-semibold text-[14px] transition-colors duration-150
+                        hover:bg-teal-light"
+                    >
+                      Sign up
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </motion.aside>
           </>

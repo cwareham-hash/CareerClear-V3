@@ -1,5 +1,12 @@
-// lib/userProgress.ts — Phase 6: simulation ratings & feedback persistence
+// lib/userProgress.ts — simulation progress + ratings, backed by Supabase.
+//
+// Tables: user_progress (one row per user/simulation/tier) and ratings.
+// `tier` stores the numeric duration as text ('10' | '30' | '120' | '300').
+// Progress completion is read as the UNION of completed_blocks across every
+// tier row for a simulation (matches the old "one shared completed set"
+// behavior), while writes target the currently-selected tier's row.
 
+import { supabase } from '@/lib/supabase'
 import type { DurationOption } from '@/lib/simulation'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -12,80 +19,149 @@ export interface SimulationFeedback {
 }
 
 export interface SimulationRating {
-  id:             string          // `${Date.now()}-${Math.random()}`
+  id:             string
   careerId:       string
-  userName:       string
   rating:         number          // 1–10
   feedback:       SimulationFeedback
   durationOption: DurationOption
-  completedAt:    string          // ISO 8601
+  completedAt:    string          // ISO 8601 (created_at)
 }
 
-// ── Storage ───────────────────────────────────────────────────────────────────
+// ── Ratings ─────────────────────────────────────────────────────────────────
 
-const RATINGS_KEY = 'cc_sim_ratings'
+interface RatingRow {
+  id:                  string
+  simulation_id:       string
+  tier:                string
+  score:               number
+  feedback_liked:      string | null
+  feedback_disliked:   string | null
+  feedback_questions:  string | null
+  feedback_comparison: string | null
+  created_at:          string
+}
 
-function readAll(): SimulationRating[] {
-  try {
-    const raw = localStorage.getItem(RATINGS_KEY)
-    if (raw) return JSON.parse(raw) as SimulationRating[]
-  } catch {
-    // ignore
+function mapRating(row: RatingRow): SimulationRating {
+  return {
+    id:             row.id,
+    careerId:       row.simulation_id,
+    rating:         row.score,
+    durationOption: Number(row.tier) as DurationOption,
+    completedAt:    row.created_at,
+    feedback: {
+      liked:      row.feedback_liked      ?? '',
+      disliked:   row.feedback_disliked   ?? '',
+      questions:  row.feedback_questions  ?? '',
+      comparison: row.feedback_comparison ?? '',
+    },
   }
-  return []
 }
 
-function writeAll(ratings: SimulationRating[]): void {
-  try {
-    localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings))
-  } catch {
-    // ignore
+export async function saveRating(args: {
+  userId:         string
+  careerId:       string
+  rating:         number
+  feedback:       SimulationFeedback
+  durationOption: DurationOption
+}): Promise<void> {
+  const { userId, careerId, rating, feedback, durationOption } = args
+  const { error } = await supabase.from('ratings').insert({
+    user_id:             userId,
+    simulation_id:       careerId,
+    tier:                String(durationOption),
+    score:               rating,
+    feedback_liked:      feedback.liked      || null,
+    feedback_disliked:   feedback.disliked   || null,
+    feedback_questions:  feedback.questions  || null,
+    feedback_comparison: feedback.comparison || null,
+  })
+  if (error) console.error('[ratings] saveRating failed:', error.message)
+}
+
+/** All of a user's ratings, newest first. */
+export async function getAllRatings(userId: string): Promise<SimulationRating[]> {
+  const { data, error } = await supabase
+    .from('ratings')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+  if (error) {
+    console.error('[ratings] getAllRatings failed:', error.message)
+    return []
   }
+  return (data as RatingRow[]).map(mapRating)
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+// ── Progress ──────────────────────────────────────────────────────────────────
 
-export function saveRating(r: SimulationRating): void {
-  const all = readAll()
-  all.push(r)
-  writeAll(all)
+interface ProgressRow {
+  simulation_id:    string
+  completed_blocks: string[]
 }
 
-export function getRatingsForCareer(userName: string, careerId: string): SimulationRating[] {
-  return readAll()
-    .filter((r) => r.userName === userName && r.careerId === careerId)
-    .sort((a, b) => (a.completedAt > b.completedAt ? -1 : 1)) // newest first
-}
-
-export function getLatestRating(userName: string, careerId: string): SimulationRating | null {
-  const ratings = getRatingsForCareer(userName, careerId)
-  return ratings[0] ?? null
-}
-
-export function getAllRatings(userName: string): SimulationRating[] {
-  return readAll()
-    .filter((r) => r.userName === userName)
-    .sort((a, b) => (a.completedAt > b.completedAt ? -1 : 1))
-}
-
-/** Returns the number of completed blocks for a simulation career. */
-export function getCompletedBlockCount(careerId: string): number {
-  try {
-    const raw = localStorage.getItem(`cc_sim_${careerId}_completed`)
-    if (raw) return (JSON.parse(raw) as string[]).length
-  } catch {
-    // ignore
+/** Union of completed block ids for one simulation (across all tier rows). */
+export async function getCompletedBlockIds(userId: string, careerId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('user_progress')
+    .select('simulation_id, completed_blocks')
+    .eq('user_id', userId)
+    .eq('simulation_id', careerId)
+  if (error) {
+    console.error('[progress] getCompletedBlockIds failed:', error.message)
+    return []
   }
-  return 0
+  const set = new Set<string>()
+  for (const row of data as ProgressRow[]) {
+    for (const id of row.completed_blocks ?? []) set.add(id)
+  }
+  return Array.from(set)
 }
 
-/** Returns the raw array of completed block IDs for a simulation career. */
-export function getCompletedBlockIds(careerId: string): string[] {
-  try {
-    const raw = localStorage.getItem(`cc_sim_${careerId}_completed`)
-    if (raw) return JSON.parse(raw) as string[]
-  } catch {
-    // ignore
+/** Map of careerId → union of completed block ids, for ALL the user's progress. */
+export async function getProgressByCareer(userId: string): Promise<Record<string, string[]>> {
+  const { data, error } = await supabase
+    .from('user_progress')
+    .select('simulation_id, completed_blocks')
+    .eq('user_id', userId)
+  if (error) {
+    console.error('[progress] getProgressByCareer failed:', error.message)
+    return {}
   }
-  return []
+  const sets: Record<string, Set<string>> = {}
+  for (const row of data as ProgressRow[]) {
+    ;(sets[row.simulation_id] ??= new Set<string>())
+    for (const id of row.completed_blocks ?? []) sets[row.simulation_id].add(id)
+  }
+  const out: Record<string, string[]> = {}
+  for (const careerId of Object.keys(sets)) out[careerId] = Array.from(sets[careerId])
+  return out
+}
+
+/**
+ * Upsert the completed-blocks list for one (user, simulation, tier). Stores the
+ * blocks completed within this tier's depth; the union across tiers reconstructs
+ * the full set on read.
+ */
+export async function upsertProgress(args: {
+  userId:          string
+  careerId:        string
+  tier:            string
+  completedBlocks: string[]
+  isCompleted:     boolean
+}): Promise<void> {
+  const { userId, careerId, tier, completedBlocks, isCompleted } = args
+  const nowIso = new Date().toISOString()
+  const { error } = await supabase.from('user_progress').upsert(
+    {
+      user_id:          userId,
+      simulation_id:    careerId,
+      tier,
+      completed_blocks: completedBlocks,
+      is_completed:     isCompleted,
+      completed_at:     isCompleted ? nowIso : null,
+      last_activity_at: nowIso,
+    },
+    { onConflict: 'user_id,simulation_id,tier' },
+  )
+  if (error) console.error('[progress] upsertProgress failed:', error.message)
 }

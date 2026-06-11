@@ -10,8 +10,10 @@ import {
 } from '@/lib/careers'
 import type { IndustryCategory, FunctionCategory } from '@/lib/careers'
 import { useFavorites } from '@/lib/useFavorites'
+import { useAuth } from '@/lib/auth'
+import { getProgressByCareer } from '@/lib/userProgress'
 
-// ── Skeleton card shown before localStorage hydration ─────────────────────────
+// ── Skeleton card shown before hydration ──────────────────────────────────────
 
 function CareerCardSkeleton() {
   return (
@@ -65,26 +67,26 @@ export default function CareerGrid() {
   const [completedCareerIds, setCompletedCareerIds]   = useState<Set<string>>(new Set())
   const [isHydrated, setIsHydrated]                   = useState(false)
   const { isFavorite, toggle }                        = useFavorites()
+  const { user }                                      = useAuth()
 
-  // Load completed simulation indicators from localStorage on mount
+  // Load "started a simulation" indicators from Supabase for the logged-in user.
   useEffect(() => {
     setIsHydrated(true)
-    const completed = new Set<string>()
-    CAREERS.forEach((career) => {
-      if (career.hasSimulation) {
-        try {
-          const stored = localStorage.getItem(`cc_sim_${career.id}_completed`)
-          if (stored) {
-            const blocks = JSON.parse(stored) as string[]
-            if (blocks.length > 0) completed.add(career.id)
-          }
-        } catch {
-          // ignore
-        }
-      }
-    })
-    setCompletedCareerIds(completed)
-  }, [])
+    if (!user) {
+      setCompletedCareerIds(new Set())
+      return
+    }
+    let active = true
+    ;(async () => {
+      const progress = await getProgressByCareer(user.id)
+      if (!active) return
+      const started = new Set(
+        Object.keys(progress).filter((careerId) => progress[careerId].length > 0),
+      )
+      setCompletedCareerIds(started)
+    })()
+    return () => { active = false }
+  }, [user])
 
   // ── Filter pill toggle helpers ──────────────────────────────────────────────
 
@@ -251,7 +253,7 @@ export default function CareerGrid() {
         {/* Grid or empty state ────────────────────────────────────────────── */}
 
         {!isHydrated ? (
-          /* Skeleton grid while waiting for localStorage */
+          /* Skeleton grid shown until the client has hydrated */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <CareerCardSkeleton key={i} />

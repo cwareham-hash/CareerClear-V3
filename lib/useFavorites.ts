@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -11,88 +13,101 @@ export interface Favorite {
   category: FavoriteCategory
 }
 
-const FAVORITES_KEY = 'cc_favorites'
-
-// ── Migration helper ──────────────────────────────────────────────────────────
-// Old format was string[] — convert to Favorite[] on first read
-
-function readFavorites(): Favorite[] {
-  try {
-    const raw = localStorage.getItem(FAVORITES_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw)
-    // Old format: string[]
-    if (Array.isArray(parsed) && (parsed.length === 0 || typeof parsed[0] === 'string')) {
-      const migrated: Favorite[] = (parsed as string[]).map((careerId) => ({
-        careerId,
-        category: 'saved_to_try',
-      }))
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(migrated))
-      return migrated
-    }
-    // New format: Favorite[]
-    return parsed as Favorite[]
-  } catch {
-    return []
-  }
-}
-
-function writeFavorites(favorites: Favorite[]): void {
-  try {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites))
-  } catch {
-    // ignore
-  }
+interface FavoriteRow {
+  career_id:     string
+  favorite_type: FavoriteCategory
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
+// Backed by the Supabase `favorites` table (RLS-scoped to the user). Logged-out
+// visitors can browse; attempting to favorite opens the auth modal.
 
 export function useFavorites() {
+  const { user, openAuthModal } = useAuth()
   const [favorites, setFavorites] = useState<Favorite[]>([])
+  const [loading, setLoading]     = useState(true)
 
-  // Read from localStorage once on mount — avoids SSR mismatch
+  // Load the user's favorites whenever the signed-in user changes.
   useEffect(() => {
-    setFavorites(readFavorites())
-  }, [])
+    if (!user) {
+      setFavorites([])
+      setLoading(false)
+      return
+    }
+    let active = true
+    ;(async () => {
+      const { data, error } = await supabase
+        .from('favorites')
+        .select('career_id, favorite_type')
+        .eq('user_id', user.id)
+      if (!active) return
+      if (error) console.error('[favorites] load failed:', error.message)
+      setFavorites(
+        (data as FavoriteRow[] | null ?? []).map((r) => ({
+          careerId: r.career_id,
+          category: r.favorite_type,
+        })),
+      )
+      setLoading(false)
+    })()
+    return () => { active = false }
+  }, [user])
 
-  /** Returns true if career is in any favorite category. */
   function isFavorite(careerId: string): boolean {
     return favorites.some((f) => f.careerId === careerId)
   }
 
-  /** Returns the category for a favorited career, or null if not favorited. */
   function getFavoriteCategory(careerId: string): FavoriteCategory | null {
     return favorites.find((f) => f.careerId === careerId)?.category ?? null
   }
 
-  /** Toggle favorite from the explore page — adds as saved_to_try or removes. */
-  function toggle(careerId: string) {
-    setFavorites((prev) => {
-      const next = prev.some((f) => f.careerId === careerId)
-        ? prev.filter((f) => f.careerId !== careerId)
-        : [...prev, { careerId, category: 'saved_to_try' as FavoriteCategory }]
-      writeFavorites(next)
-      return next
-    })
-  }
+  /** Toggle from the explore page — adds as saved_to_try or removes entirely. */
+  const toggle = useCallback(
+    async (careerId: string) => {
+      if (!user) {
+        openAuthModal('login')   // can't save without an identity
+        return
+      }
+      const exists = favorites.some((f) => f.careerId === careerId)
+      if (exists) {
+        setFavorites((prev) => prev.filter((f) => f.careerId !== careerId)) // optimistic
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('career_id', careerId)
+        if (error) console.error('[favorites] delete failed:', error.message)
+      } else {
+        setFavorites((prev) => [...prev, { careerId, category: 'saved_to_try' }]) // optimistic
+        const { error } = await supabase
+          .from('favorites')
+          .insert({ user_id: user.id, career_id: careerId, favorite_type: 'saved_to_try' })
+        if (error) console.error('[favorites] insert failed:', error.message)
+      }
+    },
+    [user, favorites, openAuthModal],
+  )
 
-  /**
-   * Upgrade a career to "Actively Pursuing".
-   * If already favorited: changes category to actively_pursuing.
-   * If not yet favorited: adds as actively_pursuing.
-   */
-  function upgradeToActively(careerId: string) {
-    setFavorites((prev) => {
-      const exists = prev.some((f) => f.careerId === careerId)
-      const next = exists
-        ? prev.map((f) =>
-            f.careerId === careerId ? { ...f, category: 'actively_pursuing' as FavoriteCategory } : f
-          )
-        : [...prev, { careerId, category: 'actively_pursuing' as FavoriteCategory }]
-      writeFavorites(next)
-      return next
-    })
-  }
+  /** Upgrade (or add) a career to "Actively Pursuing" — called after a sim. */
+  const upgradeToActively = useCallback(
+    async (careerId: string) => {
+      if (!user) return
+      setFavorites((prev) => {
+        const exists = prev.some((f) => f.careerId === careerId)
+        return exists
+          ? prev.map((f) =>
+              f.careerId === careerId ? { ...f, category: 'actively_pursuing' as FavoriteCategory } : f,
+            )
+          : [...prev, { careerId, category: 'actively_pursuing' as FavoriteCategory }]
+      })
+      const { error } = await supabase.from('favorites').upsert(
+        { user_id: user.id, career_id: careerId, favorite_type: 'actively_pursuing' },
+        { onConflict: 'user_id,career_id' },
+      )
+      if (error) console.error('[favorites] upgrade failed:', error.message)
+    },
+    [user],
+  )
 
-  return { favorites, isFavorite, getFavoriteCategory, toggle, upgradeToActively }
+  return { favorites, loading, isFavorite, getFavoriteCategory, toggle, upgradeToActively }
 }

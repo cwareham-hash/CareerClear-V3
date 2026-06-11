@@ -16,15 +16,14 @@ import {
   BookOpen,
   CheckCircle2,
   TrendingUp,
+  LogIn,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { getHistoryForUser, type QuizAttempt } from '@/lib/recommendations'
 import { CAREERS } from '@/lib/careers'
 import { SIMULATIONS, DURATION_OPTIONS, type DurationOption } from '@/lib/simulation'
 import {
-  getRatingsForCareer,
-  getLatestRating,
-  getCompletedBlockIds,
+  getProgressByCareer,
   getAllRatings,
   type SimulationRating,
 } from '@/lib/userProgress'
@@ -405,57 +404,82 @@ function SectionHeader({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { userName }  = useAuth()
+  const { user, userName, isLoading: authLoading, openAuthModal } = useAuth()
   const { favorites } = useFavorites()
 
   const [history, setHistory]           = useState<QuizAttempt[]>([])
   const [roleProgress, setRoleProgress] = useState<RoleProgress[]>([])
   const [rolesRated, setRolesRated]     = useState(0)
+  const [latestRatingByCareer, setLatestRatingByCareer] =
+    useState<Record<string, SimulationRating>>({})
+  const [dataLoading, setDataLoading]   = useState(true)
 
-  // Load quiz history (newest first)
+  // Quiz history still lives in localStorage (keyed by name), newest first.
   useEffect(() => {
-    if (userName) {
-      const attempts = getHistoryForUser(userName)
-      setHistory([...attempts].reverse())
-    }
+    if (userName) setHistory([...getHistoryForUser(userName)].reverse())
+    else setHistory([])
   }, [userName])
 
-  // Load simulation progress + ratings
+  // Load simulation progress + ratings from Supabase.
   useEffect(() => {
-    const data: RoleProgress[] = SIMULATIONS.flatMap((sim) => {
-      const completedSet = new Set(getCompletedBlockIds(sim.careerId))
-      if (completedSet.size === 0) return []
-
-      const tiers: TierProgress[] = DURATION_OPTIONS
-        .map(({ value, display }) => {
-          const visibleBlocks  = sim.timeBlocks.filter((b) => b.minDuration <= value)
-          const completedCount = visibleBlocks.filter((b) => completedSet.has(b.id)).length
-          return {
-            duration:       value,
-            display,
-            completedCount,
-            totalCount:     visibleBlocks.length,
-            isCompleted:    completedCount >= visibleBlocks.length,
-          }
-        })
-        .filter((tier) => tier.completedCount >= 1)
-
-      if (tiers.length === 0) return []
-      return [{
-        careerId: sim.careerId,
-        tiers,
-        ratings:  userName ? getRatingsForCareer(userName, sim.careerId) : [],
-      }]
-    })
-
-    setRoleProgress(data)
-
-    if (userName) {
-      const all      = getAllRatings(userName)
-      const distinct = new Set(all.map((r) => r.careerId))
-      setRolesRated(distinct.size)
+    if (!user) {
+      setRoleProgress([])
+      setRolesRated(0)
+      setLatestRatingByCareer({})
+      setDataLoading(false)
+      return
     }
-  }, [userName])
+    let active = true
+    setDataLoading(true)
+    ;(async () => {
+      const [progressMap, allRatings] = await Promise.all([
+        getProgressByCareer(user.id),
+        getAllRatings(user.id),
+      ])
+      if (!active) return
+
+      // Group ratings by career; allRatings is newest-first so the first seen
+      // per career is the latest.
+      const ratingsByCareer: Record<string, SimulationRating[]> = {}
+      const latestByCareer:  Record<string, SimulationRating>   = {}
+      for (const r of allRatings) {
+        ;(ratingsByCareer[r.careerId] ??= []).push(r)
+        if (!latestByCareer[r.careerId]) latestByCareer[r.careerId] = r
+      }
+
+      const data: RoleProgress[] = SIMULATIONS.flatMap((sim) => {
+        const completedSet = new Set(progressMap[sim.careerId] ?? [])
+        if (completedSet.size === 0) return []
+
+        const tiers: TierProgress[] = DURATION_OPTIONS
+          .map(({ value, display }) => {
+            const visibleBlocks  = sim.timeBlocks.filter((b) => b.minDuration <= value)
+            const completedCount = visibleBlocks.filter((b) => completedSet.has(b.id)).length
+            return {
+              duration:       value,
+              display,
+              completedCount,
+              totalCount:     visibleBlocks.length,
+              isCompleted:    completedCount >= visibleBlocks.length,
+            }
+          })
+          .filter((tier) => tier.completedCount >= 1)
+
+        if (tiers.length === 0) return []
+        return [{
+          careerId: sim.careerId,
+          tiers,
+          ratings:  ratingsByCareer[sim.careerId] ?? [],
+        }]
+      })
+
+      setRoleProgress(data)
+      setRolesRated(new Set(allRatings.map((r) => r.careerId)).size)
+      setLatestRatingByCareer(latestByCareer)
+      setDataLoading(false)
+    })()
+    return () => { active = false }
+  }, [user])
 
   // Stats — per tier, not per role
   const tiersInProgress = roleProgress.reduce((acc, r) => acc + r.tiers.filter((t) => !t.isCompleted).length, 0)
@@ -467,6 +491,50 @@ export default function DashboardPage() {
 
   // New user: nothing started yet
   const isNewUser = roleProgress.length === 0 && favorites.length === 0 && history.length === 0
+
+  // ── Resolving session / loading the user's data ──────────────────────────
+  if (authLoading || (user && dataLoading)) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-cream flex items-center justify-center">
+        <p className="font-sans text-[14px] text-muted">Loading your dashboard…</p>
+      </div>
+    )
+  }
+
+  // ── Logged out — the dashboard is entirely personal data ─────────────────
+  if (!user) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] bg-cream flex items-center justify-center px-4">
+        <div className="bg-white rounded-card border border-border shadow-card max-w-md w-full p-8 text-center">
+          <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-tag-bg flex items-center justify-center">
+            <LogIn size={22} style={{ color: 'var(--color-teal)' }} />
+          </div>
+          <h1 className="font-serif text-[24px] font-bold text-navy leading-tight mb-2">
+            Log in to see your dashboard
+          </h1>
+          <p className="font-sans text-[14px] text-muted leading-relaxed mb-6">
+            Your progress, ratings, and saved careers live here once you have an account.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => openAuthModal('signup')}
+              className="px-5 py-2.5 rounded-btn bg-teal text-white font-sans font-semibold
+                text-[14px] transition-colors duration-150 hover:bg-teal-light"
+            >
+              Create account
+            </button>
+            <button
+              onClick={() => openAuthModal('login')}
+              className="px-5 py-2.5 rounded-btn border border-border font-sans font-medium
+                text-[14px] text-dark hover:border-teal hover:text-teal transition-colors duration-150"
+            >
+              Log in
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-cream">
@@ -662,7 +730,7 @@ export default function DashboardPage() {
                         key={careerId}
                         careerId={careerId}
                         pursuing={true}
-                        latestRating={userName ? getLatestRating(userName, careerId) : null}
+                        latestRating={latestRatingByCareer[careerId] ?? null}
                       />
                     ))}
                   </div>

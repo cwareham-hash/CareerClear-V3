@@ -39,6 +39,7 @@ A historical note for context: the product spec document CareerClear_ProductSpec
 - **Known gap:** the codebase still implements the old four duration tiers and has full content for all four careers; migrating to the three experiential tiers and the Consulting-only rollout is upcoming work, not done.
 - **localStorage keys in use:** `cc_quiz_history` (quiz attempts), plus favorites and simulation progress/ratings — all slated for replacement by Supabase.
 - **Don't commit scratch files:** Playwright screenshots (`*.png` in root, `.playwright-mcp/`) are temporary artifacts, gitignored as of June 2026.
+- **Supabase is live (Phase 2, June 2026):** real email/password auth + Postgres replace localStorage for auth, favorites, progress, and ratings. Client in `lib/supabase.ts`; schema in `supabase/schema.sql` (run manually in the SQL Editor). Quiz history (`cc_quiz_history`) still on localStorage. `tier` columns store the numeric duration as text pending the experiential-tier migration. Email confirmation is ON. Simulations require login **and** `profiles.beta_access = true` (granted manually); exploration stays public.
 
 ## 5. Workflow rules (standing — follow these every session)
 
@@ -48,3 +49,4 @@ A historical note for context: the product spec document CareerClear_ProductSpec
 - **Visual verification:** for any visual change (layout, spacing, styling, new UI), use the Playwright MCP server to load http://localhost:3000, screenshot the affected page, and verify the result before reporting the work as done.
 - **Prompting style:** Collin prefers explicit, directive prompts and reviewing changes before and between phases.
 - **Keep this file alive:** when a new standing rule, decision, or reusable pattern emerges in a session, proactively propose adding it to this file at that moment — propose exact wording, wait for approval, never update it silently.
+- **Status line (persistent):** A custom status line is configured at the user level in `~/.claude/settings.json` (`statusLine` block) running `~/.claude/statusline.sh`. It shows the model name, current git branch, and a 5-hour rate-limit usage bar (green ≤50%, yellow 51–75%, red >75%). It loads automatically every session — no action needed normally. At session start, if the status line is missing or broken, restore it: re-create `~/.claude/statusline.sh` and the `statusLine` block in `~/.claude/settings.json`.
