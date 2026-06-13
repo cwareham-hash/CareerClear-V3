@@ -66,7 +66,7 @@ export const CAREERS: Career[] = [
     description:
       'Support senior bankers in executing mergers, acquisitions, and capital raises through advanced financial modeling, pitch book creation, and rigorous due diligence work.',
     skills: ['Financial Modeling', 'Valuation', 'Excel', 'Due Diligence', 'PowerPoint'],
-    hasSimulation: true,
+    hasSimulation: false,
   },
   {
     id: 'management-consultant',
@@ -90,7 +90,7 @@ export const CAREERS: Career[] = [
     description:
       'Research case law, draft contracts and legal memos, and advise corporate clients through high-stakes transactions, disputes, and regulatory challenges at a top-tier law firm.',
     skills: ['Legal Research', 'Contract Drafting', 'Due Diligence', 'Negotiation', 'Legal Writing'],
-    hasSimulation: true,
+    hasSimulation: false,
   },
   {
     id: 'product-manager',
@@ -102,7 +102,7 @@ export const CAREERS: Career[] = [
     description:
       'Define product vision, prioritize features alongside engineering and design, and own the roadmap that turns user insights into shipped products that millions of people rely on daily.',
     skills: ['Product Strategy', 'Roadmapping', 'User Research', 'Data Analysis', 'Stakeholder Mgmt'],
-    hasSimulation: true,
+    hasSimulation: false,
   },
 
   // ── §6.2 Demo roles — summary level only ───────────────────────────────────
