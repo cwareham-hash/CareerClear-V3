@@ -1,7 +1,7 @@
 // §5.4 Career Card — Full Detail Page
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Play, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Play, ChevronRight, Hourglass } from 'lucide-react'
 import { CAREERS } from '@/lib/careers'
 import { CAREER_DETAIL } from '@/lib/careerDetail'
 
@@ -51,13 +51,9 @@ export default function CareerDetailPage({ params }: Props) {
             <span className="px-3 py-1 rounded-pill text-[12px] font-medium border border-teal text-teal">
               {career.industry}
             </span>
-            {career.hasSimulation ? (
+            {career.hasSimulation && (
               <span className="px-3 py-1 rounded-pill text-[12px] font-medium bg-teal text-white">
                 Simulation Available
-              </span>
-            ) : (
-              <span className="px-3 py-1 rounded-pill text-[12px] font-medium border border-muted text-muted">
-                Coming Soon
               </span>
             )}
           </div>
@@ -290,8 +286,10 @@ export default function CareerDetailPage({ params }: Props) {
             </div>
           </section>
 
-          {/* Start Simulation CTA — full width, pinned to bottom of detail content */}
-          {career.hasSimulation && (
+          {/* Simulation CTA — full width, pinned to bottom of detail content.
+              Active "Start Simulation" for live roles; a disabled "Coming Soon"
+              treatment in the SAME position for roles not yet built. */}
+          {career.hasSimulation ? (
             <div className="mt-6 bg-white rounded-card border border-border shadow-card overflow-hidden">
               <div className="h-1" style={{ backgroundColor: 'var(--color-teal)' }} />
               <div className="px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -313,6 +311,30 @@ export default function CareerDetailPage({ params }: Props) {
                   <Play size={15} aria-hidden="true" />
                   Start Simulation
                 </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6 bg-white rounded-card border border-border shadow-card overflow-hidden">
+              <div className="h-1" style={{ backgroundColor: 'var(--color-border)' }} />
+              <div className="px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-sans font-bold text-[16px] text-dark mb-1">
+                    A week in this role — coming soon
+                  </h2>
+                  <p className="font-sans text-[14px] text-muted">
+                    This simulation is being built. Soon you&apos;ll be able to step through real
+                    work scenarios and see what the day-to-day actually looks like.
+                  </p>
+                </div>
+                <span
+                  aria-disabled="true"
+                  className="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-btn
+                    font-sans font-semibold text-[14px] text-muted bg-[#f3f4f6]
+                    border border-border cursor-not-allowed select-none"
+                >
+                  <Hourglass size={15} aria-hidden="true" />
+                  Simulation Coming Soon
+                </span>
               </div>
             </div>
           )}
