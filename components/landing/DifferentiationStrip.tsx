@@ -21,17 +21,6 @@ export default function DifferentiationStrip() {
           company-agnostic, designed to show you the honest reality of a role,
           not a recruiting pitch.
         </motion.p>
-
-        <motion.p
-          className="font-sans text-[14px] text-white/60"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}
-        >
-          Shaped by interviews with 20+ college students and the professionals
-          who live these careers.
-        </motion.p>
       </div>
     </section>
   )
