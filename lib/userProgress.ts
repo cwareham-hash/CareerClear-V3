@@ -1,10 +1,12 @@
 // lib/userProgress.ts — simulation progress + ratings, backed by Supabase.
 //
-// Tables: user_progress (one row per user/simulation/tier) and ratings.
-// `tier` stores the numeric duration as text ('10' | '30' | '120' | '300').
-// Progress completion is read as the UNION of completed_blocks across every
-// tier row for a simulation (matches the old "one shared completed set"
-// behavior), while writes target the currently-selected tier's row.
+// Tables: user_progress (one row per user/simulation/scenario/tier) and ratings.
+// `tier` is the experiential tier ('orientation' | 'day-in-life' | 'full').
+// `scenario` scopes Day-in-the-Life and Full to a specific scenario slug
+// (e.g. 'fresca'); Orientation is shared across scenarios and so is keyed at the
+// career level with scenario = null. Progress for a scenario page is read as the
+// UNION of completed_blocks across that career's Orientation row (scenario null)
+// and the rows for the scenario being viewed; writes target the current tier's row.
 
 import { supabase } from '@/lib/supabase'
 import type { Tier } from '@/lib/simulation'
@@ -21,6 +23,7 @@ export interface SimulationFeedback {
 export interface SimulationRating {
   id:          string
   careerId:    string
+  scenario:    string | null   // null for Orientation (career-level); slug for DIL/Full
   rating:      number          // 1–10
   feedback:    SimulationFeedback
   tier:        Tier
@@ -32,6 +35,7 @@ export interface SimulationRating {
 interface RatingRow {
   id:                  string
   simulation_id:       string
+  scenario:            string | null
   tier:                string
   score:               number
   feedback_liked:      string | null
@@ -45,6 +49,7 @@ function mapRating(row: RatingRow): SimulationRating {
   return {
     id:          row.id,
     careerId:    row.simulation_id,
+    scenario:    row.scenario,
     rating:      row.score,
     tier:        row.tier as Tier,
     completedAt: row.created_at,
@@ -60,14 +65,16 @@ function mapRating(row: RatingRow): SimulationRating {
 export async function saveRating(args: {
   userId:   string
   careerId: string
+  scenario: string | null   // null for Orientation; scenario slug for DIL/Full
   rating:   number
   feedback: SimulationFeedback
   tier:     Tier
 }): Promise<void> {
-  const { userId, careerId, rating, feedback, tier } = args
+  const { userId, careerId, scenario, rating, feedback, tier } = args
   const { error } = await supabase.from('ratings').insert({
     user_id:             userId,
     simulation_id:       careerId,
+    scenario:            scenario,
     tier:                tier,
     score:               rating,
     feedback_liked:      feedback.liked      || null,
@@ -99,13 +106,21 @@ interface ProgressRow {
   completed_blocks: string[]
 }
 
-/** Union of completed block ids for one simulation (across all tier rows). */
-export async function getCompletedBlockIds(userId: string, careerId: string): Promise<string[]> {
+/**
+ * Union of completed block ids for ONE scenario page: the career's shared
+ * Orientation (scenario = null) plus the rows for the scenario being viewed.
+ */
+export async function getCompletedBlockIds(
+  userId: string,
+  careerId: string,
+  scenario: string,
+): Promise<string[]> {
   const { data, error } = await supabase
     .from('user_progress')
     .select('simulation_id, completed_blocks')
     .eq('user_id', userId)
     .eq('simulation_id', careerId)
+    .or(`scenario.is.null,scenario.eq.${scenario}`)
   if (error) {
     console.error('[progress] getCompletedBlockIds failed:', error.message)
     return []
@@ -145,23 +160,25 @@ export async function getProgressByCareer(userId: string): Promise<Record<string
 export async function upsertProgress(args: {
   userId:          string
   careerId:        string
+  scenario:        string | null   // null for Orientation; scenario slug for DIL/Full
   tier:            string
   completedBlocks: string[]
   isCompleted:     boolean
 }): Promise<void> {
-  const { userId, careerId, tier, completedBlocks, isCompleted } = args
+  const { userId, careerId, scenario, tier, completedBlocks, isCompleted } = args
   const nowIso = new Date().toISOString()
   const { error } = await supabase.from('user_progress').upsert(
     {
       user_id:          userId,
       simulation_id:    careerId,
+      scenario,
       tier,
       completed_blocks: completedBlocks,
       is_completed:     isCompleted,
       completed_at:     isCompleted ? nowIso : null,
       last_activity_at: nowIso,
     },
-    { onConflict: 'user_id,simulation_id,tier' },
+    { onConflict: 'user_id,simulation_id,scenario,tier' },
   )
   if (error) console.error('[progress] upsertProgress failed:', error.message)
 }

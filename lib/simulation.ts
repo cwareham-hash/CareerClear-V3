@@ -410,28 +410,13 @@ export function getTierBlocks(simulation: Simulation, tier: Tier): TimeBlock[] {
   return simulation.tiers[tier]
 }
 
-// ── Backward-compat: one resolved Simulation per career ──────────────────────────
-// The dashboard still reads progress keyed by careerId and attributes completed
-// block ids across the three tiers. Until progress is scenario-scoped (stage 2),
-// expose one resolved Simulation per career, using the FIRST scenario's
-// Day-in-the-Life and Full tiers.
-// NOTE (stage 2): for a career with >1 scenario this under-counts the later
-// scenarios' blocks on the dashboard. Only Consulting (1 scenario) exists today,
-// so it is exact for now.
-export const SIMULATIONS: Simulation[] = CAREER_SIMS.flatMap((cs) => {
-  const first = cs.scenarios[0]
-  if (!first) return []
-  return [{
-    careerId:     cs.careerId,
-    careerSlug:   cs.careerSlug,
-    scenarioSlug: first.slug,
-    title:        cs.title,
-    scenario:     first.scenario,
-    project:      first.project,
-    tiers: {
-      orientation:   cs.orientation,
-      'day-in-life': first.tiers['day-in-life'],
-      full:          first.tiers.full,
-    },
-  }]
-})
+/**
+ * All authored blocks for a tier across a whole career. Orientation is
+ * career-level (returned directly); Day-in-the-Life and Full are aggregated
+ * across every scenario. Used by the dashboard rollup so no scenario's blocks
+ * are dropped when a career has more than one scenario.
+ */
+export function getCareerTierBlocks(careerSim: CareerSim, tier: Tier): TimeBlock[] {
+  if (tier === 'orientation') return careerSim.orientation
+  return careerSim.scenarios.flatMap((s) => s.tiers[tier])
+}

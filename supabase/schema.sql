@@ -93,20 +93,25 @@ create trigger on_auth_user_created
 -- ───────────────────────────────────────────────────────────────────────────
 -- 2. USER_PROGRESS
 -- ───────────────────────────────────────────────────────────────────────────
--- One row per (user, simulation, tier). `tier` currently stores the numeric
--- duration as text ('10' | '30' | '120' | '300'); it will hold the experiential
--- tier names later without any schema change. completed_blocks is the list of
--- finished activity ids.
+-- One row per (user, simulation, scenario, tier). `tier` holds the experiential
+-- tier name ('orientation' | 'day-in-life' | 'full'). `scenario` scopes
+-- Day-in-the-Life and Full to a specific scenario slug (e.g. 'fresca'); it is
+-- NULL for Orientation, which is shared across a career's scenarios. The unique
+-- constraint uses NULLS NOT DISTINCT (Postgres 15+) so Orientation's NULL
+-- scenario still collapses to one row per user/career/tier. completed_blocks is
+-- the list of finished activity ids.
 create table if not exists public.user_progress (
   id               uuid        primary key default gen_random_uuid(),
   user_id          uuid        not null references auth.users(id) on delete cascade,
   simulation_id    text        not null,
+  scenario         text,
   tier             text        not null,
   completed_blocks jsonb       not null default '[]'::jsonb,
   is_completed     boolean     not null default false,
   completed_at     timestamptz,
   last_activity_at timestamptz not null default now(),
-  unique (user_id, simulation_id, tier)
+  constraint user_progress_user_sim_scenario_tier_key
+    unique nulls not distinct (user_id, simulation_id, scenario, tier)
 );
 
 create index if not exists user_progress_user_id_idx on public.user_progress(user_id);
@@ -136,10 +141,14 @@ create policy "user_progress_update_own"
 -- ───────────────────────────────────────────────────────────────────────────
 -- 3. RATINGS
 -- ───────────────────────────────────────────────────────────────────────────
+-- Rating history is append-only (one row per submission), so there is no unique
+-- constraint here. `scenario` is NULL for Orientation and the scenario slug for
+-- Day-in-the-Life / Full, mirroring user_progress.
 create table if not exists public.ratings (
   id                   uuid        primary key default gen_random_uuid(),
   user_id              uuid        not null references auth.users(id) on delete cascade,
   simulation_id        text        not null,
+  scenario             text,
   tier                 text        not null,
   score                int         not null check (score between 1 and 10),
   feedback_liked       text,

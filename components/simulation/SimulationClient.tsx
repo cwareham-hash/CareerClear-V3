@@ -24,7 +24,12 @@ interface Props {
 }
 
 export default function SimulationClient({ simulation }: Props) {
-  const { careerId, title, scenario, project } = simulation
+  const { careerId, scenarioSlug, title, scenario, project } = simulation
+
+  // Orientation is shared across scenarios → keyed at the career level (scenario
+  // = null). Day-in-the-Life and Full are keyed to this specific scenario.
+  const scenarioKeyFor = (tier: Tier): string | null =>
+    tier === 'orientation' ? null : scenarioSlug
   const { user, userName, betaAccess, isLoading: authLoading, openAuthModal } = useAuth()
   const { isFavorite, upgradeToActively } = useFavorites()
 
@@ -50,13 +55,13 @@ export default function SimulationClient({ simulation }: Props) {
     }
     let active = true
     ;(async () => {
-      const ids = await getCompletedBlockIds(user.id, careerId)
+      const ids = await getCompletedBlockIds(user.id, careerId, scenarioSlug)
       if (!active) return
       setCompletedIds(new Set(ids))
       setIsLoaded(true)
     })()
     return () => { active = false }
-  }, [user, careerId])
+  }, [user, careerId, scenarioSlug])
 
   // ── Derived values ────────────────────────────────────────────────────────
   // The selected tier's authored blocks — direct lookup, no filtering.
@@ -119,6 +124,7 @@ export default function SimulationClient({ simulation }: Props) {
           void upsertProgress({
             userId:          user.id,
             careerId,
+            scenario:        scenarioKeyFor(selectedTier),
             tier:            selectedTier,
             completedBlocks: completedForTier,
             isCompleted:     completedForTier.length === blocks.length,
@@ -127,7 +133,8 @@ export default function SimulationClient({ simulation }: Props) {
         return next
       })
     },
-    [careerId, user, selectedTier, blocks],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [careerId, scenarioSlug, user, selectedTier, blocks],
   )
 
   const handleNextBlock = useCallback(() => {
@@ -155,6 +162,7 @@ export default function SimulationClient({ simulation }: Props) {
         void saveRating({
           userId:         user.id,
           careerId,
+          scenario:       scenarioKeyFor(selectedTier),
           rating,
           feedback,
           tier: selectedTier,
@@ -164,7 +172,8 @@ export default function SimulationClient({ simulation }: Props) {
       void upgradeToActively(careerId)
       setShowRatingModal(false)
     },
-    [careerId, user, selectedTier, upgradeToActively],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [careerId, scenarioSlug, user, selectedTier, upgradeToActively],
   )
 
   const handleRatingDismiss = useCallback(() => {

@@ -21,7 +21,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { getHistoryForUser, type QuizAttempt } from '@/lib/recommendations'
 import { CAREERS } from '@/lib/careers'
-import { SIMULATIONS, TIERS, type Tier } from '@/lib/simulation'
+import { CAREER_SIMS, getCareerTierBlocks, TIERS, type Tier } from '@/lib/simulation'
 import {
   getProgressByCareer,
   getAllRatings,
@@ -120,7 +120,7 @@ function RatingBadge({ rating }: { rating: number }) {
 function ProgressRow({ role }: { role: RoleProgress }) {
   const [expanded, setExpanded] = useState(false)
 
-  const sim    = SIMULATIONS.find((s) => s.careerId === role.careerId)
+  const sim    = CAREER_SIMS.find((c) => c.careerId === role.careerId)
   const career = CAREERS.find((c) => c.id === role.careerId)
   if (!sim || !career) return null
 
@@ -447,15 +447,16 @@ export default function DashboardPage() {
         if (!latestByCareer[r.careerId]) latestByCareer[r.careerId] = r
       }
 
-      const data: RoleProgress[] = SIMULATIONS.flatMap((sim) => {
-        const completedSet = new Set(progressMap[sim.careerId] ?? [])
+      const data: RoleProgress[] = CAREER_SIMS.flatMap((cs) => {
+        const completedSet = new Set(progressMap[cs.careerId] ?? [])
         if (completedSet.size === 0) return []
 
-        // Each tier's blocks have disjoint ids, so a completed id maps to exactly
-        // one tier — counting membership in the union attributes it correctly.
+        // Block ids are globally unique, so a completed id maps to exactly one
+        // tier. Day-in-the-Life/Full totals aggregate across every scenario of
+        // the career (getCareerTierBlocks), so no scenario's blocks are dropped.
         const tiers: TierProgress[] = TIERS
           .map(({ value, display }) => {
-            const tierBlocks     = sim.tiers[value]
+            const tierBlocks     = getCareerTierBlocks(cs, value)
             const completedCount = tierBlocks.filter((b) => completedSet.has(b.id)).length
             return {
               tier:           value,
@@ -469,9 +470,9 @@ export default function DashboardPage() {
 
         if (tiers.length === 0) return []
         return [{
-          careerId: sim.careerId,
+          careerId: cs.careerId,
           tiers,
-          ratings:  ratingsByCareer[sim.careerId] ?? [],
+          ratings:  ratingsByCareer[cs.careerId] ?? [],
         }]
       })
 
