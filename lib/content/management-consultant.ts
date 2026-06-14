@@ -7,6 +7,64 @@ import type { TimeBlockContent } from '../simulation'
 
 export const managementConsultantContent: Record<string, TimeBlockContent> = {
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // PLACEHOLDER CONTENT — Orientation & Day-in-the-Life tiers
+  // Real content is authored separately and dropped in next. These exist only so
+  // the three-tier structure is testable. Do NOT mistake this for real content.
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── Orientation tier (short briefing) ──────────────────────────────────────
+  'management-consultant-orientation-b1': {
+    before:        'PLACEHOLDER ORIENTATION CONTENT — real content coming. (Engagement overview: what Meridian hired the firm to do and why.)',
+    simulatedWork: '[PLACEHOLDER] This Orientation briefing block has not been authored yet. Real prose grounding the student in the Meridian Retail cost-transformation engagement will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+  'management-consultant-orientation-b2': {
+    before:        'PLACEHOLDER ORIENTATION CONTENT — real content coming. (The role you play: where the Analyst sits on the team.)',
+    simulatedWork: '[PLACEHOLDER] This Orientation briefing block has not been authored yet. Real prose describing the Analyst role and the four-person team will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+  'management-consultant-orientation-b3': {
+    before:        'PLACEHOLDER ORIENTATION CONTENT — real content coming. (What success looks like: the $50M savings mandate.)',
+    simulatedWork: '[PLACEHOLDER] This Orientation briefing block has not been authored yet. Real prose on the success criteria for the engagement will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+
+  // ── Day-in-the-Life tier (one representative day) ───────────────────────────
+  'management-consultant-dil-d1-b1': {
+    before:        'PLACEHOLDER DAY-IN-THE-LIFE CONTENT — real content coming. (Morning team standup.)',
+    simulatedWork: '[PLACEHOLDER] This Day-in-the-Life block has not been authored yet. Real prose for a representative morning standup will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+  'management-consultant-dil-d1-b2': {
+    before:        'PLACEHOLDER DAY-IN-THE-LIFE CONTENT — real content coming. (Cost analysis deep-work block.)',
+    simulatedWork: '[PLACEHOLDER] This Day-in-the-Life block has not been authored yet. Real prose for a cost-analysis work block will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+  'management-consultant-dil-d1-b3': {
+    before:        'PLACEHOLDER DAY-IN-THE-LIFE CONTENT — real content coming. (Stakeholder interview.)',
+    simulatedWork: '[PLACEHOLDER] This Day-in-the-Life block has not been authored yet. Real prose for a stakeholder interview will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+  'management-consultant-dil-d1-b4': {
+    before:        'PLACEHOLDER DAY-IN-THE-LIFE CONTENT — real content coming. (Findings synthesis.)',
+    simulatedWork: '[PLACEHOLDER] This Day-in-the-Life block has not been authored yet. Real prose for a findings-synthesis block will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+  'management-consultant-dil-d1-b5': {
+    before:        'PLACEHOLDER DAY-IN-THE-LIFE CONTENT — real content coming. (End-of-day team debrief.)',
+    simulatedWork: '[PLACEHOLDER] This Day-in-the-Life block has not been authored yet. Real prose for an end-of-day team debrief will be dropped in here.',
+    commentary:    'PLACEHOLDER COMMENTARY — real over-the-shoulder commentary coming.',
+    after:         'PLACEHOLDER — real content coming.',
+  },
+
   // ── Day 1: Client Kick-off ─────────────────────────────────────────────────
 
   'management-consultant-d1-b1': {

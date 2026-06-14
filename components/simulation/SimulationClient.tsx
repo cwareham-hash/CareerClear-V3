@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link'
-import { type Simulation, type TimeBlock, type DurationOption } from '@/lib/simulation'
+import { type Simulation, type TimeBlock, type Tier } from '@/lib/simulation'
 import { CAREERS } from '@/lib/careers'
 import { useAuth } from '@/lib/auth'
 import { useFavorites } from '@/lib/useFavorites'
@@ -13,7 +13,7 @@ import {
   type SimulationFeedback,
 } from '@/lib/userProgress'
 import { LogIn, Hourglass } from 'lucide-react'
-import DurationSelector from './DurationSelector'
+import TierSelector from './TierSelector'
 import SimulationCalendar from './SimulationCalendar'
 import TimeBlockPanel from './TimeBlockPanel'
 import TimeBlockModal from './TimeBlockModal'
@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function SimulationClient({ simulation }: Props) {
-  const { careerId, title, scenario, project, timeBlocks } = simulation
+  const { careerId, title, scenario, project } = simulation
   const { user, userName, betaAccess, isLoading: authLoading, openAuthModal } = useAuth()
   const { isFavorite, upgradeToActively } = useFavorites()
 
@@ -32,7 +32,7 @@ export default function SimulationClient({ simulation }: Props) {
   const career = CAREERS.find((c) => c.id === careerId)
 
   // ── State ─────────────────────────────────────────────────────────────────
-  const [selectedDuration, setSelectedDuration] = useState<DurationOption>(30)
+  const [selectedTier, setSelectedTier]         = useState<Tier>('orientation')
   const [completedIds, setCompletedIds]         = useState<Set<string>>(new Set())
   const [openBlock, setOpenBlock]               = useState<TimeBlock | null>(null)
   const [mobileDay, setMobileDay]               = useState(1)
@@ -59,38 +59,39 @@ export default function SimulationClient({ simulation }: Props) {
   }, [user, careerId])
 
   // ── Derived values ────────────────────────────────────────────────────────
-  const visibleBlocks = useMemo(
-    () => timeBlocks.filter((b) => b.minDuration <= selectedDuration),
-    [timeBlocks, selectedDuration],
+  // The selected tier's authored blocks — direct lookup, no filtering.
+  const blocks = useMemo(
+    () => simulation.tiers[selectedTier],
+    [simulation, selectedTier],
   )
 
   // Active block = first non-completed visible block
   const activeBlockId = useMemo(
-    () => visibleBlocks.find((b) => !completedIds.has(b.id))?.id ?? null,
-    [visibleBlocks, completedIds],
+    () => blocks.find((b) => !completedIds.has(b.id))?.id ?? null,
+    [blocks, completedIds],
   )
 
   const completedCount = useMemo(
-    () => visibleBlocks.filter((b) => completedIds.has(b.id)).length,
-    [visibleBlocks, completedIds],
+    () => blocks.filter((b) => completedIds.has(b.id)).length,
+    [blocks, completedIds],
   )
 
   const progressPct =
-    visibleBlocks.length > 0 ? (completedCount / visibleBlocks.length) * 100 : 0
+    blocks.length > 0 ? (completedCount / blocks.length) * 100 : 0
 
   // Index of currently-open block in the visible list
   const openBlockIndex = openBlock
-    ? visibleBlocks.findIndex((b) => b.id === openBlock.id)
+    ? blocks.findIndex((b) => b.id === openBlock.id)
     : -1
-  const hasNext     = openBlockIndex >= 0 && openBlockIndex < visibleBlocks.length - 1
+  const hasNext     = openBlockIndex >= 0 && openBlockIndex < blocks.length - 1
   const hasPrevious = openBlockIndex > 0
 
   // ── Trigger rating modal when simulation is newly completed ───────────────
   useEffect(() => {
     if (
-      visibleBlocks.length > 0 &&
+      blocks.length > 0 &&
       completedCount > prevCompletedCountRef.current &&
-      completedCount === visibleBlocks.length
+      completedCount === blocks.length
     ) {
       // Small delay so the "Mark as Completed" button animation settles
       const t = setTimeout(() => setShowRatingModal(true), 400)
@@ -98,13 +99,13 @@ export default function SimulationClient({ simulation }: Props) {
       return () => clearTimeout(t)
     }
     prevCompletedCountRef.current = completedCount
-  }, [completedCount, visibleBlocks.length])
+  }, [completedCount, blocks.length])
 
   // Reset ref when duration changes so it can re-trigger for a new tier
   useEffect(() => {
     prevCompletedCountRef.current = completedCount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDuration])
+  }, [selectedTier])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleMarkComplete = useCallback(
@@ -114,37 +115,39 @@ export default function SimulationClient({ simulation }: Props) {
         next.add(id)
         // Persist this tier's completed blocks (within its depth) to Supabase.
         if (user) {
-          const completedForTier = visibleBlocks.filter((b) => next.has(b.id)).map((b) => b.id)
+          const completedForTier = blocks.filter((b) => next.has(b.id)).map((b) => b.id)
           void upsertProgress({
             userId:          user.id,
             careerId,
-            tier:            String(selectedDuration),
+            tier:            selectedTier,
             completedBlocks: completedForTier,
-            isCompleted:     completedForTier.length === visibleBlocks.length,
+            isCompleted:     completedForTier.length === blocks.length,
           })
         }
         return next
       })
     },
-    [careerId, user, selectedDuration, visibleBlocks],
+    [careerId, user, selectedTier, blocks],
   )
 
   const handleNextBlock = useCallback(() => {
-    if (openBlockIndex >= 0 && openBlockIndex < visibleBlocks.length - 1) {
-      setOpenBlock(visibleBlocks[openBlockIndex + 1])
+    if (openBlockIndex >= 0 && openBlockIndex < blocks.length - 1) {
+      setOpenBlock(blocks[openBlockIndex + 1])
     }
-  }, [openBlockIndex, visibleBlocks])
+  }, [openBlockIndex, blocks])
 
   const handlePreviousBlock = useCallback(() => {
     if (openBlockIndex > 0) {
-      setOpenBlock(visibleBlocks[openBlockIndex - 1])
+      setOpenBlock(blocks[openBlockIndex - 1])
     }
-  }, [openBlockIndex, visibleBlocks])
+  }, [openBlockIndex, blocks])
 
-  const handleDurationChange = useCallback((v: DurationOption) => {
-    setSelectedDuration(v)
+  const handleTierChange = useCallback((v: Tier) => {
+    setSelectedTier(v)
     setOpenBlock(null)
-  }, [])
+    // Reset the mobile day to the first day this tier actually spans.
+    setMobileDay(simulation.tiers[v][0]?.day ?? 1)
+  }, [simulation])
 
   const handleRatingSubmit = useCallback(
     (rating: number, feedback: SimulationFeedback) => {
@@ -154,14 +157,14 @@ export default function SimulationClient({ simulation }: Props) {
           careerId,
           rating,
           feedback,
-          durationOption: selectedDuration,
+          tier: selectedTier,
         })
       }
       // Upgrade favorites status regardless of rating
       void upgradeToActively(careerId)
       setShowRatingModal(false)
     },
-    [careerId, user, selectedDuration, upgradeToActively],
+    [careerId, user, selectedTier, upgradeToActively],
   )
 
   const handleRatingDismiss = useCallback(() => {
@@ -265,7 +268,7 @@ export default function SimulationClient({ simulation }: Props) {
               {/* Progress indicator */}
               <div className="shrink-0 lg:text-right">
                 <p className="font-sans text-[13px] font-medium text-muted mb-1">
-                  {completedCount} of {visibleBlocks.length} activities completed
+                  {completedCount} of {blocks.length} activities completed
                 </p>
                 <div className="h-2 w-full lg:w-48 rounded-pill bg-border overflow-hidden">
                   <div
@@ -281,15 +284,14 @@ export default function SimulationClient({ simulation }: Props) {
         {/* ── Duration selector ────────────────────────────────────────────── */}
         <div className="mb-6">
           <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-2">
-            Simulation depth
+            Choose your experience
           </p>
-          <DurationSelector selected={selectedDuration} onChange={handleDurationChange} />
+          <TierSelector selected={selectedTier} onChange={handleTierChange} />
         </div>
 
         {/* ── Calendar ─────────────────────────────────────────────────────── */}
         <SimulationCalendar
-          timeBlocks={timeBlocks}
-          selectedDuration={selectedDuration}
+          blocks={blocks}
           completedIds={completedIds}
           activeBlockId={activeBlockId}
           mobileDay={mobileDay}
@@ -329,7 +331,7 @@ export default function SimulationClient({ simulation }: Props) {
         careerId={careerId}
         careerTitle={career?.title ?? title}
         careerEmoji={career?.emoji ?? '💼'}
-        durationOption={selectedDuration}
+        tier={selectedTier}
         userName={userName}
         onSubmit={handleRatingSubmit}
         onDismiss={handleRatingDismiss}

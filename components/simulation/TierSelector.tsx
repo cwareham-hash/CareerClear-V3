@@ -1,19 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { DURATION_OPTIONS, type DurationOption } from '@/lib/simulation'
+import { TIERS, type Tier } from '@/lib/simulation'
 
 interface Props {
-  selected: DurationOption
-  onChange: (value: DurationOption) => void
+  selected: Tier
+  onChange: (value: Tier) => void
 }
 
-export default function DurationSelector({ selected, onChange }: Props) {
-  const [hoveredValue, setHoveredValue] = useState<DurationOption | null>(null)
+export default function TierSelector({ selected, onChange }: Props) {
+  const [hoveredValue, setHoveredValue] = useState<Tier | null>(null)
 
   return (
     <div className="flex items-stretch gap-2">
-      {DURATION_OPTIONS.map(({ value, display, label }) => {
+      {TIERS.map(({ value, display, label }) => {
         const active    = selected === value
         const isHovered = !active && hoveredValue === value
         return (

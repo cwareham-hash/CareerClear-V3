@@ -7,7 +7,7 @@
 // behavior), while writes target the currently-selected tier's row.
 
 import { supabase } from '@/lib/supabase'
-import type { DurationOption } from '@/lib/simulation'
+import type { Tier } from '@/lib/simulation'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -19,12 +19,12 @@ export interface SimulationFeedback {
 }
 
 export interface SimulationRating {
-  id:             string
-  careerId:       string
-  rating:         number          // 1–10
-  feedback:       SimulationFeedback
-  durationOption: DurationOption
-  completedAt:    string          // ISO 8601 (created_at)
+  id:          string
+  careerId:    string
+  rating:      number          // 1–10
+  feedback:    SimulationFeedback
+  tier:        Tier
+  completedAt: string          // ISO 8601 (created_at)
 }
 
 // ── Ratings ─────────────────────────────────────────────────────────────────
@@ -43,11 +43,11 @@ interface RatingRow {
 
 function mapRating(row: RatingRow): SimulationRating {
   return {
-    id:             row.id,
-    careerId:       row.simulation_id,
-    rating:         row.score,
-    durationOption: Number(row.tier) as DurationOption,
-    completedAt:    row.created_at,
+    id:          row.id,
+    careerId:    row.simulation_id,
+    rating:      row.score,
+    tier:        row.tier as Tier,
+    completedAt: row.created_at,
     feedback: {
       liked:      row.feedback_liked      ?? '',
       disliked:   row.feedback_disliked   ?? '',
@@ -58,17 +58,17 @@ function mapRating(row: RatingRow): SimulationRating {
 }
 
 export async function saveRating(args: {
-  userId:         string
-  careerId:       string
-  rating:         number
-  feedback:       SimulationFeedback
-  durationOption: DurationOption
+  userId:   string
+  careerId: string
+  rating:   number
+  feedback: SimulationFeedback
+  tier:     Tier
 }): Promise<void> {
-  const { userId, careerId, rating, feedback, durationOption } = args
+  const { userId, careerId, rating, feedback, tier } = args
   const { error } = await supabase.from('ratings').insert({
     user_id:             userId,
     simulation_id:       careerId,
-    tier:                String(durationOption),
+    tier:                tier,
     score:               rating,
     feedback_liked:      feedback.liked      || null,
     feedback_disliked:   feedback.disliked   || null,

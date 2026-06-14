@@ -21,7 +21,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { getHistoryForUser, type QuizAttempt } from '@/lib/recommendations'
 import { CAREERS } from '@/lib/careers'
-import { SIMULATIONS, DURATION_OPTIONS, type DurationOption } from '@/lib/simulation'
+import { SIMULATIONS, TIERS, type Tier } from '@/lib/simulation'
 import {
   getProgressByCareer,
   getAllRatings,
@@ -45,17 +45,17 @@ function matchBadgeClass(pct: number): string {
   return 'bg-border text-muted'
 }
 
-function durationLabel(d: DurationOption): string {
-  return DURATION_OPTIONS.find((o) => o.value === d)?.display ?? `${d} min`
+function tierLabel(t: Tier): string {
+  return TIERS.find((o) => o.value === t)?.display ?? t
 }
 
 // ── Per-tier progress types ───────────────────────────────────────────────────
 
 interface TierProgress {
-  duration:       DurationOption
-  display:        string        // e.g. "10 min", "2 hours"
+  tier:           Tier
+  display:        string        // e.g. "Orientation", "Full Simulation"
   completedCount: number
-  totalCount:     number        // visible blocks at this tier (minDuration <= duration)
+  totalCount:     number        // authored blocks in this tier
   isCompleted:    boolean
 }
 
@@ -141,7 +141,7 @@ function ProgressRow({ role }: { role: RoleProgress }) {
         {role.tiers.map((tier) => {
           const pct = Math.round((tier.completedCount / tier.totalCount) * 100)
           return (
-            <div key={tier.duration} className="flex flex-col gap-1.5">
+            <div key={tier.tier} className="flex flex-col gap-1.5">
               {/* Row 1: pill + status badge + spacer + CTA */}
               <div className="flex items-center gap-2">
                 <span
@@ -218,7 +218,7 @@ function ProgressRow({ role }: { role: RoleProgress }) {
               <div className="flex items-center gap-2 mb-3">
                 <RatingBadge rating={r.rating} />
                 <span className="font-sans text-[12px] text-muted">
-                  {formatDate(r.completedAt)} · {durationLabel(r.durationOption)}
+                  {formatDate(r.completedAt)} · {tierLabel(r.tier)}
                 </span>
               </div>
               <div className="flex flex-col gap-3">
@@ -451,16 +451,18 @@ export default function DashboardPage() {
         const completedSet = new Set(progressMap[sim.careerId] ?? [])
         if (completedSet.size === 0) return []
 
-        const tiers: TierProgress[] = DURATION_OPTIONS
+        // Each tier's blocks have disjoint ids, so a completed id maps to exactly
+        // one tier — counting membership in the union attributes it correctly.
+        const tiers: TierProgress[] = TIERS
           .map(({ value, display }) => {
-            const visibleBlocks  = sim.timeBlocks.filter((b) => b.minDuration <= value)
-            const completedCount = visibleBlocks.filter((b) => completedSet.has(b.id)).length
+            const tierBlocks     = sim.tiers[value]
+            const completedCount = tierBlocks.filter((b) => completedSet.has(b.id)).length
             return {
-              duration:       value,
+              tier:           value,
               display,
               completedCount,
-              totalCount:     visibleBlocks.length,
-              isCompleted:    completedCount >= visibleBlocks.length,
+              totalCount:     tierBlocks.length,
+              isCompleted:    tierBlocks.length > 0 && completedCount >= tierBlocks.length,
             }
           })
           .filter((tier) => tier.completedCount >= 1)

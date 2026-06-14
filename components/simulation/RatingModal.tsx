@@ -3,18 +3,18 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import type { DurationOption } from '@/lib/simulation'
+import type { Tier } from '@/lib/simulation'
 import type { SimulationFeedback } from '@/lib/userProgress'
 
 interface Props {
-  show:           boolean
-  careerId:       string
-  careerTitle:    string
-  careerEmoji:    string
-  durationOption: DurationOption
-  userName:       string | null
-  onSubmit:       (rating: number, feedback: SimulationFeedback) => void
-  onDismiss:      () => void
+  show:        boolean
+  careerId:    string
+  careerTitle: string
+  careerEmoji: string
+  tier:        Tier
+  userName:    string | null
+  onSubmit:    (rating: number, feedback: SimulationFeedback) => void
+  onDismiss:   () => void
 }
 
 const ANCHOR_LABELS: Record<number, string> = {
