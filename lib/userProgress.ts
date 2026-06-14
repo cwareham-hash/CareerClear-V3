@@ -132,6 +132,28 @@ export async function getCompletedBlockIds(
   return Array.from(set)
 }
 
+/**
+ * Completed block ids for the career-level Orientation (scenario IS NULL).
+ * Orientation is shared across projects, so it is keyed at the career level.
+ */
+export async function getOrientationCompletedBlockIds(userId: string, careerId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('user_progress')
+    .select('completed_blocks')
+    .eq('user_id', userId)
+    .eq('simulation_id', careerId)
+    .is('scenario', null)
+  if (error) {
+    console.error('[progress] getOrientationCompletedBlockIds failed:', error.message)
+    return []
+  }
+  const set = new Set<string>()
+  for (const row of data as { completed_blocks: string[] }[]) {
+    for (const id of row.completed_blocks ?? []) set.add(id)
+  }
+  return Array.from(set)
+}
+
 /** Map of careerId → union of completed block ids, for ALL the user's progress. */
 export async function getProgressByCareer(userId: string): Promise<Record<string, string[]>> {
   const { data, error } = await supabase

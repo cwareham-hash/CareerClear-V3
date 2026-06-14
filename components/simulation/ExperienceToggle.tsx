@@ -1,19 +1,27 @@
 'use client'
 
+// In-project experience toggle: Day in the Life vs Full Simulation for the SAME
+// project. Orientation is NOT here — it is a separate career-level destination.
 import { useState } from 'react'
-import { TIERS, type Tier } from '@/lib/simulation'
+
+export type Experience = 'day-in-life' | 'full'
+
+const OPTIONS: { value: Experience; display: string; label: string }[] = [
+  { value: 'day-in-life', display: 'Day in the Life', label: 'One representative day'   },
+  { value: 'full',        display: 'Full Simulation', label: 'Complete multi-day arc'  },
+]
 
 interface Props {
-  selected: Tier
-  onChange: (value: Tier) => void
+  selected: Experience
+  onChange: (value: Experience) => void
 }
 
-export default function TierSelector({ selected, onChange }: Props) {
-  const [hoveredValue, setHoveredValue] = useState<Tier | null>(null)
+export default function ExperienceToggle({ selected, onChange }: Props) {
+  const [hoveredValue, setHoveredValue] = useState<Experience | null>(null)
 
   return (
     <div className="flex items-stretch gap-2">
-      {TIERS.map(({ value, display, label }) => {
+      {OPTIONS.map(({ value, display, label }) => {
         const active    = selected === value
         const isHovered = !active && hoveredValue === value
         return (
@@ -26,22 +34,10 @@ export default function TierSelector({ selected, onChange }: Props) {
               font-sans transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/30"
             style={
               active
-                ? {
-                    backgroundColor: 'var(--color-navy)',
-                    color: '#ffffff',
-                    borderColor: 'var(--color-teal)',
-                  }
+                ? { backgroundColor: 'var(--color-navy)', color: '#ffffff', borderColor: 'var(--color-teal)' }
                 : isHovered
-                ? {
-                    backgroundColor: '#ffffff',
-                    color: 'var(--color-teal)',
-                    borderColor: 'var(--color-teal)',
-                  }
-                : {
-                    backgroundColor: '#ffffff',
-                    color: 'var(--color-dark-text)',
-                    borderColor: 'var(--color-border)',
-                  }
+                ? { backgroundColor: '#ffffff', color: 'var(--color-teal)', borderColor: 'var(--color-teal)' }
+                : { backgroundColor: '#ffffff', color: 'var(--color-dark-text)', borderColor: 'var(--color-border)' }
             }
             aria-pressed={active}
           >

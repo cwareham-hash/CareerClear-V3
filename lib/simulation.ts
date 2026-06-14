@@ -58,7 +58,8 @@ export interface TimeBlock {
 export interface Scenario {
   id:       string
   slug:     string         // human-readable, e.g. 'fresca'
-  title:    string         // short scenario name (for the picker)
+  title:    string         // short project codename, e.g. 'Project Fresca'
+  type?:    string         // user-facing category label, e.g. 'Corporate' (type-first cards)
   scenario: string         // the situation set-up shown in the overview header
   project:  string         // the project name, e.g. "Project Fresca — Restaurant Profit Study"
   tiers: {
@@ -222,6 +223,7 @@ export const CAREER_SIMS: CareerSim[] = [
         id:       'management-consultant-fresca',
         slug:     'fresca',
         title:    'Project Fresca',
+        type:     'Corporate',
         scenario: 'An 8-week profit-improvement study for Fresca, a 240-location fast-casual chain recently bought by a private equity firm whose value-creation plan calls for $30M in profit improvement. You are a first-year Associate, three months in, owning the labor-cost workstream. It is week 3 of 8, and the week ends with the first Steering Committee presentation to Fresca\'s CEO and the sponsor.',
         project:  'Project Fresca — Restaurant Profit Study',
         tiers: {
@@ -274,6 +276,7 @@ export const CAREER_SIMS: CareerSim[] = [
         id:       'management-consultant-public-sector',
         slug:     'public-sector',
         title:    'Project Gateway',
+        type:     'Public Sector',
         scenario: 'A 10-week operational review for the Hartwell State Department of Human Services, which processes Medicaid and SNAP benefits through 38 county offices. Applications take months, families are waiting, and a new set of federal renewal and work-requirement rules takes effect in 14 weeks, roughly doubling the agency\'s workload. You are a first-year Associate, three months in, owning the county-operations workstream: why some offices clear applications in days and others take months under identical rules. The week ends with a Steering Committee presentation to the Commissioner.',
         project:  'Project Gateway: State Benefits Backlog Review',
         tiers: {
@@ -325,6 +328,7 @@ export const CAREER_SIMS: CareerSim[] = [
         id:       'management-consultant-financial-services',
         slug:     'financial-services',
         title:    'Project Atlas',
+        type:     'Financial Services',
         scenario: 'A 9-week target operating model engagement for Cascade Public Pension Fund, a $90B fund insourcing its investment management to cut external fees and gain control. You are a first-year Associate, three months in, owning the middle-office workstream. The central question: the binding constraint on insourcing is not the front office but the middle office, specifically the data layer and the Investment Book of Record. The week builds to an Investment Committee presentation on what to build in-house, what to outsource, and how to sequence it safely.',
         project:  'Project Atlas: Pension Fund Operating Model',
         tiers: {

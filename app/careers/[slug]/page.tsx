@@ -305,7 +305,7 @@ export default function CareerDetailPage({ params }: Props) {
                     Ready to experience a week in this role?
                   </h2>
                   <p className="font-sans text-[14px] text-muted">
-                    Step through real work scenarios, complete activities at your own pace, and
+                    Step through real work situations, complete activities at your own pace, and
                     see what a day-to-day actually looks like.
                   </p>
                 </div>
@@ -330,7 +330,7 @@ export default function CareerDetailPage({ params }: Props) {
                   </h2>
                   <p className="font-sans text-[14px] text-muted">
                     This simulation is being built. Soon you&apos;ll be able to step through real
-                    work scenarios and see what the day-to-day actually looks like.
+                    work situations and see what the day-to-day actually looks like.
                   </p>
                 </div>
                 <span
