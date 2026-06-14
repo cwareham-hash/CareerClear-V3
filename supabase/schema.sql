@@ -13,8 +13,10 @@
 --
 -- Security model: Row Level Security (RLS) is ON for every table, so the
 -- public anon key used by the browser can only ever read/write the logged-in
--- user's OWN rows. `beta_access` is locked so users cannot grant it to
--- themselves — only you (via the dashboard / service role) can flip it.
+-- user's OWN rows. `beta_access` now DEFAULTS TO TRUE, so a new signup can open
+-- simulations as soon as they log in — no manual flip required. It is still
+-- locked against user modification: a user cannot change their own beta_access
+-- (see the column-level grant below); only you (dashboard / service role) can.
 -- ============================================================================
 
 
@@ -25,7 +27,7 @@ create table if not exists public.profiles (
   id          uuid        primary key references auth.users(id) on delete cascade,
   full_name   text,
   university  text,                          -- nullable / optional
-  beta_access boolean     not null default false,
+  beta_access boolean     not null default true,   -- open beta: new signups get access automatically
   created_at  timestamptz not null default now()
 );
 
@@ -62,6 +64,8 @@ grant  update (full_name, university) on public.profiles to authenticated;
 
 -- Auto-create a profile row whenever a new auth user signs up. full_name and
 -- university are read from the signup metadata the app passes through.
+-- beta_access is set to TRUE explicitly here (matching the column default) so
+-- new signups can open simulations immediately, with no manual flip.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -69,11 +73,12 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, full_name, university)
+  insert into public.profiles (id, full_name, university, beta_access)
   values (
     new.id,
     new.raw_user_meta_data ->> 'full_name',
-    new.raw_user_meta_data ->> 'university'
+    new.raw_user_meta_data ->> 'university',
+    true
   );
   return new;
 end;
