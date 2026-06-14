@@ -95,14 +95,15 @@ export interface Simulation {
 
 // ── Phase 5 content imports ────────────────────────────────────────────────────
 
-import { ibAnalystContent }             from './content/ib-analyst'
-import { managementConsultantContent }  from './content/management-consultant'
-import { lawAssociateContent }          from './content/law-associate'
-import { productManagerContent }        from './content/product-manager'
+import { ibAnalystContent }                    from './content/ib-analyst'
+import { managementConsultantContent }         from './content/management-consultant'
+import { managementConsultantPublicSectorContent } from './content/management-consultant-public-sector'
+import { lawAssociateContent }                 from './content/law-associate'
+import { productManagerContent }               from './content/product-manager'
 
 const CONTENT_LOOKUP: Record<string, Record<string, TimeBlockContent>> = {
   'ib-analyst':             ibAnalystContent,
-  'management-consultant':  managementConsultantContent,
+  'management-consultant':  { ...managementConsultantContent, ...managementConsultantPublicSectorContent },
   'law-associate':          lawAssociateContent,
   'product-manager':        productManagerContent,
 }
@@ -265,6 +266,57 @@ export const CAREER_SIMS: CareerSim[] = [
             makeBlock('management-consultant', "management-consultant-full-d5-b4", 5, "2:30 to 4:00 PM", "Friday training: the partner masterclass", 'learning'),
             makeBlock('management-consultant', "management-consultant-full-d5-b5", 5, "4:00 to 4:45 PM", "Week wrap with Priya: the feedback ritual", 'team'),
             makeBlock('management-consultant', "management-consultant-full-d5-b6", 5, "7:00 to 8:00 PM", "The week, weighed", 'learning'),
+          ],
+        },
+      },
+      {
+        id:       'management-consultant-public-sector',
+        slug:     'public-sector',
+        title:    'Project Gateway',
+        scenario: 'A 10-week operational review for the Hartwell State Department of Human Services, which processes Medicaid and SNAP benefits through 38 county offices. Applications take months, families are waiting, and a new set of federal renewal and work-requirement rules takes effect in 14 weeks, roughly doubling the agency\'s workload. You are a first-year Associate, three months in, owning the county-operations workstream: why some offices clear applications in days and others take months under identical rules. The week ends with a Steering Committee presentation to the Commissioner.',
+        project:  'Project Gateway: State Benefits Backlog Review',
+        tiers: {
+          // Day in the Life (one county field day, 7 blocks)
+          'day-in-life': [
+            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b1", 1, "7:15 to 8:30 AM", "The drive out to Eastwood County", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b2", 1, "8:45 to 9:45 AM", "Walking the floor before the office opens", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b3", 1, "9:45 to 11:00 AM", "Shadowing a caseworker", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b4", 1, "11:00 to 11:45 AM", "The caseworker's break: turnover, burnout, and the human cost", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b5", 1, "11:45 AM to 12:15 PM", "Closing with the office manager", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b6", 1, "1:30 to 3:00 PM", "Reconciling the floor against the data", 'independent'),
+            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b7", 1, "3:00 to 4:00 PM", "Debrief with the engagement manager", 'team'),
+          ],
+          // Full Simulation (Sunday night through Friday, 29 blocks)
+          full: [
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d0-b1", 0, "8:00 to 10:00 PM", "The Sunday reset before the capital", 'learning'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b1", 1, "5:45 to 8:45 AM", "The Monday migration", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b2", 1, "9:00 to 10:00 AM", "War room: planning the week backward from Thursday", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b3", 1, "10:00 AM to 1:00 PM", "Into the data: where the five-fold gap lives", 'independent'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b4", 1, "2:00 to 3:30 PM", "Meeting the deputy: the most important skeptic in the building", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b5", 1, "3:45 to 5:30 PM", "The internal AI tool and the benchmark hunt", 'independent'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b6", 1, "7:00 to 9:30 PM", "Team dinner, and the conversation about the career", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b1", 2, "7:15 to 8:45 AM", "The drive out to Eastwood County", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b2", 2, "8:45 to 9:45 AM", "Walking the floor before the office opens", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b3", 2, "9:45 to 11:00 AM", "Shadowing a caseworker", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b4", 2, "11:00 to 11:45 AM", "The break room: turnover, burnout, and the human cost", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b5", 2, "11:45 AM to 12:30 PM", "Closing with the office manager, and the real blocker", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b6", 2, "2:00 to 4:30 PM", "Reconciling the floor against the data, and the debrief", 'independent'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b1", 3, "8:00 to 9:30 AM", "Building the storyline before the slides", 'independent'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b2", 3, "9:30 AM to 12:30 PM", "The problem-solving session: the partner sharpens the edge", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b3", 3, "1:30 to 2:30 PM", "The governance story, in full", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b4", 3, "3:00 to 7:00 PM", "Building the deck", 'independent'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b5", 3, "7:30 to 8:15 PM", "The pre-wire: no surprises in the room", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b1", 4, "7:30 to 8:45 AM", "The dry run", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b2", 4, "1:30 to 1:50 PM", "Managing up: the partner and the Commissioner", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b3", 4, "2:00 to 2:40 PM", "The Steering Committee", 'presentation'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b4", 4, "2:40 to 3:10 PM", "The hard questions", 'presentation'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b5", 4, "3:10 to 3:30 PM", "The decision", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b6", 4, "6:30 to 9:00 PM", "The flight home", 'learning'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b1", 5, "9:00 to 10:00 AM", "The home-office debrief", 'team'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b2", 5, "10:00 to 10:40 AM", "The career conversation", 'learning'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b3", 5, "11:00 AM to 12:30 PM", "Documenting the win and scoping what is next", 'independent'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b4", 5, "2:00 to 2:30 PM", "The line outside the door", 'learning'),
+            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b5", 5, "4:00 to 4:30 PM", "Closing the week", 'learning'),
           ],
         },
       },
