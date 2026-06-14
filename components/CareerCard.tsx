@@ -81,8 +81,10 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
           {title}
         </h3>
 
-        {/* Description — §7.6.1: 14px regular #6b7280, 2–3 lines */}
-        <p className="font-sans text-[14px] text-muted leading-relaxed mb-4 flex-1">
+        {/* Description — §7.6.1: 14px regular #6b7280. Clamped so the longer
+            exploration-role descriptions don't make grid cards uneven; full text
+            shows on the detail page. */}
+        <p className="font-sans text-[14px] text-muted leading-relaxed mb-4 flex-1 line-clamp-4">
           {description}
         </p>
 

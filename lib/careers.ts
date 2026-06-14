@@ -2,6 +2,11 @@
 // §6.1 — 4 fully developed roles (hasSimulation: true)
 // §6.2 — 6 demonstration roles (hasSimulation: false)
 // §6.3 — Taxonomy: industry and function categories
+//
+// The 90 net-new exploration-only roles live in lib/content/explorationRoles.ts
+// (generated from the planning draft) and are appended to CAREERS below.
+
+import { EXPLORATION_CAREERS } from './content/explorationRoles'
 
 export type IndustryCategory =
   | 'Finance'
@@ -10,6 +15,18 @@ export type IndustryCategory =
   | 'Technology'
   | 'Marketing'
   | 'Sales'
+  // Expanded for the exploration library (90 net-new roles)
+  | 'Accounting'
+  | 'Design'
+  | 'General Management'
+  | 'Government'
+  | 'Healthcare'
+  | 'Human Resources'
+  | 'Insurance'
+  | 'Media'
+  | 'Nonprofit'
+  | 'Operations'
+  | 'Real Estate'
 
 export type FunctionCategory =
   | 'Analytical'
@@ -42,6 +59,17 @@ export const INDUSTRY_FILTERS: IndustryCategory[] = [
   'Technology',
   'Marketing',
   'Sales',
+  'Accounting',
+  'Design',
+  'General Management',
+  'Government',
+  'Healthcare',
+  'Human Resources',
+  'Insurance',
+  'Media',
+  'Nonprofit',
+  'Operations',
+  'Real Estate',
 ]
 
 export const FUNCTION_FILTERS: FunctionCategory[] = [
@@ -179,4 +207,7 @@ export const CAREERS: Career[] = [
     skills: ['Relationship Building', 'Negotiation', 'CRM Tools', 'Prospecting', 'Communication'],
     hasSimulation: false,
   },
+
+  // ── 90 net-new exploration-only roles (generated; hasSimulation: false) ──────
+  ...EXPLORATION_CAREERS,
 ]

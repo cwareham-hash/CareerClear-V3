@@ -1,4 +1,7 @@
-// §5.4 Career Detail — Rich content for the 4 core career roles
+// §5.4 Career Detail — Rich content for the 4 core career roles, plus the 90
+// exploration-only roles (appended via EXPLORATION_DETAIL at the bottom).
+
+import { EXPLORATION_DETAIL } from './content/explorationRoles'
 
 export interface CareerStage {
   title: string
@@ -10,7 +13,8 @@ export interface CareerDetailContent {
   aboutRole: string[]
   typicalWorkday: string[]
   aiImpact: string[]
-  trajectory: CareerStage[]
+  // Optional: exploration-only roles have no authored career-trajectory data.
+  trajectory?: CareerStage[]
   requiredSkills: string[]
   education: {
     majors: string[]
@@ -229,4 +233,6 @@ export const CAREER_DETAIL: Record<string, CareerDetailContent> = {
     ],
   },
 
+  // ── 90 exploration-only roles (generated from the planning draft) ────────────
+  ...EXPLORATION_DETAIL,
 }

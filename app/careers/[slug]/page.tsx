@@ -172,23 +172,27 @@ export default function CareerDetailPage({ params }: Props) {
                   ))}
                 </ul>
 
-                <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-2">
-                  Graduate Degrees
-                </p>
-                <ul className="space-y-1.5">
-                  {detail.education.graduateDegrees.map((degree) => (
-                    <li key={degree} className="flex items-start gap-2">
-                      <span
-                        className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full"
-                        style={{ backgroundColor: 'var(--color-navy)' }}
-                        aria-hidden="true"
-                      />
-                      <span className="font-sans text-[13px] text-dark leading-snug">
-                        {degree}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                {detail.education.graduateDegrees.length > 0 && (
+                  <>
+                    <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-2">
+                      Graduate Degrees
+                    </p>
+                    <ul className="space-y-1.5">
+                      {detail.education.graduateDegrees.map((degree) => (
+                        <li key={degree} className="flex items-start gap-2">
+                          <span
+                            className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: 'var(--color-navy)' }}
+                            aria-hidden="true"
+                          />
+                          <span className="font-sans text-[13px] text-dark leading-snug">
+                            {degree}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </div>
 
               {/* Sample Companies */}
@@ -215,7 +219,9 @@ export default function CareerDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Career Trajectory — full width */}
+          {/* Career Trajectory — full width (omitted for exploration-only roles
+              that have no authored trajectory data) */}
+          {detail.trajectory && detail.trajectory.length > 0 && (
           <section className="mt-6 bg-white rounded-card border border-border shadow-card overflow-hidden">
             <div className="h-1" style={{ backgroundColor: 'var(--color-navy)' }} />
             <div className="px-8 py-8">
@@ -271,7 +277,7 @@ export default function CareerDetailPage({ params }: Props) {
                       </div>
 
                       {/* Arrow between stages */}
-                      {i < detail.trajectory.length - 1 && (
+                      {i < detail.trajectory!.length - 1 && (
                         <ChevronRight
                           size={18}
                           aria-hidden="true"
@@ -285,6 +291,7 @@ export default function CareerDetailPage({ params }: Props) {
               </div>
             </div>
           </section>
+          )}
 
           {/* Simulation CTA — full width, pinned to bottom of detail content.
               Active "Start Simulation" for live roles; a disabled "Coming Soon"
