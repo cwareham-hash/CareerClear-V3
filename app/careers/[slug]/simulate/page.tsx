@@ -1,27 +1,34 @@
-// §5.5 Simulation interface — server wrapper
-import { notFound } from 'next/navigation'
-import { SIMULATIONS, getSimulation } from '@/lib/simulation'
+// §5.5 Simulation entry point — scenario routing.
+//   0 scenarios → notFound (matches the old behavior).
+//   1 scenario  → redirect straight in, no picker, no extra click.
+//   2+ scenarios → show the scenario picker.
+import { notFound, redirect } from 'next/navigation'
+import { CAREER_SIMS, getCareerSim } from '@/lib/simulation'
 import { CAREERS } from '@/lib/careers'
-import SimulationClient from '@/components/simulation/SimulationClient'
+import ScenarioPicker from '@/components/simulation/ScenarioPicker'
 
 interface Props {
   params: { slug: string }
 }
 
-// Pre-render only the careers that have simulations
+// Pre-render one entry page per career that has a simulation wired up.
 export function generateStaticParams() {
-  return SIMULATIONS.map((s) => ({ slug: s.slug }))
+  return CAREER_SIMS.map((cs) => ({ slug: cs.careerSlug }))
 }
 
 export default function SimulatePage({ params }: Props) {
-  const simulation = getSimulation(params.slug)
-  if (!simulation) notFound()
+  const careerSim = getCareerSim(params.slug)
+  if (!careerSim) notFound()
 
-  // Route guard: a simulation may still be wired up (kept in SIMULATIONS) but
-  // hidden behind the "Coming Soon" state via hasSimulation: false. Don't let a
-  // hand-typed URL reach it. Re-enabling is a one-line flip in lib/careers.ts.
-  const career = CAREERS.find((c) => c.id === simulation.careerId)
+  // Same guard as the scenario page: hidden ("Coming Soon") careers 404 here too.
+  const career = CAREERS.find((c) => c.id === careerSim.careerId)
   if (!career?.hasSimulation) notFound()
 
-  return <SimulationClient simulation={simulation} />
+  const scenarios = careerSim.scenarios
+  if (scenarios.length === 0) notFound()
+  if (scenarios.length === 1) {
+    redirect(`/careers/${params.slug}/simulate/${scenarios[0].slug}`)
+  }
+
+  return <ScenarioPicker careerSim={careerSim} />
 }
