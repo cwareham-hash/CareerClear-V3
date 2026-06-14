@@ -150,7 +150,28 @@ export function BeforeSection({ content }: { content: string }) {
   )
 }
 
-export function ScriptSection({ content }: { content: string }) {
+export function ScriptSection({ content, asProse = false }: { content: string; asProse?: boolean }) {
+  // Briefing prose (e.g. Orientation) is plain narration paragraphs, not a
+  // screenplay — render it as clean body text instead of running it through the
+  // dialogue/scene parser, which would mis-style or mis-split it.
+  if (asProse) {
+    const paragraphs = content.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
+    return (
+      <div>
+        <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-3">
+          During
+        </p>
+        <div className="space-y-3">
+          {paragraphs.map((para, i) => (
+            <p key={i} className="font-sans text-[14px] text-dark leading-relaxed">
+              {para}
+            </p>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   const lines = parseScriptLines(content)
   return (
     <div>

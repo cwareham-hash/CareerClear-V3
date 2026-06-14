@@ -38,3 +38,6 @@ next-env.d.ts
 # playwright screenshots / scratch artifacts
 /.playwright-mcp/
 /*.png
+
+# content integration scratch drafts (source .md + generator, not shipped)
+/_content-integration/

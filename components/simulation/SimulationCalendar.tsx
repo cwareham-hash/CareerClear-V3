@@ -2,10 +2,11 @@
 
 import { ACTIVITY_COLORS, ACTIVITY_LABELS, type TimeBlock } from '@/lib/simulation'
 
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+// Indexed by day number directly: day 0 = Sunday (the full sim opens Sunday night).
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function dayLabel(day: number): string {
-  return DAY_LABELS[day - 1] ?? `Day ${day}`
+  return DAY_LABELS[day] ?? `Day ${day}`
 }
 
 // Legend items — human-readable names mapped to activity types

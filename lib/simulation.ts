@@ -41,11 +41,14 @@ export interface TimeBlockContent {
 
 export interface TimeBlock {
   id:           string
-  day:          number       // 1-based; orientation/day-in-life span fewer days than full
+  day:          number       // 0 = Sunday; orientation/day-in-life span fewer days than full
   timeRange:    string
   title:        string
   activityType: ActivityType
   content:      TimeBlockContent
+  // When true, the During section is briefing prose (paragraphs), not screenplay —
+  // rendered as clean body text rather than parsed as dialogue. Used by Orientation.
+  briefing?:    boolean
 }
 
 export interface Simulation {
@@ -94,9 +97,10 @@ function makeBlock(
   timeRange: string,
   title: string,
   activityType: ActivityType,
+  briefing = false,
 ): TimeBlock {
   const content = CONTENT_LOOKUP[careerId]?.[blockId] ?? FALLBACK_CONTENT
-  return { id: blockId, day, timeRange, title, activityType, content }
+  return { id: blockId, day, timeRange, title, activityType, content, briefing }
 }
 
 // Full-tier convenience: derives the id from day/block number, preserving the
@@ -168,56 +172,59 @@ export const SIMULATIONS: Simulation[] = [
     careerId: 'management-consultant',
     slug:     'management-consultant',
     title:    'Management Consultant',
-    scenario: 'Meridian Retail, an $800M regional retailer, has engaged your firm to identify $50M in cost savings without compromising customer experience. You are the lead analyst on a four-person team.',
-    project:  'Meridian Retail Cost Transformation',
+    scenario: 'An 8-week profit-improvement study for Fresca, a 240-location fast-casual chain recently bought by a private equity firm whose value-creation plan calls for $30M in profit improvement. You are a first-year Associate, three months in, owning the labor-cost workstream. It is week 3 of 8, and the week ends with the first Steering Committee presentation to Fresca\'s CEO and the sponsor.',
+    project:  'Project Fresca — Restaurant Profit Study',
     tiers: {
-      // ── Orientation — PLACEHOLDER (2–3 short briefing blocks) ──────────────
-      // Real orientation content is authored separately and dropped in next.
+      // Real V2 content — Project Fresca. Prose in lib/content/management-consultant.ts;
+      // block metadata generated from the _content-integration/ drafts.
+      // ── Orientation (3 reading blocks, briefing prose) ─────────────────────
       orientation: [
-        makeBlock('management-consultant', 'management-consultant-orientation-b1', 1, 'Briefing · Part 1', 'PLACEHOLDER — Engagement Overview',      'learning'),
-        makeBlock('management-consultant', 'management-consultant-orientation-b2', 1, 'Briefing · Part 2', 'PLACEHOLDER — The Role You Play',        'learning'),
-        makeBlock('management-consultant', 'management-consultant-orientation-b3', 1, 'Briefing · Part 3', 'PLACEHOLDER — What Success Looks Like',  'learning'),
+        makeBlock('management-consultant', "management-consultant-orientation-b1", 1, "~4 min read", "What the job actually is, and what you would do all day", 'learning', true),
+        makeBlock('management-consultant', "management-consultant-orientation-b2", 1, "~4 min read", "The rhythm, the pyramid, and the machinery nobody explains", 'learning', true),
+        makeBlock('management-consultant', "management-consultant-orientation-b3", 1, "~4 min read", "The honest trade, and how to tell if it is you", 'learning', true),
       ],
-      // ── Day in the Life — PLACEHOLDER (one representative day, 5 blocks) ────
+      // ── Day in the Life (one Wednesday deck day, 7 blocks) ─────────────────
       'day-in-life': [
-        makeBlock('management-consultant', 'management-consultant-dil-d1-b1', 1, '9:00–9:30 AM',  'PLACEHOLDER — Morning Team Standup',   'meeting'),
-        makeBlock('management-consultant', 'management-consultant-dil-d1-b2', 1, '9:30–12:00 PM', 'PLACEHOLDER — Cost Analysis Block',    'independent'),
-        makeBlock('management-consultant', 'management-consultant-dil-d1-b3', 1, '1:00–2:30 PM',  'PLACEHOLDER — Stakeholder Interview',  'meeting'),
-        makeBlock('management-consultant', 'management-consultant-dil-d1-b4', 1, '2:30–5:00 PM',  'PLACEHOLDER — Findings Synthesis',     'independent'),
-        makeBlock('management-consultant', 'management-consultant-dil-d1-b5', 1, '5:00–6:00 PM',  'PLACEHOLDER — End-of-Day Team Debrief','team'),
+        makeBlock('management-consultant', "management-consultant-dil-d1-b1", 1, "6:45 to 8:00 AM", "Hotel morning: the calm before", 'learning'),
+        makeBlock('management-consultant', "management-consultant-dil-d1-b2", 1, "8:00 to 9:00 AM", "Storyline huddle: the dot-dash", 'team'),
+        makeBlock('management-consultant', "management-consultant-dil-d1-b3", 1, "9:00 AM to 12:30 PM", "The build sprint", 'independent'),
+        makeBlock('management-consultant', "management-consultant-dil-d1-b4", 1, "2:00 to 3:30 PM", "The Dan review: half your pages die", 'team'),
+        makeBlock('management-consultant', "management-consultant-dil-d1-b5", 1, "4:00 to 8:00 PM", "Rebuild: answer-first", 'independent'),
+        makeBlock('management-consultant', "management-consultant-dil-d1-b6", 1, "8:00 to 10:45 PM", "The late night: version 9 and the final pass", 'team'),
+        makeBlock('management-consultant', "management-consultant-dil-d1-b7", 1, "10:45 to 11:15 PM", "The walk back: what today actually was", 'learning'),
       ],
-      // ── Full Simulation — the complete, real, existing consulting content ───
+      // ── Full Simulation (Sunday night through Friday, 30 blocks) ───────────
       full: [
-        // Day 1 — Client Kick-off
-        b('management-consultant', 1, 1, '9:00–9:30 AM',    'Team Alignment Call',                    'meeting'),
-        b('management-consultant', 1, 2, '10:00–12:00 PM',  'Client Industry Research',               'learning'),
-        b('management-consultant', 1, 3, '1:00–3:00 PM',    'Client Kick-off Workshop',               'meeting'),
-        b('management-consultant', 1, 4, '3:30–5:30 PM',    'Hypothesis Tree Development',            'team'),
-        b('management-consultant', 1, 5, '6:00–9:00 PM',    'Work Plan and Timeline Build',           'independent'),
-        // Day 2 — Data Gathering
-        b('management-consultant', 2, 1, '9:00–9:30 AM',    'Daily Standup',                          'meeting'),
-        b('management-consultant', 2, 2, '10:00–12:00 PM',  'Stakeholder Interviews: Operations',     'meeting'),
-        b('management-consultant', 2, 3, '1:30–3:00 PM',    'Stakeholder Interviews: Finance',        'meeting'),
-        b('management-consultant', 2, 4, '3:30–6:00 PM',    'Interview Synthesis',                    'independent'),
-        b('management-consultant', 2, 5, '6:00–9:00 PM',    'Data Model Setup',                       'independent'),
-        // Day 3 — Analysis
-        b('management-consultant', 3, 1, '9:30–10:00 AM',   'Check-in with Engagement Manager',       'meeting'),
-        b('management-consultant', 3, 2, '10:30–12:00 PM',  'Cost Benchmarking Analysis',             'independent'),
-        b('management-consultant', 3, 3, '1:00–3:00 PM',    'Supply Chain Opportunity Assessment',    'independent'),
-        b('management-consultant', 3, 4, '3:30–5:30 PM',    'Mid-point Team Scrub',                   'team'),
-        b('management-consultant', 3, 5, '6:00–9:00 PM',    'Findings Quantification',                'independent'),
-        // Day 4 — Recommendations
-        b('management-consultant', 4, 1, '9:00–9:30 AM',    'Story-lining Session',                   'team'),
-        b('management-consultant', 4, 2, '10:00–12:00 PM',  'Recommendation Deck Structure',          'independent'),
-        b('management-consultant', 4, 3, '1:30–3:00 PM',    'Internal Review with Senior Manager',    'team'),
-        b('management-consultant', 4, 4, '3:30–6:00 PM',    'Executive Slides Build',                 'independent'),
-        b('management-consultant', 4, 5, '6:00–9:00 PM',    'Implementation Roadmap',                 'independent'),
-        // Day 5 — Client Readout
-        b('management-consultant', 5, 1, '9:00–9:30 AM',    'Partner Pre-brief',                      'meeting'),
-        b('management-consultant', 5, 2, '10:00–11:00 AM',  'Final Dry Run Presentation',             'team'),
-        b('management-consultant', 5, 3, '11:30 AM–1:00 PM','Client Readout Presentation',            'presentation'),
-        b('management-consultant', 5, 4, '2:00–4:00 PM',    'Client Q&A Session',                    'meeting'),
-        b('management-consultant', 5, 5, '4:30–7:30 PM',    'Revised Proposal and Follow-ups',        'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d0-b1", 0, "8:00 to 10:00 PM", "The Sunday reset", 'learning'),
+        makeBlock('management-consultant', "management-consultant-full-d1-b1", 1, "5:45 to 7:50 AM", "The Monday migration", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d1-b2", 1, "8:30 to 9:30 AM", "War room check-in: planning the week backward", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d1-b3", 1, "9:30 AM to 12:30 PM", "Into the data: finding the thread", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d1-b4", 1, "1:00 to 2:30 PM", "Problem-solving session: Priya finds the hole", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d1-b5", 1, "3:00 to 6:30 PM", "The rebuild: does the finding survive?", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d1-b6", 1, "7:30 to 10:00 PM", "Team dinner, and the email sweep", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d2-b1", 2, "7:00 to 8:00 AM", "The drive out: Marcus's field briefing", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d2-b2", 2, "8:00 to 10:30 AM", "Store visit: watching the overtime happen", 'meeting'),
+        makeBlock('management-consultant', "management-consultant-full-d2-b3", 2, "11:00 AM to 12:00 PM", "The defensive interview", 'meeting'),
+        makeBlock('management-consultant', "management-consultant-full-d2-b4", 2, "1:30 to 4:00 PM", "Synthesis: from notes to \"so what\"", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d2-b5", 2, "4:00 to 5:00 PM", "Coaching session: what you missed", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d2-b6", 2, "5:00 to 8:30 PM", "Evening build: ghost pages and the hotel gym", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d3-b1", 3, "8:00 to 9:00 AM", "Storyline huddle: the dot-dash", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d3-b2", 3, "9:00 AM to 12:30 PM", "The build sprint", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d3-b3", 3, "2:00 to 3:30 PM", "The Dan review: half your pages die", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d3-b4", 3, "4:00 to 8:00 PM", "Rebuild: answer-first", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d3-b5", 3, "8:00 to 10:45 PM", "The late night: version 9 and the final pass", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d4-b1", 4, "7:30 to 8:45 AM", "Dry run: getting handed the pen", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d4-b2", 4, "9:30 to 10:30 AM", "The pre-wire: no surprises", 'meeting'),
+        makeBlock('management-consultant', "management-consultant-full-d4-b3", 4, "12:40 to 2:10 PM", "The scramble: 80 minutes, one question", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d4-b4", 4, "3:00 to 4:30 PM", "SteerCo: the question comes to you", 'presentation'),
+        makeBlock('management-consultant', "management-consultant-full-d4-b5", 4, "4:45 to 5:30 PM", "Debrief in the lobby", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d4-b6", 4, "6:30 to 9:15 PM", "The flight home", 'learning'),
+        makeBlock('management-consultant', "management-consultant-full-d5-b1", 5, "9:00 to 10:00 AM", "Team debrief call: the week 4 sprint takes shape", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d5-b2", 5, "10:00 AM to 12:00 PM", "The cleanup: documentation, hygiene, and a staffing email", 'independent'),
+        makeBlock('management-consultant', "management-consultant-full-d5-b3", 5, "1:00 to 2:00 PM", "Coffee with Marcus: the honest career conversation", 'learning'),
+        makeBlock('management-consultant', "management-consultant-full-d5-b4", 5, "2:30 to 4:00 PM", "Friday training: the partner masterclass", 'learning'),
+        makeBlock('management-consultant', "management-consultant-full-d5-b5", 5, "4:00 to 4:45 PM", "Week wrap with Priya: the feedback ritual", 'team'),
+        makeBlock('management-consultant', "management-consultant-full-d5-b6", 5, "7:00 to 8:00 PM", "The week, weighed", 'learning'),
       ],
     },
   },

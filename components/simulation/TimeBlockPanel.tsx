@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { ACTIVITY_COLORS, ACTIVITY_LABELS, type TimeBlock } from '@/lib/simulation'
@@ -26,6 +27,13 @@ export default function TimeBlockPanel({
   hasNext,
   hasPrevious,
 }: Props) {
+  // Reset scroll to the top of the content whenever the displayed block changes,
+  // so advancing to the next block never opens mid-scroll.
+  const scrollRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
+  }, [block?.id])
+
   return (
     <AnimatePresence>
       {block && (
@@ -86,9 +94,9 @@ export default function TimeBlockPanel({
               </div>
 
               {/* Scrollable body */}
-              <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
                 <BeforeSection content={block.content.before} />
-                <ScriptSection content={block.content.simulatedWork} />
+                <ScriptSection content={block.content.simulatedWork} asProse={block.briefing} />
                 <CommentarySection content={block.content.commentary} />
                 <AfterSection content={block.content.after} />
               </div>
