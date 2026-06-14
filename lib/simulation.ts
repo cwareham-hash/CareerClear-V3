@@ -98,12 +98,13 @@ export interface Simulation {
 import { ibAnalystContent }                    from './content/ib-analyst'
 import { managementConsultantContent }         from './content/management-consultant'
 import { managementConsultantPublicSectorContent } from './content/management-consultant-public-sector'
+import { managementConsultantFinancialServicesContent } from './content/management-consultant-financial-services'
 import { lawAssociateContent }                 from './content/law-associate'
 import { productManagerContent }               from './content/product-manager'
 
 const CONTENT_LOOKUP: Record<string, Record<string, TimeBlockContent>> = {
   'ib-analyst':             ibAnalystContent,
-  'management-consultant':  { ...managementConsultantContent, ...managementConsultantPublicSectorContent },
+  'management-consultant':  { ...managementConsultantContent, ...managementConsultantPublicSectorContent, ...managementConsultantFinancialServicesContent },
   'law-associate':          lawAssociateContent,
   'product-manager':        productManagerContent,
 }
@@ -317,6 +318,55 @@ export const CAREER_SIMS: CareerSim[] = [
             makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b3", 5, "11:00 AM to 12:30 PM", "Documenting the win and scoping what is next", 'independent'),
             makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b4", 5, "2:00 to 2:30 PM", "The line outside the door", 'learning'),
             makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b5", 5, "4:00 to 4:30 PM", "Closing the week", 'learning'),
+          ],
+        },
+      },
+      {
+        id:       'management-consultant-financial-services',
+        slug:     'financial-services',
+        title:    'Project Atlas',
+        scenario: 'A 9-week target operating model engagement for Cascade Public Pension Fund, a $90B fund insourcing its investment management to cut external fees and gain control. You are a first-year Associate, three months in, owning the middle-office workstream. The central question: the binding constraint on insourcing is not the front office but the middle office, specifically the data layer and the Investment Book of Record. The week builds to an Investment Committee presentation on what to build in-house, what to outsource, and how to sequence it safely.',
+        project:  'Project Atlas: Pension Fund Operating Model',
+        tiers: {
+          // Day in the Life (one TOM design day, 7 blocks)
+          'day-in-life': [
+            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b1", 1, "8:00 to 9:00 AM", "The whiteboard: Devin draws the three offices", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b2", 1, "9:20 to 10:30 AM", "The realist: interviewing the head of operations", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b3", 1, "10:45 to 11:45 AM", "The ambition: meeting the CIO", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b4", 1, "12:00 to 1:30 PM", "Mapping the middle-office capability gap", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b5", 1, "2:00 to 3:00 PM", "The custodian call: understanding the outsource option", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b6", 1, "3:15 to 5:00 PM", "Building the build-versus-outsource framework", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b7", 1, "5:15 to 6:15 PM", "Debrief with the engagement manager", 'team'),
+          ],
+          // Full Simulation (Sunday night through Friday, 27 blocks)
+          full: [
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d0-b1", 0, "8:00 to 10:00 PM", "The Sunday reset", 'learning'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b1", 1, "5:45 to 8:45 AM", "The Monday migration", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b2", 1, "9:00 to 10:00 AM", "War room: planning backward from the Investment Committee", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b3", 1, "10:00 AM to 1:00 PM", "Mastering the current state", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b4", 1, "4:00 to 5:00 PM", "The CIO kickoff: meeting the ambition", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b5", 1, "5:15 to 6:45 PM", "Benchmarking the Canadian model", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b6", 1, "7:30 to 9:30 PM", "Team dinner, and the conversation about the career", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b1", 2, "8:00 to 8:45 AM", "The whiteboard: Devin draws the three offices", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b2", 2, "9:00 to 10:30 AM", "The realist: interviewing the COO", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b3", 2, "11:00 AM to 12:15 PM", "The risk officer: you cannot manage what you cannot see", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b4", 2, "1:30 to 4:30 PM", "Synthesizing the gap before the design", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b1", 3, "8:00 to 9:30 AM", "Structuring the design", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b2", 3, "10:00 to 11:30 AM", "The problem-solving session: the partner sharpens it", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b3", 3, "1:00 to 2:00 PM", "The custodian call: the outsource option", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b4", 3, "2:15 to 5:00 PM", "Building the recommendation", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b5", 3, "5:15 to 6:00 PM", "The pre-wire: routing the truth through the COO", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b1", 4, "7:30 to 8:45 AM", "The dry run", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b2", 4, "1:15 to 1:40 PM", "Managing up: the partner and the CIO", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b3", 4, "2:00 to 2:45 PM", "The Investment Committee", 'presentation'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b4", 4, "2:45 to 3:15 PM", "The hard questions", 'presentation'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b5", 4, "3:15 to 3:35 PM", "The decision", 'meeting'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b6", 4, "6:30 to 9:00 PM", "The flight home", 'learning'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b1", 5, "9:00 to 10:00 AM", "The home-office debrief", 'team'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b2", 5, "10:00 to 10:40 AM", "The career conversation", 'learning'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b3", 5, "11:00 AM to 12:30 PM", "Documenting the decision and scoping what is next", 'independent'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b4", 5, "2:00 to 2:30 PM", "What the week was about", 'learning'),
+            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b5", 5, "4:00 to 4:30 PM", "Closing the week", 'learning'),
           ],
         },
       },
