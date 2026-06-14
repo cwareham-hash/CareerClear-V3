@@ -490,6 +490,15 @@ export function getCareerSim(careerSlug: string): CareerSim | undefined {
   return CAREER_SIMS.find((c) => c.careerSlug === careerSlug)
 }
 
+/**
+ * Normalize a time range for display so every block reads consistently with a
+ * "to" connector (e.g. "9:00–9:30 AM" → "9:00 to 9:30 AM"). En/em dashes between
+ * times become " to "; strings without a dash (e.g. "~4 min read") pass through.
+ */
+export function formatTimeRange(timeRange: string): string {
+  return timeRange.replace(/\s*[–—]\s*/g, ' to ')
+}
+
 /** Resolve one scenario into a renderable Simulation (career Orientation + scenario tiers). */
 export function getScenario(careerSlug: string, scenarioSlug: string): Simulation | undefined {
   const careerSim = getCareerSim(careerSlug)

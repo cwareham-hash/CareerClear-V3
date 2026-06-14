@@ -3,8 +3,9 @@
 // TYPE-FIRST, each with two direct entry buttons: Day in the Life and Full
 // Simulation. No "scenario" wording — the user sees "project".
 import Link from 'next/link'
-import { BookOpen, ArrowRight, CalendarDays, CalendarRange } from 'lucide-react'
+import { BookOpen, ArrowRight } from 'lucide-react'
 import type { CareerSim } from '@/lib/simulation'
+import ProjectCard from './ProjectCard'
 
 interface Props {
   careerSim: CareerSim
@@ -63,46 +64,9 @@ export default function SimulationLanding({ careerSim }: Props) {
         <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-3">
           Projects
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
           {scenarios.map((sc) => (
-            <div
-              key={sc.id}
-              className="bg-white rounded-card border border-border shadow-card overflow-hidden flex flex-col"
-            >
-              <div className="h-1" style={{ backgroundColor: 'var(--color-teal)' }} />
-              <div className="px-6 py-5 flex flex-col flex-1">
-                {/* TYPE is primary; codename is secondary */}
-                <h3 className="font-serif text-[22px] font-bold text-navy leading-tight">
-                  {sc.type ?? sc.title}
-                </h3>
-                <p className="font-sans text-[13px] font-medium text-muted mb-3">{sc.title}</p>
-                <p className="font-sans text-[14px] text-muted leading-relaxed line-clamp-2 mb-4">
-                  {sc.scenario}
-                </p>
-
-                {/* Two direct entry points */}
-                <div className="mt-auto flex flex-col sm:flex-row gap-2">
-                  <Link
-                    href={`/careers/${careerSlug}/simulate/${sc.slug}?experience=day-in-life`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-btn
-                      bg-teal text-white font-sans font-semibold text-[13px]
-                      transition-colors duration-150 hover:bg-teal-light"
-                  >
-                    <CalendarDays size={14} aria-hidden="true" />
-                    Day in the Life
-                  </Link>
-                  <Link
-                    href={`/careers/${careerSlug}/simulate/${sc.slug}?experience=full`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-btn
-                      border border-border text-dark font-sans font-semibold text-[13px]
-                      transition-colors duration-150 hover:border-teal hover:text-teal"
-                  >
-                    <CalendarRange size={14} aria-hidden="true" />
-                    Full Simulation
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <ProjectCard key={sc.id} scenario={sc} careerSlug={careerSlug} />
           ))}
         </div>
       </div>

@@ -22,6 +22,7 @@ import {
 } from '@/lib/userProgress'
 import SimAccessGate from './SimAccessGate'
 import SimulationCalendar from './SimulationCalendar'
+import OrientationReadingList from './OrientationReadingList'
 import TimeBlockPanel from './TimeBlockPanel'
 import TimeBlockModal from './TimeBlockModal'
 import RatingModal from './RatingModal'
@@ -34,7 +35,9 @@ interface Props {
   blocks:      TimeBlock[]     // the blocks to render for the current tier
   header:      ReactNode       // left side of the overview card
   progressNoun?: string        // "activities" (default) | "readings" for Orientation
-  selector?:   ReactNode       // optional toggle rendered above the calendar
+  selector?:   ReactNode       // optional toggle rendered above the body
+  variant?:    'calendar' | 'reading'  // 'reading' = Orientation list; default 'calendar'
+  footer?:     (allComplete: boolean) => ReactNode  // optional CTA below the body
 }
 
 export default function BlockExperience({
@@ -46,6 +49,8 @@ export default function BlockExperience({
   header,
   progressNoun = 'activities',
   selector,
+  variant = 'calendar',
+  footer,
 }: Props) {
   const { user, userName } = useAuth()
   const { isFavorite, upgradeToActively } = useFavorites()
@@ -73,10 +78,17 @@ export default function BlockExperience({
         ? await getOrientationCompletedBlockIds(user.id, careerId)
         : await getCompletedBlockIds(user.id, careerId, scenario)
       if (!active) return
-      setCompletedIds(new Set(ids))
+      const idSet = new Set(ids)
+      setCompletedIds(idSet)
+      // Seed the completion baseline from what just loaded, so an experience that
+      // arrives ALREADY complete is not mistaken for a fresh completion (which
+      // would pop the rating modal on load). Only an increase during this session
+      // — i.e. the user finishing the final block now — triggers the modal.
+      prevCompletedCountRef.current = blocks.filter((b) => idSet.has(b.id)).length
       setIsLoaded(true)
     })()
     return () => { active = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, careerId, scenario])
 
   // ── Derived values ────────────────────────────────────────────────────────
@@ -89,6 +101,7 @@ export default function BlockExperience({
     [blocks, completedIds],
   )
   const progressPct = blocks.length > 0 ? (completedCount / blocks.length) * 100 : 0
+  const allComplete = blocks.length > 0 && completedCount === blocks.length
 
   const openBlockIndex = openBlock ? blocks.findIndex((b) => b.id === openBlock.id) : -1
   const hasNext     = openBlockIndex >= 0 && openBlockIndex < blocks.length - 1
@@ -192,16 +205,28 @@ export default function BlockExperience({
           {/* ── Optional experience toggle ─────────────────────────────────── */}
           {selector && <div className="mb-6">{selector}</div>}
 
-          {/* ── Calendar ───────────────────────────────────────────────────── */}
-          <SimulationCalendar
-            blocks={blocks}
-            completedIds={completedIds}
-            activeBlockId={activeBlockId}
-            mobileDay={mobileDay}
-            onMobileDayChange={setMobileDay}
-            onBlockClick={setOpenBlock}
-            isLoading={!isLoaded}
-          />
+          {/* ── Body: reading list (Orientation) or calendar ──────────────────── */}
+          {variant === 'reading' ? (
+            <OrientationReadingList
+              blocks={blocks}
+              completedIds={completedIds}
+              activeBlockId={activeBlockId}
+              onBlockClick={setOpenBlock}
+            />
+          ) : (
+            <SimulationCalendar
+              blocks={blocks}
+              completedIds={completedIds}
+              activeBlockId={activeBlockId}
+              mobileDay={mobileDay}
+              onMobileDayChange={setMobileDay}
+              onBlockClick={setOpenBlock}
+              isLoading={!isLoaded}
+            />
+          )}
+
+          {/* ── Optional forward CTA (e.g. end-of-Orientation next step) ──────── */}
+          {footer && footer(allComplete)}
         </div>
 
         <TimeBlockPanel

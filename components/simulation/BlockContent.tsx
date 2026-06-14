@@ -120,10 +120,13 @@ function ScriptLineItem({ line, index }: { line: ScriptLine; index: number }) {
 
     case 'narration':
     default:
+      // Plain narration is the bulk of the "During" body — render it as dark,
+      // non-italic body text (matching the Before box) for comfortable reading.
+      // The muted-italic treatment is reserved for bracketed scene directions.
       return (
         <p
           key={index}
-          className="font-sans text-[13px] text-muted italic leading-relaxed mb-1"
+          className="font-sans text-[14px] text-dark leading-relaxed mb-2"
         >
           {line.text}
         </p>

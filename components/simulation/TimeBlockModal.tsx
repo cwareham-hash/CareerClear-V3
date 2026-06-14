@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import { ACTIVITY_COLORS, ACTIVITY_LABELS, type TimeBlock } from '@/lib/simulation'
+import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock } from '@/lib/simulation'
 import { BeforeSection, ScriptSection, CommentarySection, AfterSection } from './BlockContent'
 
 interface Props {
@@ -81,7 +81,7 @@ export default function TimeBlockModal({
                   <h2 className="font-sans font-bold text-[16px] text-dark leading-snug">
                     {block.title}
                   </h2>
-                  <p className="font-sans text-[12px] text-muted mt-0.5">{block.timeRange}</p>
+                  <p className="font-sans text-[12px] text-muted mt-0.5">{formatTimeRange(block.timeRange)}</p>
                 </div>
                 <button
                   onClick={onClose}
@@ -144,7 +144,7 @@ export default function TimeBlockModal({
                   className="font-sans text-[13px] font-medium text-muted
                     hover:text-dark transition-colors duration-150"
                 >
-                  Back to Calendar
+                  Back
                 </button>
                 <button
                   onClick={onNextBlock}

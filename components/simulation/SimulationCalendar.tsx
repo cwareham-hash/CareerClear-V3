@@ -1,6 +1,6 @@
 'use client'
 
-import { ACTIVITY_COLORS, ACTIVITY_LABELS, type TimeBlock } from '@/lib/simulation'
+import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock } from '@/lib/simulation'
 
 // Indexed by day number directly: day 0 = Sunday (the full sim opens Sunday night).
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -8,6 +8,9 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 function dayLabel(day: number): string {
   return DAY_LABELS[day] ?? `Day ${day}`
 }
+
+// Comfortable single-column reading width for single-day views.
+const SINGLE_DAY_MAX = 'max-w-[680px] mx-auto'
 
 // Legend items — human-readable names mapped to activity types
 const LEGEND_ITEMS: { label: string; type: keyof typeof ACTIVITY_COLORS }[] = [
@@ -55,9 +58,10 @@ export default function SimulationCalendar({
   onBlockClick,
   isLoading = false,
 }: Props) {
-  // Distinct days this tier spans (orientation/day-in-life have fewer than 5).
+  // Distinct days this tier spans (Day-in-the-Life has one; Full spans Sun–Fri).
   const days = Array.from(new Set(blocks.map((b) => b.day))).sort((a, b) => a - b)
   const cols = Math.max(days.length, 1)
+  const isSingleDay = days.length <= 1
 
   // Group by day
   const byDay = (day: number) => blocks.filter((b) => b.day === day)
@@ -65,10 +69,34 @@ export default function SimulationCalendar({
   // Ensure the active mobile day is one this tier actually has.
   const activeMobileDay = days.includes(mobileDay) ? mobileDay : days[0] ?? 1
 
+  // ── Single-day view: a centered narrow reading column, no day header, no tabs ──
+  if (isSingleDay) {
+    return (
+      <>
+        <div className={`${SINGLE_DAY_MAX} flex flex-col gap-3`}>
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => <TimeBlockSkeleton key={i} />)
+            : blocks.map((block) => (
+                <TimeBlockCard
+                  key={block.id}
+                  block={block}
+                  isCompleted={completedIds.has(block.id)}
+                  isActive={activeBlockId === block.id}
+                  onClick={() => onBlockClick(block)}
+                />
+              ))}
+        </div>
+        <div className={SINGLE_DAY_MAX}>
+          <CalendarLegend />
+        </div>
+      </>
+    )
+  }
+
+  // ── Multi-day view (Full Simulation): the Sun–Fri grid, unchanged ────────────
   if (isLoading) {
     return (
       <>
-        {/* ── Desktop skeleton ──────────────────────────────────────────── */}
         <div
           className="hidden lg:grid gap-3"
           style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
@@ -76,9 +104,7 @@ export default function SimulationCalendar({
           {days.map((day) => (
             <div key={day} className="flex flex-col gap-2">
               <div className="text-center py-2 border-b border-border">
-                <span className="font-sans font-semibold text-[13px] text-dark">
-                  {dayLabel(day)}
-                </span>
+                <span className="font-sans font-semibold text-[13px] text-dark">{dayLabel(day)}</span>
                 <span className="font-sans text-[11px] text-muted ml-1">Day {day}</span>
               </div>
               {Array.from({ length: 4 }).map((_, i) => (
@@ -88,7 +114,6 @@ export default function SimulationCalendar({
           ))}
         </div>
 
-        {/* ── Mobile skeleton ───────────────────────────────────────────── */}
         <div className="lg:hidden">
           <div className="flex items-center border-b border-border mb-4 overflow-x-auto">
             {days.map((day) => (
@@ -123,17 +148,13 @@ export default function SimulationCalendar({
           <div key={day} className="flex flex-col gap-2">
             {/* Day header */}
             <div className="text-center py-2 border-b border-border">
-              <span className="font-sans font-semibold text-[13px] text-dark">
-                {dayLabel(day)}
-              </span>
+              <span className="font-sans font-semibold text-[13px] text-dark">{dayLabel(day)}</span>
               <span className="font-sans text-[11px] text-muted ml-1">Day {day}</span>
             </div>
 
             {/* Blocks */}
             {byDay(day).length === 0 ? (
-              <p className="font-sans text-[12px] text-muted text-center py-4 italic">
-                No blocks
-              </p>
+              <p className="font-sans text-[12px] text-muted text-center py-4 italic">No blocks</p>
             ) : (
               byDay(day).map((block) => (
                 <TimeBlockCard
@@ -161,10 +182,7 @@ export default function SimulationCalendar({
                 onClick={() => onMobileDayChange(day)}
                 className={`flex-1 min-w-[60px] py-3 font-sans text-[13px] font-medium border-b-2 -mb-px
                   transition-colors duration-150 focus-visible:outline-none
-                  ${active
-                    ? 'border-teal text-teal font-bold'
-                    : 'border-transparent text-muted hover:text-dark'
-                  }`}
+                  ${active ? 'border-teal text-teal font-bold' : 'border-transparent text-muted hover:text-dark'}`}
               >
                 {dayLabel(day)}
               </button>
@@ -276,7 +294,7 @@ function TimeBlockCard({
           </p>
 
           {/* Time range */}
-          <p className="font-sans text-[11px] text-muted mt-1">{block.timeRange}</p>
+          <p className="font-sans text-[11px] text-muted mt-1">{formatTimeRange(block.timeRange)}</p>
         </div>
       </div>
     </button>

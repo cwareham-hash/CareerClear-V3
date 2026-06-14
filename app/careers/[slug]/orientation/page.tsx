@@ -29,6 +29,7 @@ export default function OrientationPage({ params }: Props) {
   return (
     <OrientationClient
       careerId={careerSim.careerId}
+      careerSlug={careerSim.careerSlug}
       careerTitle={careerSim.title}
       blocks={careerSim.orientation}
     />
