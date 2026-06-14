@@ -2,6 +2,7 @@
 // exploration-only roles (appended via EXPLORATION_DETAIL at the bottom).
 
 import { EXPLORATION_DETAIL } from './content/explorationRoles'
+import { DEMO_ROLE_DETAIL } from './content/demoRoleDetail'
 
 export interface CareerStage {
   title: string
@@ -235,4 +236,7 @@ export const CAREER_DETAIL: Record<string, CareerDetailContent> = {
 
   // ── 90 exploration-only roles (generated from the planning draft) ────────────
   ...EXPLORATION_DETAIL,
+
+  // ── 6 original demo roles — exploration detail content (keyed by existing slug)
+  ...DEMO_ROLE_DETAIL,
 }
