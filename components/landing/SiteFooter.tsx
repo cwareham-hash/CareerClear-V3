@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 /**
- * Site footer — navy, wordmark + tagline + placeholder contact line.
+ * Site footer — navy, wordmark + tagline.
  * Server component (no interactivity).
  */
 export default function SiteFooter() {
@@ -23,13 +23,8 @@ export default function SiteFooter() {
           </span>
         </Link>
 
-        <p className="font-sans text-[14px] text-white/70 mb-6">
+        <p className="font-sans text-[14px] text-white/70">
           Experience the career. Before you commit.
-        </p>
-
-        {/* Placeholder contact line — Collin will replace with real details */}
-        <p className="font-sans text-[13px] text-white/50">
-          Questions? Reach us at contact@careerclear.example (placeholder)
         </p>
       </div>
     </footer>

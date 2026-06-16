@@ -54,8 +54,10 @@ function tierLabel(t: Tier): string {
 interface TierProgress {
   tier:           Tier
   display:        string        // e.g. "Orientation", "Full Simulation"
+  scenarioSlug:   string | null // project slug for DIL/Full; null for career-level Orientation
+  projectTitle:   string | null // e.g. "Project Fresca"; null for Orientation
   completedCount: number
-  totalCount:     number        // authored blocks in this tier
+  totalCount:     number        // authored activities in this tier (scoped per project)
   isCompleted:    boolean
 }
 
@@ -141,7 +143,7 @@ function ProgressRow({ role }: { role: RoleProgress }) {
         {role.tiers.map((tier) => {
           const pct = Math.round((tier.completedCount / tier.totalCount) * 100)
           return (
-            <div key={tier.tier} className="flex flex-col gap-1.5">
+            <div key={`${tier.scenarioSlug ?? 'orientation'}-${tier.tier}`} className="flex flex-col gap-1.5">
               {/* Row 1: pill + status badge + spacer + CTA */}
               <div className="flex items-center gap-2">
                 <span
@@ -162,7 +164,11 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                 </span>
                 <span className="flex-1" />
                 <Link
-                  href={`/careers/${career.slug}/simulate`}
+                  href={
+                    tier.tier === 'orientation'
+                      ? `/careers/${career.slug}/orientation`
+                      : `/careers/${career.slug}/simulate/${tier.scenarioSlug}?experience=${tier.tier}`
+                  }
                   className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-btn
                     font-sans font-semibold text-[12px] text-white transition-colors duration-150"
                   style={{ backgroundColor: 'var(--color-teal)' }}
@@ -186,9 +192,10 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                 />
               </div>
 
-              {/* Block count */}
+              {/* Activity count — scoped to this project, matches the overview page */}
               <p className="font-sans text-[12px] text-muted">
-                {tier.completedCount}/{tier.totalCount} blocks · {pct}%
+                {tier.projectTitle ? `${tier.projectTitle} · ` : ''}
+                {tier.completedCount}/{tier.totalCount} activities · {pct}%
               </p>
             </div>
           )
@@ -452,21 +459,47 @@ export default function DashboardPage() {
         if (completedSet.size === 0) return []
 
         // Block ids are globally unique, so a completed id maps to exactly one
-        // tier. Day-in-the-Life/Full totals aggregate across every scenario of
-        // the career (getCareerTierBlocks), so no scenario's blocks are dropped.
-        const tiers: TierProgress[] = TIERS
-          .map(({ value, display }) => {
-            const tierBlocks     = getCareerTierBlocks(cs, value)
-            const completedCount = tierBlocks.filter((b) => completedSet.has(b.id)).length
-            return {
-              tier:           value,
-              display,
+        // (tier, scenario). Totals/completed are scoped PER PROJECT — exactly like
+        // the scenario overview page — so the two screens always agree. Orientation
+        // is career-level (shared across projects, scenario = null); Day-in-the-Life
+        // and Full are counted separately for each scenario.
+        const tiers: TierProgress[] = []
+
+        // Orientation — career-level, shared across every project.
+        {
+          const blocks         = getCareerTierBlocks(cs, 'orientation')
+          const completedCount = blocks.filter((b) => completedSet.has(b.id)).length
+          if (completedCount >= 1) {
+            tiers.push({
+              tier:           'orientation',
+              display:        tierLabel('orientation'),
+              scenarioSlug:   null,
+              projectTitle:   null,
               completedCount,
-              totalCount:     tierBlocks.length,
-              isCompleted:    tierBlocks.length > 0 && completedCount >= tierBlocks.length,
-            }
-          })
-          .filter((tier) => tier.completedCount >= 1)
+              totalCount:     blocks.length,
+              isCompleted:    blocks.length > 0 && completedCount >= blocks.length,
+            })
+          }
+        }
+
+        // Day-in-the-Life and Full — one row per project, scoped to that project's
+        // authored blocks (sc.tiers[tier]), matching the overview page's counts.
+        for (const sc of cs.scenarios) {
+          for (const value of ['day-in-life', 'full'] as const) {
+            const blocks         = sc.tiers[value]
+            const completedCount = blocks.filter((b) => completedSet.has(b.id)).length
+            if (completedCount < 1) continue
+            tiers.push({
+              tier:           value,
+              display:        tierLabel(value),
+              scenarioSlug:   sc.slug,
+              projectTitle:   sc.title,
+              completedCount,
+              totalCount:     blocks.length,
+              isCompleted:    blocks.length > 0 && completedCount >= blocks.length,
+            })
+          }
+        }
 
         if (tiers.length === 0) return []
         return [{

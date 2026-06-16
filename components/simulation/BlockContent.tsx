@@ -98,10 +98,10 @@ function ScriptLineItem({ line, index }: { line: ScriptLine; index: number }) {
     case 'dialogue':
       return (
         <div key={index} className="mb-1">
-          <span className="font-sans font-bold text-[14px] text-dark">
+          <span className="font-sans font-bold text-[15px] text-dark">
             {line.speaker}:
           </span>{' '}
-          <span className="font-sans text-[14px] text-dark leading-relaxed">
+          <span className="font-sans text-[15px] text-dark leading-relaxed">
             {line.text}
           </span>
         </div>
@@ -111,7 +111,7 @@ function ScriptLineItem({ line, index }: { line: ScriptLine; index: number }) {
       return (
         <p
           key={index}
-          className="font-sans text-[14px] text-dark italic leading-relaxed mb-1 pl-3"
+          className="font-sans text-[15px] text-dark italic leading-relaxed mb-1 pl-3"
           style={{ borderLeft: '2px solid #e5e7eb' }}
         >
           {line.text}
@@ -126,7 +126,7 @@ function ScriptLineItem({ line, index }: { line: ScriptLine; index: number }) {
       return (
         <p
           key={index}
-          className="font-sans text-[14px] text-dark leading-relaxed mb-2"
+          className="font-sans text-[15px] text-dark leading-relaxed mb-2"
         >
           {line.text}
         </p>
@@ -148,7 +148,7 @@ export function BeforeSection({ content }: { content: string }) {
           Before: Setting the Scene
         </p>
       </div>
-      <p className="font-sans text-[14px] text-dark leading-relaxed">{content}</p>
+      <p className="font-sans text-[15px] text-dark leading-relaxed">{content}</p>
     </div>
   )
 }
@@ -166,7 +166,7 @@ export function ScriptSection({ content, asProse = false }: { content: string; a
         </p>
         <div className="space-y-3">
           {paragraphs.map((para, i) => (
-            <p key={i} className="font-sans text-[14px] text-dark leading-relaxed">
+            <p key={i} className="font-sans text-[15px] text-dark leading-relaxed">
               {para}
             </p>
           ))}
@@ -211,7 +211,7 @@ export function CommentarySection({ content }: { content: string }) {
       </div>
       <div className="space-y-2">
         {sentences.map((sentence, i) => (
-          <p key={i} className="font-sans text-[13px] text-dark italic leading-relaxed">
+          <p key={i} className="font-sans text-[15px] text-dark italic leading-relaxed">
             {sentence}
           </p>
         ))}
@@ -232,7 +232,7 @@ export function AfterSection({ content }: { content: string }) {
           After: What&apos;s Next
         </p>
       </div>
-      <p className="font-sans text-[14px] text-dark leading-relaxed">{content}</p>
+      <p className="font-sans text-[15px] text-dark leading-relaxed">{content}</p>
     </div>
   )
 }
