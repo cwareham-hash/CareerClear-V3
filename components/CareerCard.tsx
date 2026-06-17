@@ -63,7 +63,8 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
                 ? `Remove ${title} from favorites`
                 : `Save ${title} to favorites`
             }
-            className="p-1 -mr-1 -mt-1 rounded-md transition-colors hover:bg-cream"
+            className="p-1 -mr-1 -mt-1 rounded-md transition-colors hover:bg-cream
+              focus-visible:outline-none focus-visible:ring-2"
           >
             <Heart
               size={18}
@@ -147,7 +148,8 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
           <Link
             href={`/careers/${slug}`}
             className="font-sans text-[13px] font-semibold text-teal
-              hover:text-teal-light transition-colors duration-150 shrink-0"
+              hover:text-teal-light transition-colors duration-150 shrink-0
+              rounded focus-visible:outline-none focus-visible:ring-2"
           >
             Explore →
           </Link>

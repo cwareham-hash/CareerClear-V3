@@ -73,6 +73,7 @@ export default function Navbar() {
                   key={href}
                   href={href}
                   className={`font-sans text-[14px] font-medium transition-colors duration-150
+                    rounded focus-visible:outline-none focus-visible:ring-2
                     ${active
                       ? 'text-teal border-b-2 border-teal pb-0.5'
                       : 'text-dark hover:text-teal'
@@ -166,6 +167,7 @@ export default function Navbar() {
                       key={href}
                       href={href}
                       className={`px-6 py-4 font-sans text-[15px] font-medium transition-colors
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset
                         ${active ? 'text-teal bg-tag-bg' : 'text-dark hover:bg-cream'}`}
                     >
                       {label}

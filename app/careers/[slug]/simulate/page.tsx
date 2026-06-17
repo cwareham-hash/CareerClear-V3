@@ -1,6 +1,7 @@
 // Simulation entry point — the landing page for a career. Always shows the
 // shared Orientation plus the projects (no auto-redirect). Project selection and
 // the Day-in-the-Life / Full choice happen here, on one page.
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CAREER_SIMS, getCareerSim } from '@/lib/simulation'
 import { CAREERS } from '@/lib/careers'
@@ -13,6 +14,15 @@ interface Props {
 // Pre-render one landing page per career that has a simulation wired up.
 export function generateStaticParams() {
   return CAREER_SIMS.map((cs) => ({ slug: cs.careerSlug }))
+}
+
+export function generateMetadata({ params }: Props): Metadata {
+  const careerSim = getCareerSim(params.slug)
+  return {
+    title: careerSim
+      ? `Choose a Project · ${careerSim.title} — Career Clear`
+      : 'Choose a Project — Career Clear',
+  }
 }
 
 export default function SimulatePage({ params }: Props) {

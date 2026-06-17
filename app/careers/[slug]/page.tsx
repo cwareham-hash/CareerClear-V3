@@ -1,4 +1,5 @@
 // §5.4 Career Card — Full Detail Page
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Play, ChevronRight, Hourglass } from 'lucide-react'
@@ -11,6 +12,11 @@ interface Props {
 
 export function generateStaticParams() {
   return CAREERS.map((career) => ({ slug: career.slug }))
+}
+
+export function generateMetadata({ params }: Props): Metadata {
+  const career = CAREERS.find((c) => c.slug === params.slug)
+  return { title: career ? `${career.title} — Career Clear` : 'Career — Career Clear' }
 }
 
 export default function CareerDetailPage({ params }: Props) {

@@ -1,6 +1,7 @@
 // Career-level Orientation — the shared briefing, reached ONLY here (never
 // through a project URL). Neutral chrome, no project header. Login + beta gating
 // live inside the client (SimAccessGate).
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CAREER_SIMS, getCareerSim } from '@/lib/simulation'
 import { CAREERS } from '@/lib/careers'
@@ -13,6 +14,15 @@ interface Props {
 // Pre-render one orientation page per career that has authored orientation content.
 export function generateStaticParams() {
   return CAREER_SIMS.filter((cs) => cs.orientation.length > 0).map((cs) => ({ slug: cs.careerSlug }))
+}
+
+export function generateMetadata({ params }: Props): Metadata {
+  const careerSim = getCareerSim(params.slug)
+  return {
+    title: careerSim
+      ? `Orientation · ${careerSim.title} — Career Clear`
+      : 'Orientation — Career Clear',
+  }
 }
 
 export default function OrientationPage({ params }: Props) {

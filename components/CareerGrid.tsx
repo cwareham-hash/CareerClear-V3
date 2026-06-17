@@ -160,25 +160,36 @@ export default function CareerGrid() {
       <div className="max-w-7xl mx-auto">
 
         {/* §5.2.2: Full-width search bar with magnifier icon */}
-        <div className="relative mb-6">
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
-            aria-hidden="true"
-          />
-          <input
-            type="search"
-            placeholder="Search careers..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search careers"
-            className="
-              w-full pl-11 pr-4 py-3 rounded-btn border border-border bg-white
-              font-sans text-[15px] text-dark placeholder:text-muted
-              outline-none focus:border-teal focus:ring-2 focus:ring-teal/20
-              transition-colors duration-150
-            "
-          />
+        <div className="mb-6">
+          {/* Visible label — persists after the placeholder disappears.
+              Styled like the Industry/Function filter group labels for consistency. */}
+          <label
+            htmlFor="career-search"
+            className="block font-sans text-[11px] font-semibold text-muted
+              uppercase tracking-wider mb-2"
+          >
+            Search careers
+          </label>
+          <div className="relative">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+              aria-hidden="true"
+            />
+            <input
+              id="career-search"
+              type="search"
+              placeholder="Search careers..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="
+                w-full pl-11 pr-4 py-3 rounded-btn border border-border bg-white
+                font-sans text-[15px] text-dark placeholder:text-muted
+                outline-none focus:border-teal focus:ring-2 focus:ring-teal/20
+                transition-colors duration-150
+              "
+            />
+          </div>
         </div>
 
         {/* §5.2.2: Horizontal filter pill row — Industry + Function groups */}

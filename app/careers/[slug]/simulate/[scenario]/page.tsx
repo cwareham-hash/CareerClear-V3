@@ -1,8 +1,9 @@
 // One PROJECT (e.g. /careers/management-consultant/simulate/public-sector).
 // Opens at the experience the user chose (?experience=day-in-life | full),
 // defaulting to Day in the Life — never Orientation.
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { CAREER_SIMS, getScenario } from '@/lib/simulation'
+import { CAREER_SIMS, getCareerSim, getScenario } from '@/lib/simulation'
 import { CAREERS } from '@/lib/careers'
 import SimulationClient from '@/components/simulation/SimulationClient'
 import { type Experience } from '@/components/simulation/ExperienceToggle'
@@ -17,6 +18,15 @@ export function generateStaticParams() {
   return CAREER_SIMS.flatMap((cs) =>
     cs.scenarios.map((sc) => ({ slug: cs.careerSlug, scenario: sc.slug })),
   )
+}
+
+export function generateMetadata({ params }: Props): Metadata {
+  const careerSim = getCareerSim(params.slug)
+  const scenario = careerSim?.scenarios.find((s) => s.slug === params.scenario)
+  if (scenario && careerSim) {
+    return { title: `${scenario.title} · ${careerSim.title} — Career Clear` }
+  }
+  return { title: 'Project — Career Clear' }
 }
 
 export default function ScenarioSimulatePage({ params, searchParams }: Props) {
