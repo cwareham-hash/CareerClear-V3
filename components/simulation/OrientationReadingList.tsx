@@ -46,9 +46,10 @@ export default function OrientationReadingList({
             </span>
 
             <div className="min-w-0 flex-1">
-              <p className="font-sans font-semibold text-[15px] text-dark leading-snug">
+              {/* Serif title to match the Day in the Life timeline cards. */}
+              <h3 className="font-serif text-[17px] font-bold text-navy leading-snug">
                 {block.title}
-              </p>
+              </h3>
               <p className="font-sans text-[12px] text-muted mt-0.5">
                 {formatTimeRange(block.timeRange)}
                 {isActive && !isCompleted && <span style={{ color: 'var(--color-teal)' }}> · Start here</span>}

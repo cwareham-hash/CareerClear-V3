@@ -119,9 +119,11 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
                 clearly signal it's not yet available. The spec doesn't define
                 the demo-role badge style; user specified "Coming Soon". */}
             {hasSimulation ? (
+              // Subtle "Simulation" tag — quiet teal-tint pill (reuses the
+              // career.hasSimulation flag, the same source that gates the sim routes).
               <span
-                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium
-                  bg-teal text-white"
+                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium"
+                style={{ backgroundColor: 'var(--color-tag-bg)', color: 'var(--color-teal)' }}
               >
                 Simulation
               </span>

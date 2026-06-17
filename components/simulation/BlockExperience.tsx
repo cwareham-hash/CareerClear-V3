@@ -134,11 +134,15 @@ export default function BlockExperience({
   }, [completedCount, blocks.length])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleMarkComplete = useCallback(
-    (id: string) => {
+  // Toggle a block complete/incomplete and persist the change to the shared
+  // user_progress store, so the hub tier counts, the stepper, and the dashboard
+  // all stay in sync (they read the same source).
+  const handleToggleComplete = useCallback(
+    (id: string, complete: boolean) => {
       setCompletedIds((prev) => {
         const next = new Set(prev)
-        next.add(id)
+        if (complete) next.add(id)
+        else next.delete(id)
         if (user) {
           const completedForTier = blocks.filter((b) => next.has(b.id)).map((b) => b.id)
           void upsertProgress({
@@ -147,7 +151,7 @@ export default function BlockExperience({
             scenario,
             tier,
             completedBlocks: completedForTier,
-            isCompleted:     completedForTier.length === blocks.length,
+            isCompleted:     blocks.length > 0 && completedForTier.length === blocks.length,
           })
         }
         return next
@@ -239,7 +243,7 @@ export default function BlockExperience({
         <TimeBlockPanel
           block={openBlock}
           onClose={() => setOpenBlock(null)}
-          onMarkComplete={handleMarkComplete}
+          onToggleComplete={handleToggleComplete}
           onNextBlock={handleNextBlock}
           onPreviousBlock={handlePreviousBlock}
           isCompleted={openBlock ? completedIds.has(openBlock.id) : false}
@@ -250,7 +254,7 @@ export default function BlockExperience({
         <TimeBlockModal
           block={openBlock}
           onClose={() => setOpenBlock(null)}
-          onMarkComplete={handleMarkComplete}
+          onToggleComplete={handleToggleComplete}
           onNextBlock={handleNextBlock}
           onPreviousBlock={handlePreviousBlock}
           isCompleted={openBlock ? completedIds.has(openBlock.id) : false}

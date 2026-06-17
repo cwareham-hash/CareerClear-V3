@@ -12,7 +12,7 @@ const TITLE_ID = 'timeblock-modal-title'
 interface Props {
   block:            TimeBlock | null
   onClose:          () => void
-  onMarkComplete:   (id: string) => void
+  onToggleComplete: (id: string, complete: boolean) => void
   onNextBlock:      () => void
   onPreviousBlock:  () => void
   isCompleted:      boolean
@@ -23,7 +23,7 @@ interface Props {
 export default function TimeBlockModal({
   block,
   onClose,
-  onMarkComplete,
+  onToggleComplete,
   onNextBlock,
   onPreviousBlock,
   isCompleted,
@@ -126,24 +126,26 @@ export default function TimeBlockModal({
 
             {/* Footer */}
             <div className="shrink-0 px-5 py-4 border-t border-border flex flex-col gap-3">
-              {/* Primary action */}
+              {/* Primary action — a complete/incomplete toggle (persists). */}
               {isCompleted ? (
-                <div
-                  className="flex items-center justify-center gap-2 py-3 rounded-btn"
+                <button
+                  onClick={() => onToggleComplete(block.id, false)}
+                  aria-label={`Mark "${block.title}" as incomplete`}
+                  className="w-full py-3 rounded-btn flex items-center justify-center gap-2
+                    transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2"
                   style={{ backgroundColor: 'var(--color-tag-bg)' }}
                 >
-                  <span
-                    className="font-sans font-semibold text-[14px]"
-                    style={{ color: 'var(--color-teal)' }}
-                  >
+                  <span className="font-sans font-semibold text-[14px]" style={{ color: 'var(--color-teal)' }}>
                     ✓ Completed
                   </span>
-                </div>
+                  <span className="font-sans text-[12px] text-muted">· Mark as incomplete</span>
+                </button>
               ) : (
                 <button
-                  onClick={() => onMarkComplete(block.id)}
+                  onClick={() => onToggleComplete(block.id, true)}
+                  aria-label={`Mark "${block.title}" as completed`}
                   className="w-full py-3 rounded-btn font-sans font-semibold text-[14px] text-white
-                    transition-colors duration-150"
+                    transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2"
                   style={{ backgroundColor: 'var(--color-teal)' }}
                 >
                   Mark as Completed
