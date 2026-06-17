@@ -88,3 +88,8 @@
 ::-webkit-scrollbar-track  { background: transparent; }
 ::-webkit-scrollbar-thumb  { background: var(--color-border); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* Hidden scrollbar — used where a fade affordance signals scrollability instead
+   (e.g. the project switch-chip strip). */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

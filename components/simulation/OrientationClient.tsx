@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { type TimeBlock } from '@/lib/simulation'
 import BlockExperience from './BlockExperience'
+import Breadcrumb from './Breadcrumb'
 
 interface Props {
   careerId:    string
@@ -15,7 +16,24 @@ interface Props {
   blocks:      TimeBlock[]
 }
 
+// Reading view shares the hub's centered ~two-thirds-width column (matches the
+// Day in the Life view; never applies to the Full Simulation grid).
+const READING_WIDTH = 'w-full lg:w-[min(66vw,1100px)]'
+
 export default function OrientationClient({ careerId, careerSlug, careerTitle, blocks }: Props) {
+  // Back-navigation: Explore › Career › Simulation (hub) › Orientation.
+  const breadcrumb = (
+    <Breadcrumb
+      className="mb-5"
+      items={[
+        { label: 'Explore', href: '/explore' },
+        { label: careerTitle, href: `/careers/${careerSlug}` },
+        { label: 'Simulation', href: `/careers/${careerSlug}/simulate` },
+        { label: 'Orientation' },
+      ]}
+    />
+  )
+
   const header = (
     <>
       <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-1">
@@ -81,6 +99,8 @@ export default function OrientationClient({ careerId, careerSlug, careerTitle, b
       blocks={blocks}
       progressNoun="readings"
       header={header}
+      breadcrumb={breadcrumb}
+      widthClass={READING_WIDTH}
       variant="reading"
       footer={renderFooter}
     />

@@ -6,7 +6,12 @@
 import { useState } from 'react'
 import { type Simulation } from '@/lib/simulation'
 import BlockExperience from './BlockExperience'
+import Breadcrumb from './Breadcrumb'
 import ExperienceToggle, { type Experience } from './ExperienceToggle'
+
+// ADJUST DAY-IN-LIFE WIDTH here — match the hub: ~two-thirds of the viewport on
+// wide screens, capped so it never gets absurdly wide; fills width on mobile.
+const DAY_IN_LIFE_WIDTH = 'w-full lg:w-[min(66vw,1100px)]'
 
 interface Props {
   simulation: Simulation
@@ -16,10 +21,29 @@ interface Props {
 }
 
 export default function SimulationClient({ simulation, initialExperience = 'day-in-life' }: Props) {
-  const { careerId, scenarioSlug, title, scenario, project } = simulation
+  const { careerId, careerSlug, scenarioSlug, title, scenario, project } = simulation
   const [experience, setExperience] = useState<Experience>(initialExperience)
 
   const blocks = simulation.tiers[experience]
+
+  const experienceLabel = experience === 'full' ? 'Full Simulation' : 'Day in the Life'
+
+  // Back-navigation: Explore › Career › Simulation (hub) › Project · <experience>.
+  const breadcrumb = (
+    <Breadcrumb
+      className="mb-5"
+      items={[
+        { label: 'Explore', href: '/explore' },
+        { label: title, href: `/careers/${careerSlug}` },
+        { label: 'Simulation', href: `/careers/${careerSlug}/simulate` },
+        { label: experienceLabel },
+      ]}
+    />
+  )
+
+  // Day in the Life uses the hub's centered ~two-thirds-width column; the Full
+  // Simulation view keeps its existing wide layout (unchanged this phase).
+  const widthClass = experience === 'day-in-life' ? DAY_IN_LIFE_WIDTH : undefined
 
   const header = (
     <>
@@ -43,6 +67,8 @@ export default function SimulationClient({ simulation, initialExperience = 'day-
       tier={experience}
       blocks={blocks}
       header={header}
+      breadcrumb={breadcrumb}
+      widthClass={widthClass}
       selector={
         <>
           <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-2">

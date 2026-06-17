@@ -36,6 +36,8 @@ interface Props {
   header:      ReactNode       // left side of the overview card
   progressNoun?: string        // "activities" (default) | "readings" for Orientation
   selector?:   ReactNode       // optional toggle rendered above the body
+  breadcrumb?: ReactNode       // optional back-nav rendered at the very top
+  widthClass?: string          // outer container width (default keeps the wide layout)
   variant?:    'calendar' | 'reading'  // 'reading' = Orientation list; default 'calendar'
   footer?:     (allComplete: boolean) => ReactNode  // optional CTA below the body
 }
@@ -49,6 +51,8 @@ export default function BlockExperience({
   header,
   progressNoun = 'activities',
   selector,
+  breadcrumb,
+  widthClass = 'max-w-7xl',
   variant = 'calendar',
   footer,
 }: Props) {
@@ -179,7 +183,10 @@ export default function BlockExperience({
   return (
     <SimAccessGate label={accessLabel}>
       <div className="min-h-[calc(100vh-4rem)] bg-cream">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
+        <div className={`${widthClass} mx-auto px-4 lg:px-6 py-8`}>
+
+          {/* ── Back-navigation breadcrumb (optional) ─────────────────────────── */}
+          {breadcrumb}
 
           {/* ── Overview card ──────────────────────────────────────────────── */}
           <div className="bg-white rounded-card border border-border shadow-card overflow-hidden mb-8">
