@@ -3,8 +3,9 @@
 // A single PROJECT (e.g. Project Fresca). Shows a two-way Day-in-the-Life / Full
 // Simulation toggle and renders the chosen experience via BlockExperience.
 // Orientation is no longer a tier here — it is its own career-level route.
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, CalendarRange } from 'lucide-react'
 import { type Simulation } from '@/lib/simulation'
 import BlockExperience from './BlockExperience'
@@ -25,6 +26,26 @@ interface Props {
 export default function SimulationClient({ simulation, initialExperience = 'day-in-life' }: Props) {
   const { careerId, careerSlug, scenarioSlug, title, scenario, project } = simulation
   const [experience, setExperience] = useState<Experience>(initialExperience)
+  const router = useRouter()
+
+  // Switch the visible tier AND keep the URL's ?experience= in sync, so a refresh
+  // or a shared link lands on the same view. Used by BOTH the in-page toggle and
+  // the Day-in-the-Life completion card, so the two behave identically. This is a
+  // same-route query change, so a plain <Link> soft-navigation would update the
+  // URL without re-seeding this already-mounted component's state — hence the
+  // explicit setExperience. router.replace keeps history clean; we scroll to the
+  // top so switching from the completion card lands at the start of the grid.
+  const changeExperience = useCallback(
+    (next: Experience) => {
+      setExperience(next)
+      router.replace(
+        `/careers/${careerSlug}/simulate/${scenarioSlug}?experience=${next}`,
+        { scroll: false },
+      )
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    [router, careerSlug, scenarioSlug],
+  )
 
   const blocks = simulation.tiers[experience]
 
@@ -47,9 +68,8 @@ export default function SimulationClient({ simulation, initialExperience = 'day-
   // Simulation view keeps its existing wide layout (unchanged this phase).
   const widthClass = experience === 'day-in-life' ? DAY_IN_LIFE_WIDTH : undefined
 
-  // Forward/back routes for the Day-in-the-Life completion card.
-  const fullHref = `/careers/${careerSlug}/simulate/${scenarioSlug}?experience=full`
-  const hubHref  = `/careers/${careerSlug}/simulate`
+  // Back route for the Day-in-the-Life completion card (genuine cross-route nav).
+  const hubHref = `/careers/${careerSlug}/simulate`
 
   // Day-in-the-Life completion card — mirrors the orientation completion card,
   // shown below the timeline once every block is done. Two controls only (no skip
@@ -69,9 +89,12 @@ export default function SimulationClient({ simulation, initialExperience = 'day-
           </p>
 
           {/* Prominent forward CTA → Full Simulation, colored to match the
-              completion checkmark (var(--color-teal)). */}
-          <Link
-            href={fullHref}
+              completion checkmark (var(--color-teal)). Switches the view in place
+              and syncs the URL via the shared handler (a plain Link soft-nav would
+              flip the URL but not this mounted component's state). */}
+          <button
+            type="button"
+            onClick={() => changeExperience('full')}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-btn text-white
               font-sans font-semibold text-[14px] transition-opacity duration-150 hover:opacity-90
               focus-visible:outline-none focus-visible:ring-2"
@@ -80,7 +103,7 @@ export default function SimulationClient({ simulation, initialExperience = 'day-
             <CalendarRange size={16} aria-hidden="true" />
             Continue to the Full Simulation
             <ArrowRight size={16} aria-hidden="true" />
-          </Link>
+          </button>
 
           {/* Lower-emphasis back to this project on the hub. */}
           <div className="mt-4">
@@ -128,7 +151,7 @@ export default function SimulationClient({ simulation, initialExperience = 'day-
           <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-2">
             Choose your experience
           </p>
-          <ExperienceToggle selected={experience} onChange={setExperience} />
+          <ExperienceToggle selected={experience} onChange={changeExperience} />
         </>
       }
     />
