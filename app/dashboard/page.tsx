@@ -165,8 +165,10 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                 <span className="flex-1" />
                 <Link
                   href={
+                    // Orientation is per-project now (rollup is career-level with
+                    // no single project to deep-link), so send to the project hub.
                     tier.tier === 'orientation'
-                      ? `/careers/${career.slug}/orientation`
+                      ? `/careers/${career.slug}/simulate`
                       : `/careers/${career.slug}/simulate/${tier.scenarioSlug}?experience=${tier.tier}`
                   }
                   className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-btn

@@ -58,9 +58,7 @@ export interface TimeBlock {
 
 // A Scenario is a fully self-contained PROJECT: it owns all three experiential
 // tiers, including its own per-project Orientation. (Orientation used to live
-// once at the career level and be shared; it is now a property of each project.
-// Legacy MC projects share one orientation array by reference — see
-// MC_SHARED_ORIENTATION — until each gets its own authored four-reading set.)
+// once at the career level and be shared; it is now a property of each project.)
 export interface Scenario {
   id:       string
   slug:     string         // human-readable, e.g. 'fresca'
@@ -89,9 +87,8 @@ export interface CareerSim {
   scenarios:   Scenario[]
 }
 
-// A fully-resolved simulation for ONE scenario: the shared career Orientation
-// stitched together with that scenario's Day-in-the-Life and Full tiers. This is
-// the shape SimulationClient renders (the same three-tier shape as before).
+// A fully-resolved simulation for ONE scenario: that project's own Orientation,
+// Day-in-the-Life, and Full tiers. This is the shape SimulationClient renders.
 export interface Simulation {
   careerId:     string
   careerSlug:   string
@@ -109,16 +106,13 @@ export interface Simulation {
 // ── Phase 5 content imports ────────────────────────────────────────────────────
 
 import { ibAnalystContent }                    from './content/ib-analyst'
-import { managementConsultantContent }         from './content/management-consultant'
-import { managementConsultantPublicSectorContent } from './content/management-consultant-public-sector'
-import { managementConsultantFinancialServicesContent } from './content/management-consultant-financial-services'
 import { managementConsultantMeridianContent } from './content/management-consultant-meridian'
 import { lawAssociateContent }                 from './content/law-associate'
 import { productManagerContent }               from './content/product-manager'
 
 const CONTENT_LOOKUP: Record<string, Record<string, TimeBlockContent>> = {
   'ib-analyst':             ibAnalystContent,
-  'management-consultant':  { ...managementConsultantContent, ...managementConsultantPublicSectorContent, ...managementConsultantFinancialServicesContent, ...managementConsultantMeridianContent },
+  'management-consultant':  managementConsultantMeridianContent,
   'law-associate':          lawAssociateContent,
   'product-manager':        productManagerContent,
 }
@@ -161,17 +155,6 @@ function b(
 }
 
 // ── Management Consultant — per-project orientation block sets ─────────────────
-
-// The original career-level Orientation (3 readings, "what consulting is").
-// Now shared BY REFERENCE across the legacy MC projects (Fresca / Gateway /
-// Atlas) so they keep working unchanged. Same block ids → completing it under
-// any one legacy project marks it complete for the others (the old shared
-// behaviour, preserved). Meridian uses its own per-project orientation instead.
-const MC_SHARED_ORIENTATION: TimeBlock[] = [
-  makeBlock('management-consultant', "management-consultant-orientation-b1", 1, "~4 min read", "What the job actually is, and what you would do all day", 'learning', true),
-  makeBlock('management-consultant', "management-consultant-orientation-b2", 1, "~4 min read", "The rhythm, the pyramid, and the machinery nobody explains", 'learning', true),
-  makeBlock('management-consultant', "management-consultant-orientation-b3", 1, "~4 min read", "The honest trade, and how to tell if it is you", 'learning', true),
-]
 
 // Project Meridian — the new self-contained project. Four-reading per-project
 // Orientation (client/world; situation; engagement/cast; seat/vocabulary); the
@@ -286,9 +269,9 @@ export const CAREER_SIMS: CareerSim[] = [
     careerId:   'management-consultant',
     careerSlug: 'management-consultant',
     title:      'Management Consultant',
-    // Each project owns its orientation. Meridian (sorted first) has its own
-    // four-reading per-project orientation; the legacy projects (Fresca /
-    // Gateway / Atlas) share MC_SHARED_ORIENTATION by reference for now.
+    // Each project owns its orientation. Meridian is the only project: it has its
+    // own four-reading per-project orientation, a curated Day-in-the-Life, and the
+    // full Monday-to-Friday week.
     scenarios: [
       {
         // ── Project Meridian (new, self-contained) ─────────────────────────
@@ -304,167 +287,6 @@ export const CAREER_SIMS: CareerSim[] = [
           orientation:   MERIDIAN_ORIENTATION,
           'day-in-life': MERIDIAN_DITL,
           full:          MERIDIAN_FULL,
-        },
-      },
-      {
-        id:       'management-consultant-fresca',
-        slug:     'fresca',
-        title:    'Project Fresca',
-        type:     'Corporate',
-        hidden:   true,   // hidden from project pickers (Slice 3); data still loads by URL
-        scenario: 'An 8-week profit-improvement study for Fresca, a 240-location fast-casual chain recently bought by a private equity firm whose value-creation plan calls for $30M in profit improvement. You are a first-year Associate, three months in, owning the labor-cost workstream. It is week 3 of 8, and the week ends with the first Steering Committee presentation to Fresca\'s CEO and the sponsor.',
-        project:  'Project Fresca — Restaurant Profit Study',
-        tiers: {
-          orientation:   MC_SHARED_ORIENTATION,  // shared 3-reading MC orientation
-          // ── Day in the Life (one Wednesday deck day, 7 blocks) ─────────────────
-          'day-in-life': [
-            makeBlock('management-consultant', "management-consultant-dil-d1-b1", 1, "6:45 to 8:00 AM", "Hotel morning: the calm before", 'learning'),
-            makeBlock('management-consultant', "management-consultant-dil-d1-b2", 1, "8:00 to 9:00 AM", "Storyline huddle: the dot-dash", 'team'),
-            makeBlock('management-consultant', "management-consultant-dil-d1-b3", 1, "9:00 AM to 12:30 PM", "The build sprint", 'independent'),
-            makeBlock('management-consultant', "management-consultant-dil-d1-b4", 1, "2:00 to 3:30 PM", "The Dan review: half your pages die", 'team'),
-            makeBlock('management-consultant', "management-consultant-dil-d1-b5", 1, "4:00 to 8:00 PM", "Rebuild: answer-first", 'independent'),
-            makeBlock('management-consultant', "management-consultant-dil-d1-b6", 1, "8:00 to 10:45 PM", "The late night: version 9 and the final pass", 'team'),
-            makeBlock('management-consultant', "management-consultant-dil-d1-b7", 1, "10:45 to 11:15 PM", "The walk back: what today actually was", 'learning'),
-          ],
-          // ── Full Simulation (Sunday night through Friday, 30 blocks) ───────────
-          full: [
-            makeBlock('management-consultant', "management-consultant-full-d0-b1", 0, "8:00 to 10:00 PM", "The Sunday reset", 'learning'),
-            makeBlock('management-consultant', "management-consultant-full-d1-b1", 1, "5:45 to 7:50 AM", "The Monday migration", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d1-b2", 1, "8:30 to 9:30 AM", "War room check-in: planning the week backward", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d1-b3", 1, "9:30 AM to 12:30 PM", "Into the data: finding the thread", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d1-b4", 1, "1:00 to 2:30 PM", "Problem-solving session: Priya finds the hole", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d1-b5", 1, "3:00 to 6:30 PM", "The rebuild: does the finding survive?", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d1-b6", 1, "7:30 to 10:00 PM", "Team dinner, and the email sweep", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d2-b1", 2, "7:00 to 8:00 AM", "The drive out: Marcus's field briefing", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d2-b2", 2, "8:00 to 10:30 AM", "Store visit: watching the overtime happen", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-full-d2-b3", 2, "11:00 AM to 12:00 PM", "The defensive interview", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-full-d2-b4", 2, "1:30 to 4:00 PM", "Synthesis: from notes to \"so what\"", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d2-b5", 2, "4:00 to 5:00 PM", "Coaching session: what you missed", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d2-b6", 2, "5:00 to 8:30 PM", "Evening build: ghost pages and the hotel gym", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d3-b1", 3, "8:00 to 9:00 AM", "Storyline huddle: the dot-dash", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d3-b2", 3, "9:00 AM to 12:30 PM", "The build sprint", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d3-b3", 3, "2:00 to 3:30 PM", "The Dan review: half your pages die", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d3-b4", 3, "4:00 to 8:00 PM", "Rebuild: answer-first", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d3-b5", 3, "8:00 to 10:45 PM", "The late night: version 9 and the final pass", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d4-b1", 4, "7:30 to 8:45 AM", "Dry run: getting handed the pen", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d4-b2", 4, "9:30 to 10:30 AM", "The pre-wire: no surprises", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-full-d4-b3", 4, "12:40 to 2:10 PM", "The scramble: 80 minutes, one question", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d4-b4", 4, "3:00 to 4:30 PM", "SteerCo: the question comes to you", 'presentation'),
-            makeBlock('management-consultant', "management-consultant-full-d4-b5", 4, "4:45 to 5:30 PM", "Debrief in the lobby", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d4-b6", 4, "6:30 to 9:15 PM", "The flight home", 'learning'),
-            makeBlock('management-consultant', "management-consultant-full-d5-b1", 5, "9:00 to 10:00 AM", "Team debrief call: the week 4 sprint takes shape", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d5-b2", 5, "10:00 AM to 12:00 PM", "The cleanup: documentation, hygiene, and a staffing email", 'independent'),
-            makeBlock('management-consultant', "management-consultant-full-d5-b3", 5, "1:00 to 2:00 PM", "Coffee with Marcus: the honest career conversation", 'learning'),
-            makeBlock('management-consultant', "management-consultant-full-d5-b4", 5, "2:30 to 4:00 PM", "Friday training: the partner masterclass", 'learning'),
-            makeBlock('management-consultant', "management-consultant-full-d5-b5", 5, "4:00 to 4:45 PM", "Week wrap with Priya: the feedback ritual", 'team'),
-            makeBlock('management-consultant', "management-consultant-full-d5-b6", 5, "7:00 to 8:00 PM", "The week, weighed", 'learning'),
-          ],
-        },
-      },
-      {
-        id:       'management-consultant-public-sector',
-        slug:     'public-sector',
-        title:    'Project Gateway',
-        type:     'Public Sector',
-        hidden:   true,   // hidden from project pickers (Slice 2); data still loads by URL
-        scenario: 'A 10-week operational review for the Hartwell State Department of Human Services, which processes Medicaid and SNAP benefits through 38 county offices. Applications take months, families are waiting, and a new set of federal renewal and work-requirement rules takes effect in 14 weeks, roughly doubling the agency\'s workload. You are a first-year Associate, three months in, owning the county-operations workstream: why some offices clear applications in days and others take months under identical rules. The week ends with a Steering Committee presentation to the Commissioner.',
-        project:  'Project Gateway: State Benefits Backlog Review',
-        tiers: {
-          orientation:   MC_SHARED_ORIENTATION,  // shared 3-reading MC orientation
-          // Day in the Life (one county field day, 7 blocks)
-          'day-in-life': [
-            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b1", 1, "7:15 to 8:30 AM", "The drive out to Eastwood County", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b2", 1, "8:45 to 9:45 AM", "Walking the floor before the office opens", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b3", 1, "9:45 to 11:00 AM", "Shadowing a caseworker", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b4", 1, "11:00 to 11:45 AM", "The caseworker's break: turnover, burnout, and the human cost", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b5", 1, "11:45 AM to 12:15 PM", "Closing with the office manager", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b6", 1, "1:30 to 3:00 PM", "Reconciling the floor against the data", 'independent'),
-            makeBlock('management-consultant', "management-consultant-public-sector-dil-d1-b7", 1, "3:00 to 4:00 PM", "Debrief with the engagement manager", 'team'),
-          ],
-          // Full Simulation (Sunday night through Friday, 29 blocks)
-          full: [
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d0-b1", 0, "8:00 to 10:00 PM", "The Sunday reset before the capital", 'learning'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b1", 1, "5:45 to 8:45 AM", "The Monday migration", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b2", 1, "9:00 to 10:00 AM", "War room: planning the week backward from Thursday", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b3", 1, "10:00 AM to 1:00 PM", "Into the data: where the five-fold gap lives", 'independent'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b4", 1, "2:00 to 3:30 PM", "Meeting the deputy: the most important skeptic in the building", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b5", 1, "3:45 to 5:30 PM", "The internal AI tool and the benchmark hunt", 'independent'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d1-b6", 1, "7:00 to 9:30 PM", "Team dinner, and the conversation about the career", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b1", 2, "7:15 to 8:45 AM", "The drive out to Eastwood County", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b2", 2, "8:45 to 9:45 AM", "Walking the floor before the office opens", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b3", 2, "9:45 to 11:00 AM", "Shadowing a caseworker", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b4", 2, "11:00 to 11:45 AM", "The break room: turnover, burnout, and the human cost", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b5", 2, "11:45 AM to 12:30 PM", "Closing with the office manager, and the real blocker", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d2-b6", 2, "2:00 to 4:30 PM", "Reconciling the floor against the data, and the debrief", 'independent'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b1", 3, "8:00 to 9:30 AM", "Building the storyline before the slides", 'independent'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b2", 3, "9:30 AM to 12:30 PM", "The problem-solving session: the partner sharpens the edge", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b3", 3, "1:30 to 2:30 PM", "The governance story, in full", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b4", 3, "3:00 to 7:00 PM", "Building the deck", 'independent'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d3-b5", 3, "7:30 to 8:15 PM", "The pre-wire: no surprises in the room", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b1", 4, "7:30 to 8:45 AM", "The dry run", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b2", 4, "1:30 to 1:50 PM", "Managing up: the partner and the Commissioner", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b3", 4, "2:00 to 2:40 PM", "The Steering Committee", 'presentation'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b4", 4, "2:40 to 3:10 PM", "The hard questions", 'presentation'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b5", 4, "3:10 to 3:30 PM", "The decision", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d4-b6", 4, "6:30 to 9:00 PM", "The flight home", 'learning'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b1", 5, "9:00 to 10:00 AM", "The home-office debrief", 'team'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b2", 5, "10:00 to 10:40 AM", "The career conversation", 'learning'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b3", 5, "11:00 AM to 12:30 PM", "Documenting the win and scoping what is next", 'independent'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b4", 5, "2:00 to 2:30 PM", "The line outside the door", 'learning'),
-            makeBlock('management-consultant', "management-consultant-public-sector-full-d5-b5", 5, "4:00 to 4:30 PM", "Closing the week", 'learning'),
-          ],
-        },
-      },
-      {
-        id:       'management-consultant-financial-services',
-        slug:     'financial-services',
-        title:    'Project Atlas',
-        type:     'Financial Services',
-        hidden:   true,   // hidden from project pickers (Slice 2); data still loads by URL
-        scenario: 'A 9-week target operating model engagement for Cascade Public Pension Fund, a $90B fund insourcing its investment management to cut external fees and gain control. You are a first-year Associate, three months in, owning the middle-office workstream. The central question: the binding constraint on insourcing is not the front office but the middle office, specifically the data layer and the Investment Book of Record. The week builds to an Investment Committee presentation on what to build in-house, what to outsource, and how to sequence it safely.',
-        project:  'Project Atlas: Pension Fund Operating Model',
-        tiers: {
-          orientation:   MC_SHARED_ORIENTATION,  // shared 3-reading MC orientation
-          // Day in the Life (one TOM design day, 7 blocks)
-          'day-in-life': [
-            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b1", 1, "8:00 to 9:00 AM", "The whiteboard: Devin draws the three offices", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b2", 1, "9:20 to 10:30 AM", "The realist: interviewing the head of operations", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b3", 1, "10:45 to 11:45 AM", "The ambition: meeting the CIO", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b4", 1, "12:00 to 1:30 PM", "Mapping the middle-office capability gap", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b5", 1, "2:00 to 3:00 PM", "The custodian call: understanding the outsource option", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b6", 1, "3:15 to 5:00 PM", "Building the build-versus-outsource framework", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-dil-d1-b7", 1, "5:15 to 6:15 PM", "Debrief with the engagement manager", 'team'),
-          ],
-          // Full Simulation (Sunday night through Friday, 27 blocks)
-          full: [
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d0-b1", 0, "8:00 to 10:00 PM", "The Sunday reset", 'learning'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b1", 1, "5:45 to 8:45 AM", "The Monday migration", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b2", 1, "9:00 to 10:00 AM", "War room: planning backward from the Investment Committee", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b3", 1, "10:00 AM to 1:00 PM", "Mastering the current state", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b4", 1, "4:00 to 5:00 PM", "The CIO kickoff: meeting the ambition", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b5", 1, "5:15 to 6:45 PM", "Benchmarking the Canadian model", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d1-b6", 1, "7:30 to 9:30 PM", "Team dinner, and the conversation about the career", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b1", 2, "8:00 to 8:45 AM", "The whiteboard: Devin draws the three offices", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b2", 2, "9:00 to 10:30 AM", "The realist: interviewing the COO", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b3", 2, "11:00 AM to 12:15 PM", "The risk officer: you cannot manage what you cannot see", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d2-b4", 2, "1:30 to 4:30 PM", "Synthesizing the gap before the design", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b1", 3, "8:00 to 9:30 AM", "Structuring the design", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b2", 3, "10:00 to 11:30 AM", "The problem-solving session: the partner sharpens it", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b3", 3, "1:00 to 2:00 PM", "The custodian call: the outsource option", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b4", 3, "2:15 to 5:00 PM", "Building the recommendation", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d3-b5", 3, "5:15 to 6:00 PM", "The pre-wire: routing the truth through the COO", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b1", 4, "7:30 to 8:45 AM", "The dry run", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b2", 4, "1:15 to 1:40 PM", "Managing up: the partner and the CIO", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b3", 4, "2:00 to 2:45 PM", "The Investment Committee", 'presentation'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b4", 4, "2:45 to 3:15 PM", "The hard questions", 'presentation'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b5", 4, "3:15 to 3:35 PM", "The decision", 'meeting'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d4-b6", 4, "6:30 to 9:00 PM", "The flight home", 'learning'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b1", 5, "9:00 to 10:00 AM", "The home-office debrief", 'team'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b2", 5, "10:00 to 10:40 AM", "The career conversation", 'learning'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b3", 5, "11:00 AM to 12:30 PM", "Documenting the decision and scoping what is next", 'independent'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b4", 5, "2:00 to 2:30 PM", "What the week was about", 'learning'),
-            makeBlock('management-consultant', "management-consultant-financial-services-full-d5-b5", 5, "4:00 to 4:30 PM", "Closing the week", 'learning'),
-          ],
         },
       },
     ],
@@ -620,10 +442,9 @@ export function getTierBlocks(simulation: Simulation, tier: Tier): TimeBlock[] {
 
 /**
  * All authored blocks for a tier across a whole career, aggregated across every
- * scenario and de-duplicated by block id (legacy MC projects share one
- * orientation array by reference, so the same orientation ids appear under
- * multiple scenarios — dedupe keeps the dashboard rollup honest). Used by the
- * dashboard so no scenario's blocks are dropped when a career has many projects.
+ * scenario and de-duplicated by block id. Used by the dashboard so no scenario's
+ * blocks are dropped when a career has many projects. (Block ids are unique per
+ * project today; the dedupe is a cheap safeguard kept for that rollup.)
  */
 export function getCareerTierBlocks(careerSim: CareerSim, tier: Tier): TimeBlock[] {
   const seen = new Set<string>()
