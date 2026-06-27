@@ -120,9 +120,12 @@ export default function BlockExperience({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tier])
 
-  // Trigger the rating modal when the current tier is newly completed.
+  // Trigger the rating modal when the current tier is newly completed. The
+  // feedback survey is intentionally NOT shown for Orientation — only for the
+  // Day-in-the-Life and Full Simulation tiers.
   useEffect(() => {
     if (
+      tier !== 'orientation' &&
       blocks.length > 0 &&
       completedCount > prevCompletedCountRef.current &&
       completedCount === blocks.length
@@ -157,8 +160,16 @@ export default function BlockExperience({
         }
         return next
       })
+      // Clean exit: marking the FINAL block of Orientation or Day-in-the-Life
+      // complete closes the open panel/modal and lands the user on the overview,
+      // where the completion card shows. (Full Simulation is left unchanged.)
+      if (complete && (tier === 'orientation' || tier === 'day-in-life')) {
+        const completesTier =
+          blocks.length > 0 && blocks.every((b) => b.id === id || completedIds.has(b.id))
+        if (completesTier) setOpenBlock(null)
+      }
     },
-    [careerId, scenario, tier, user, blocks],
+    [careerId, scenario, tier, user, blocks, completedIds],
   )
 
   const handleNextBlock = useCallback(() => {

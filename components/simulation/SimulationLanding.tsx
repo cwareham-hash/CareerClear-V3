@@ -215,13 +215,31 @@ export default function SimulationLanding({ careerSim }: Props) {
         <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-1">
           {title}
         </p>
-        <h1 className="font-serif text-[26px] lg:text-[30px] font-bold text-navy leading-tight mb-2">
-          Choose a project
-        </h1>
-        <p className="font-sans text-[14px] text-muted leading-relaxed max-w-2xl mb-6">
-          New here? Start with the Orientation to understand the role. Then step into any
-          project — try a Day in the Life, or commit to the Full Simulation.
-        </p>
+        {/* Top-of-hub copy keyed to how many projects are visible (C10/C11):
+            ≥2 → "Choose a project" framing; exactly 1 → lead with that project's
+            own name (pulled from data) and a fixed identity/guidance template. */}
+        {isMulti ? (
+          <>
+            <h1 className="font-serif text-[26px] lg:text-[30px] font-bold text-navy leading-tight mb-2">
+              Choose a project
+            </h1>
+            <p className="font-sans text-[14px] text-muted leading-relaxed max-w-2xl mb-6">
+              Choose a project to begin. Each project is a self-contained engagement: start
+              with a short orientation, then try a day in the life, or commit to the full simulation.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className="font-serif text-[26px] lg:text-[30px] font-bold text-navy leading-tight mb-2">
+              {selected?.title ?? scenarios[0]?.title ?? 'Project'}
+            </h1>
+            <p className="font-sans text-[14px] text-muted leading-relaxed max-w-2xl mb-6">
+              A six-week financial services consulting engagement for an alternative asset
+              manager, Meridian Park. Start with a short orientation to get your bearings, then
+              try a day in the life, or commit to the full simulation.
+            </p>
+          </>
+        )}
 
         {/* Intended-order indicator — the experience sequence (Phase 4).
             Steps 2/3 reflect the selected project; chevrons show left→right order. */}
@@ -410,8 +428,8 @@ export default function SimulationLanding({ careerSim }: Props) {
       <SoftGateDialog
         open={gateOpen}
         onClose={closeGate}
-        onGoToOrientation={() => { closeGate(); router.push(orientationHref) }}
-        onStartAnyway={() => {
+        onPrimary={() => { closeGate(); router.push(orientationHref) }}
+        onSecondary={() => {
           const href = pendingHref
           closeGate()
           if (href) router.push(href)

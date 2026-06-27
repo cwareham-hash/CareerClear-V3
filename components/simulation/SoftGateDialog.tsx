@@ -7,18 +7,44 @@
 import { useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useDialog } from './useDialog'
 
+// Gentle, non-locking confirm dialog. The defaults reproduce the original
+// "start with Orientation" hub gate; every string and both actions are
+// overridable so the same component can host other soft nudges (e.g. the
+// orientation-complete "skip to the full simulation" prompt).
 interface Props {
-  open:               boolean
-  onClose:            () => void   // cancel / Escape — focus returns to the trigger
-  onGoToOrientation:  () => void
-  onStartAnyway:      () => void
+  open:            boolean
+  onClose:         () => void   // cancel / Escape / backdrop — focus returns to the trigger
+  title?:          string
+  description?:    string
+  Icon?:           LucideIcon          // top accent icon
+  primaryLabel?:   string
+  primaryIcon?:    LucideIcon | null   // icon inside the primary button (null = none)
+  onPrimary:       () => void
+  secondaryLabel?: string
+  onSecondary:     () => void
 }
 
-export default function SoftGateDialog({ open, onClose, onGoToOrientation, onStartAnyway }: Props) {
+const DEFAULT_DESCRIPTION =
+  'We recommend starting with Orientation to get the most out of this project. You can still jump straight in if you’d like.'
+
+export default function SoftGateDialog({
+  open,
+  onClose,
+  title = 'Start with Orientation?',
+  description = DEFAULT_DESCRIPTION,
+  Icon = BookOpen,
+  primaryLabel = 'Go to Orientation',
+  primaryIcon = BookOpen,
+  onPrimary,
+  secondaryLabel = 'Start anyway',
+  onSecondary,
+}: Props) {
   const containerRef    = useRef<HTMLDivElement>(null)
   const initialFocusRef = useRef<HTMLButtonElement>(null)
+  const PrimaryIcon     = primaryIcon
 
   // Single dialog instance (no desktop/mobile split), so always-match the query.
   useDialog({
@@ -67,39 +93,38 @@ export default function SoftGateDialog({ open, onClose, onGoToOrientation, onSta
             >
               <span className="inline-flex w-11 h-11 rounded-full items-center justify-center mb-4"
                 style={{ backgroundColor: 'var(--color-tag-bg)' }}>
-                <BookOpen size={20} style={{ color: 'var(--color-teal)' }} aria-hidden="true" />
+                <Icon size={20} style={{ color: 'var(--color-teal)' }} aria-hidden="true" />
               </span>
 
               <h2 id="softgate-title" className="font-sans font-bold text-[17px] text-navy mb-1.5">
-                Start with Orientation?
+                {title}
               </h2>
               <p id="softgate-desc" className="font-sans text-[14px] text-muted leading-relaxed mb-5">
-                We recommend starting with Orientation to get the most out of this project.
-                You can still jump straight in if you’d like.
+                {description}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   ref={initialFocusRef}
                   type="button"
-                  onClick={onGoToOrientation}
+                  onClick={onPrimary}
                   className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-btn
                     bg-teal text-white font-sans font-semibold text-[13px]
                     transition-colors duration-150 hover:bg-teal-light
                     focus-visible:outline-none focus-visible:ring-2"
                 >
-                  <BookOpen size={14} aria-hidden="true" />
-                  Go to Orientation
+                  {PrimaryIcon && <PrimaryIcon size={14} aria-hidden="true" />}
+                  {primaryLabel}
                 </button>
                 <button
                   type="button"
-                  onClick={onStartAnyway}
+                  onClick={onSecondary}
                   className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-btn
                     border border-border text-dark font-sans font-semibold text-[13px]
                     transition-colors duration-150 hover:border-teal hover:text-teal
                     focus-visible:outline-none focus-visible:ring-2"
                 >
-                  Start anyway
+                  {secondaryLabel}
                 </button>
               </div>
             </div>
