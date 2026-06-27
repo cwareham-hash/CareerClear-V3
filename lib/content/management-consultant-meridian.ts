@@ -10,13 +10,13 @@ import type { TimeBlockContent } from '../simulation'
 //
 // Sources (transcribed verbatim; prose not paraphrased or trimmed):
 //   orientation/Meridian_Park_Orientation_V3.md
-//   full-simulation/Meridian_Park_Monday_Blocks_1-5_Final_V1.md          (blocks 1–5)
+//   full-simulation/Meridian_Park_Monday_Blocks_1-5_Final_V2.md          (blocks 1–5)
 //   scenario/Meridian_Park_Interview_GoldStandard_V4_Complete.md          (block 6, Ellen)
-//   full-simulation/Meridian_Park_Blocks_7-8_Final_V1.md                  (blocks 7–8)
-//   full-simulation/Meridian_Park_Wednesday_Blocks_9-10_Final_V1.md       (blocks 9–10)
-//   full-simulation/Meridian_Park_Thursday_Blocks_11-15_Final_V1.md       (blocks 11–15)
-//   full-simulation/Meridian_Park_Friday_Blocks_16-19_Final_V1.md         (blocks 16–19)
-//   day-in-the-life/Meridian_Park_Day_in_the_Life_V1.md                   (DITL framing)
+//   full-simulation/Meridian_Park_Blocks_7-8_Final_V2.md                  (blocks 7–8)
+//   full-simulation/Meridian_Park_Wednesday_Blocks_9-10_Final_V2.md       (blocks 9–10)
+//   full-simulation/Meridian_Park_Thursday_Blocks_11-15_Final_V3.md       (blocks 11–15)
+//   full-simulation/Meridian_Park_Friday_Blocks_16-19_Final_V2.md         (blocks 16–19)
+//   day-in-the-life/Meridian_Park_Day_in_the_Life_V2.md                   (DITL framing)
 //
 // Mapping per block:
 //   before        ← "### Setting the Scene"  (neutral 3rd person, kept as written)
@@ -217,7 +217,7 @@ A few terms will come up often. They are worth knowing now so the conversations 
   // ── Monday (day 1) — blocks 1–5 ───────────────────────────────────────────────
 
   'management-consultant-meridian-full-d1-b1': {
-    before: `Monday morning, the start of week 3 of the six-week Meridian engagement. The team gathers for its weekly kickoff. David, the Senior Manager who sits above Marcus, joins to take stock at the halfway mark: what the interviews so far are surfacing, which working hypotheses the team is now testing, and what has to get done this week. Marcus runs the day to day. Carly has sat in on a string of the investor interviews and owns the synthesis and the first deck pages.`,
+    before: `Monday morning, the start of week 3 of the six-week Meridian engagement. The team gathers in the firm's New York office, its home base for the engagement, for the weekly kickoff. David, the Senior Manager who sits above Marcus, joins to take stock at the halfway mark: what the interviews so far are surfacing, which working hypotheses the team is now testing, and what has to get done this week. Marcus runs the day to day. Carly has sat in on a string of the investor interviews and owns the synthesis and the first deck pages.`,
     simulatedWork: `David: Morning, both. We're at the halfway mark, so before we get to this week I want to take stock. Marcus, the state of play. Where are we on interviews, and what are they telling us?
 
 Marcus: Fourteen of the thirty done. Tuesday and Wednesday get us another six or seven, which puts us where we need to be to start locking themes. The headline is more consistent than I expected at this stage. People like Meridian. The investment relationship is good, and they trust the data on the portal. The frustration is almost entirely about what the portal does not do once that data is in front of them.
@@ -279,7 +279,7 @@ Marcus: That is it. And do not polish anything yet. I would rather see a rough s
   },
 
   'management-consultant-meridian-full-d1-b3': {
-    before: `Carly settles in to sharpen this week's interview guide before tomorrow's calls. The team interviews seven or eight more investors across Tuesday and Wednesday, and the guide is the tool that keeps each conversation tethered to what the team is trying to prove. The artifact is the guide itself, tailored from the base version to test this week's hypotheses.`,
+    before: `Carly settles in at her desk in the New York office to sharpen this week's interview guide before tomorrow's calls. The team interviews seven or eight more investors across Tuesday and Wednesday, and the guide is the tool that keeps each conversation tethered to what the team is trying to prove. The artifact is the guide itself, tailored from the base version to test this week's hypotheses.`,
     simulatedWork: '',
     commentary: `We have a hypothesis now, the last mile, so the guide I am sharpening this morning has one job: test it, not fish. Most of the base questions stay. What I am adding are the sharper probes that force the difference between an investor who wants a finished document and one who wants raw data, because that distinction is the spine of the whole story. The pull is always to ask everything while I have them on the call, so I am cutting about as many questions as I am adding, keeping only the ones that earn their place against the hypothesis.`,
     after: '',
@@ -542,7 +542,7 @@ My cleaned-up notes are an important artifact, and they get added to our ongoing
   },
 
   'management-consultant-meridian-full-d2-b2': {
-    before: `After the Ellen call, Carly stays at her desk and works the interview notes into shape. There is no meeting and no call in this block. It is the pair of artifacts that come out of the hour, shown back to back: first the raw notes Carly typed live during the interview, then the cleaned, structured version she rewrites them into.`,
+    before: `After the Ellen call, Carly stays at her desk in the firm's New York office and works the interview notes into shape. There is no meeting and no call in this block. It is the pair of artifacts that come out of the hour, shown back to back: first the raw notes Carly typed live during the interview, then the cleaned, structured version she rewrites them into.`,
     simulatedWork: '',
     commentary: '',
     after: '',
@@ -550,7 +550,7 @@ My cleaned-up notes are an important artifact, and they get added to our ongoing
   },
 
   'management-consultant-meridian-full-d2-b3': {
-    before: `Later the same morning, Carly and Marcus join a scheduled video call with Raymond, the Chief Investment Officer of a life insurance company that holds an infrastructure allocation with Meridian Park. Raymond is a different kind of investor from the pension CIO earlier in the day. An insurer runs its investments through its own systems for statutory accounting and regulatory capital, so what it needs from a portal is usable data rather than finished documents. Marcus will lead the conversation; Carly is here to take notes and listen for what matters.`,
+    before: `Later the same morning, from the same New York office, Carly and Marcus join a scheduled video call with Raymond, the Chief Investment Officer of a life insurance company that holds an infrastructure allocation with Meridian Park. Meridian's investors are institutions spread across the country, so the interviews run over video. Raymond is a different kind of investor from the pension CIO earlier in the day. An insurer runs its investments through its own systems for statutory accounting and regulatory capital, so what it needs from a portal is usable data rather than finished documents. Marcus will lead the conversation; Carly is here to take notes and listen for what matters.`,
     simulatedWork: `[Marcus and Carly are on the call. Raymond joins a moment later.]
 
 Marcus: Raymond, hi, thanks for making the time. We're a few weeks past quarter-end, so I imagine you're in the thick of the statutory filing right now, I appreciate you fitting us in. I'm Marcus, and this is my colleague Carly.
@@ -653,7 +653,7 @@ Raymond: Of course. Send it back to them straight, that's all I'd ask. Good luck
   // ── Wednesday (day 3) — block 9 (problem-solving), block 10 (deck build) ───────
 
   'management-consultant-meridian-full-d3-b1': {
-    before: `Wednesday, late morning. Tuesday's interviews and one this morning are in the bank, so the theme tracker has more rows than it did Monday, and the count of completed interviews is up around twenty. Marcus and Carly sit down for the week's problem-solving session: the working meeting where the team compares what it is hearing, attacks its own logic, and tightens the themes into something the deck can stand on. Carly brings the ghost deck and the tracker.`,
+    before: `Wednesday, late morning. Tuesday's interviews and one this morning are in the bank, so the theme tracker has more rows than it did Monday, and the count of completed interviews is up around twenty. Marcus and Carly sit down in the New York office for the week's problem-solving session: the working meeting where the team compares what it is hearing, attacks its own logic, and tightens the themes into something the deck can stand on. Carly brings the ghost deck and the tracker.`,
     simulatedWork: `Marcus: Alright, put up the skeleton. Walk me through the spine and I will try to break it.
 
 Carly: Straw man, so go ahead and attack it. Situation, the relationship is good and the data is accurate, nobody argues with that. Complication, the portal stops at accurate data and leaves the last mile to the investor, and the bar has moved. Resolution, a prioritized, fundable set of improvements. The middle is where the work is.
@@ -692,7 +692,7 @@ Marcus: And resist the urge to put the recommendation in Section 2. We earn the 
   },
 
   'management-consultant-meridian-full-d3-b2': {
-    before: `With the themes tightened, Carly turns the complication section of the ghost deck into finished pages. The discipline now is one idea per page, an action-title lead-in that states the so-what, and the synthesized interview evidence sitting underneath it. The artifact is the section as drafted, the version that goes to Marcus for review.`,
+    before: `With the themes tightened, Carly settles back at her desk in the firm's New York office and turns the complication section of the ghost deck into finished pages. The discipline now is one idea per page, an action-title lead-in that states the so-what, and the synthesized interview evidence sitting underneath it. The artifact is the section as drafted, the version that goes to Marcus for review.`,
     simulatedWork: '',
     commentary: `The page I am on right now needs a title, and that is where most of the time goes. Not a label like capital-activity reporting, which would just make Marcus hunt for the point. I am writing it as a full sentence that says the so-what, so a busy executive who reads only the titles still gets the argument. Then I hold the page to one idea. The minute this page tries to say two things, it stops being a slide and becomes a document, and Marcus will split it before I finish explaining it, so I would rather catch it now. That is why this is slower than it looks. Most of the two hours is deciding what each page is actually for, then proving that one thing with the cleanest evidence I have in the tracker.`,
     after: '',
@@ -743,7 +743,7 @@ Body:
   // ── Thursday (day 4) — blocks 11–15 ───────────────────────────────────────────
 
   'management-consultant-meridian-full-d4-b1': {
-    before: `Thursday morning. Marcus has Carly's complication section open and walks her through his edits. A meaningful share of it gets restructured, which on a first draft is the norm rather than a verdict on the work. The artifact is one of Carly's pages with Marcus's markup.`,
+    before: `Thursday morning, in the firm's New York office. Marcus has Carly's complication section open and walks her through his edits. A meaningful share of it gets restructured, which on a first draft is the norm rather than a verdict on the work. The artifact is one of Carly's pages with Marcus's markup.`,
     simulatedWork: `Marcus: First, the good news. Page one is doing exactly what it should. The title says the point, there is one idea, and the two quotes earn their place. I would leave it almost alone. That is the bar for the rest.
 
 Carly: Good. That one felt like it clicked.
@@ -837,7 +837,7 @@ Footnote: base is 20 of 30 planned investor interviews completed, as of Wednesda
   },
 
   'management-consultant-meridian-full-d4-b3': {
-    before: `Thursday afternoon. Marcus and Carly join the mid-engagement checkpoint with Meridian. This is a status meeting, not the final readout: the team shares where the themes are landing and the initial direction, gathers the client's reaction, and keeps everyone aligned so nothing in the week-six readout comes as a surprise. From Meridian: Diane, the Global Head of Client Solutions who sponsored the work and owns the platform strategy and its funding; Gregory, the Head of Investor Relations, whose team operates the portal day to day; and Laura, the Head of Technology, who owns the build. Marcus leads. Carly is along to see client management directly.`,
+    before: `Thursday afternoon. Marcus and Carly travel to Meridian's office for the mid-engagement checkpoint, the week's one in-person client meeting. This is a status meeting, not the final readout: the team shares where the themes are landing and the initial direction, gathers the client's reaction, and keeps everyone aligned so nothing in the week-six readout comes as a surprise. From Meridian: Diane, the Global Head of Client Solutions who sponsored the work and owns the platform strategy and its funding; Gregory, the Head of Investor Relations, whose team operates the portal day to day; and Laura, the Head of Technology, who owns the build. Marcus leads. Carly is along to see client management directly.`,
     simulatedWork: `Marcus: Diane, Gregory, Laura, thank you for the time. I know the calendars are full, so I will be efficient. This is a checkpoint, not the readout. We are three weeks in, halfway, and the point today is to show you where the themes are landing while there is still time to steer, get your reactions, and make sure nothing in week six is a surprise. I brought Carly, who has been in many of the investor interviews and is building the synthesis, so she can speak to the evidence directly if it is useful.
 
 [Carly nods.]
@@ -888,7 +888,7 @@ Diane: Then this was a good use of the hour. Thank you, both.`,
   },
 
   'management-consultant-meridian-full-d4-b4': {
-    before: `After the Meridian team drops off, Marcus and Carly stay on the line for a few minutes. This is the part that does not show up in any deliverable: Marcus walking Carly through what just happened in that room, and why he handled it the way he did.`,
+    before: `Still at Meridian's office after the checkpoint, Marcus and Carly step aside for a few minutes to debrief before the dinner. This is the part that does not show up in any deliverable: Marcus walking Carly through what just happened in that room, and why he handled it the way he did.`,
     simulatedWork: `Marcus: So. What did you see in there?
 
 Carly: Honestly, that you spent more time managing Laura than anyone, even though Diane is the sponsor.
@@ -934,7 +934,7 @@ Marcus: That is most of what it is. The readout should feel inevitable. Everythi
   // ── Friday (day 5) — blocks 16–19 ─────────────────────────────────────────────
 
   'management-consultant-meridian-full-d5-b1': {
-    before: `Friday morning. David has the complication section in front of him, now revised through Marcus's review and updated after the client checkpoint. His review is a different altitude from Marcus's: less about whether a page is clean, more about whether the argument survives the room it is built for, the one with Diane and her leadership in it.`,
+    before: `Friday morning, back in the firm's New York office for the team's office day. David has the complication section in front of him, now revised through Marcus's review and updated after the client checkpoint. His review is a different altitude from Marcus's: less about whether a page is clean, more about whether the argument survives the room it is built for, the one with Diane and her leadership in it.`,
     simulatedWork: `David: I read it the way Diane's boss will read it. Titles only, front to back, ninety seconds. Want to know what I got?
 
 Carly: Please.
@@ -1059,7 +1059,7 @@ const meridianDITL: Record<string, TimeBlockContent> = {
   // 1. Team frames the day (reframed from the Monday kickoff: day-framing wording
   //    + a threading OTSC). Its dialogue differs slightly from full block 1.
   'management-consultant-meridian-dil-d1-b1': {
-    before: `The team starts the day together. David, the Senior Manager who sits above Marcus, joins to take stock and frame the work ahead: what the investor interviews are surfacing, which working hypotheses the team is now testing, and what has to move from raw interviews toward a finished argument. Marcus runs the day to day. Carly has sat in on a string of the investor interviews and owns the synthesis and the first deck pages. This is the room where the day's work gets pointed.`,
+    before: `The team starts the day together in the firm's New York office, its home base for the engagement. David, the Senior Manager who sits above Marcus, joins to take stock and frame the work ahead: what the investor interviews are surfacing, which working hypotheses the team is now testing, and what has to move from raw interviews toward a finished argument. Marcus runs the day to day. Carly has sat in on a string of the investor interviews and owns the synthesis and the first deck pages. This is the room where the day's work gets pointed.`,
     simulatedWork: `David: Morning, both. We're at the halfway mark, so before we get into the day I want to take stock. Marcus, the state of play. Where are we on interviews, and what are they telling us?
 
 Marcus: Fourteen of the thirty done, more coming today, which puts us where we need to be to start locking themes. The headline is more consistent than I expected at this stage. People like Meridian. The investment relationship is good, and they trust the data on the portal. The frustration is almost entirely about what the portal does not do once that data is in front of them.
@@ -1107,25 +1107,25 @@ David: Then we are set. Let us get into it.`,
   // 3. Note cleanup (full block 7) — fuller standalone scene.
   'management-consultant-meridian-dil-d1-b3': {
     ...meridianBase['management-consultant-meridian-full-d2-b2'],
-    before: `The call done, Carly stays at her desk and works the interview notes into shape while Ellen's voice is still fresh. There is no meeting and no call in this block. It is the pair of artifacts that come out of the hour, shown back to back: first the raw notes Carly typed live during the interview, then the cleaned, structured version she rewrites them into. The rough version is how it actually looks mid-call; the clean version is what gets added to the running interview log and coded into the themes.`,
+    before: `The call done, Carly stays at her desk in the firm's New York office and works the interview notes into shape while Ellen's voice is still fresh. There is no meeting and no call in this block. It is the pair of artifacts that come out of the hour, shown back to back: first the raw notes Carly typed live during the interview, then the cleaned, structured version she rewrites them into. The rough version is how it actually looks mid-call; the clean version is what gets added to the running interview log and coded into the themes.`,
   },
 
   // 4. Problem-solving session (full block 9) — fuller standalone scene.
   'management-consultant-meridian-dil-d1-b4': {
     ...meridianBase['management-consultant-meridian-full-d3-b1'],
-    before: `Later in the day, with more interviews now in the bank, Marcus and Carly sit down for the team's problem-solving session: the working meeting where they compare what they are hearing, attack their own logic, and tighten the themes into something the deck can stand on. By this point the theme tracker carries around twenty completed interviews, more rows than it held at the start of the week. Carly brings the ghost deck and the tracker. This is the hour where loose threads either become a defensible theme or get cut.`,
+    before: `Later in the day, with more interviews now in the bank, Marcus and Carly sit down in the New York office for the team's problem-solving session: the working meeting where they compare what they are hearing, attack their own logic, and tighten the themes into something the deck can stand on. By this point the theme tracker carries around twenty completed interviews, more rows than it held at the start of the week. Carly brings the ghost deck and the tracker. This is the hour where loose threads either become a defensible theme or get cut.`,
   },
 
   // 5. Deck section build (full block 10) — scene lightly extended for the single day.
   'management-consultant-meridian-dil-d1-b5': {
     ...meridianBase['management-consultant-meridian-full-d3-b2'],
-    before: `With the themes tightened in the session, Carly turns the complication section of the ghost deck into finished pages. The discipline now is one idea per page, an action-title lead-in that states the so-what, and the synthesized interview evidence sitting underneath it. The artifact is the section as drafted, the version that goes to Marcus for review. This is where the morning's interview, Ellen's words included, starts becoming an actual page.`,
+    before: `With the themes tightened in the session, Carly turns the complication section of the ghost deck into finished pages at her desk in the New York office. The discipline now is one idea per page, an action-title lead-in that states the so-what, and the synthesized interview evidence sitting underneath it. The artifact is the section as drafted, the version that goes to Marcus for review. This is where the morning's interview, Ellen's words included, starts becoming an actual page.`,
   },
 
   // 6. Deck review with Marcus (full block 11) — fuller scene + a closing-the-day OTSC appended.
   'management-consultant-meridian-dil-d1-b6': {
     ...meridianBase['management-consultant-meridian-full-d4-b1'],
-    before: `With the section drafted, Carly takes it to Marcus. He has her complication section open and walks her through his edits. A meaningful share of it gets restructured, which on a first draft is the norm rather than a verdict on the work. The artifact is one of Carly's pages with Marcus's markup. This is the last stop of the day, where the page she built an hour ago gets pressure-tested before it goes anywhere near David.`,
+    before: `With the section drafted, Carly takes it to Marcus in the firm's New York office. He has her complication section open and walks her through his edits. A meaningful share of it gets restructured, which on a first draft is the norm rather than a verdict on the work. The artifact is one of Carly's pages with Marcus's markup. This is the last stop of the day, where the page she built an hour ago gets pressure-tested before it goes anywhere near David.`,
     commentary: `Marcus reworked the bones of one page out of three and left the other two mostly alone, and the page he tore up was the one where I had crammed four ideas onto a slide because I did not want to waste the space. It stings a little to see a page come back that restructured, and the first instinct is to read it as a grade. It is not. The thing I hold onto is what he said at the end: the thinking was right, the structure was not. Structure I can fix in an hour. So that is the next hour.
 
 That is the loop, start to end. This morning Ellen told us she is paying for a finished product and getting raw ingredients. By this afternoon that exact frustration is sitting in a deck page, coded, counted, argued over with Marcus, and pointed at something Meridian can actually fund. I walked you through it as one clean day. The real version is messier and more interrupted than this, more calls stacked up, more half-built pages waiting on a number. But the line through it is exactly what you just watched: a real person's problem this morning, on its way to a page David can read, by the end of the day.`,
