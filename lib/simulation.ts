@@ -6,7 +6,7 @@
 // authored TimeBlocks directly — there is no "filter the same blocks by
 // duration"; the three tiers are separately authored block sets.
 
-export type ActivityType = 'meeting' | 'independent' | 'team' | 'presentation' | 'learning'
+export type ActivityType = 'meeting' | 'independent' | 'team' | 'presentation' | 'learning' | 'social'
 export type Tier = 'orientation' | 'day-in-life' | 'full'
 
 // §7.6.2 colour coding
@@ -16,6 +16,7 @@ export const ACTIVITY_COLORS: Record<ActivityType, string> = {
   team:         '#d4a017', // gold
   presentation: '#22c55e', // green
   learning:     '#8b5cf6', // purple
+  social:       '#e76f51', // coral (relationship/social blocks, e.g. a client dinner)
 }
 
 export const ACTIVITY_LABELS: Record<ActivityType, string> = {
@@ -24,6 +25,7 @@ export const ACTIVITY_LABELS: Record<ActivityType, string> = {
   team:         'Team Sync',
   presentation: 'Presentation',
   learning:     'Learning',
+  social:       'Social',
 }
 
 // The three experiential tiers, in display order.
@@ -56,6 +58,18 @@ export interface TimeBlock {
   briefing?:    boolean
 }
 
+// A non-clickable "connector" slot on the Full Simulation week grid: lunch,
+// heads-down time, commute, or an interview the user does not sit in on. It shows
+// the real hour-by-hour shape of the week WITHOUT being enterable — it carries no
+// content and no activity color (rendered grey), and never opens the panel. It is
+// NOT an activity: connectors are excluded from the "X of Y activities" count.
+export interface ConnectorSlot {
+  day:   number   // 1 = Mon … 5 = Fri (matches the full-week block days)
+  start: string   // e.g. '8:00' — business-day 12h; used for time-order placement
+  end:   string   // e.g. '8:30'
+  label: string   // short description, e.g. 'Lunch'
+}
+
 // A Scenario is a fully self-contained PROJECT: it owns all three experiential
 // tiers, including its own per-project Orientation. (Orientation used to live
 // once at the career level and be shared; it is now a property of each project.)
@@ -76,6 +90,8 @@ export interface Scenario {
     'day-in-life': TimeBlock[]
     full:          TimeBlock[]
   }
+  // Greyed, non-enterable schedule slots for the Full Simulation week grid only.
+  connectors?: ConnectorSlot[]
 }
 
 // A career's simulation: many self-contained Scenarios (each owns its own
@@ -101,6 +117,7 @@ export interface Simulation {
     'day-in-life': TimeBlock[]
     full:          TimeBlock[]
   }
+  connectors?: ConnectorSlot[]   // Full-week grey schedule slots (non-enterable)
 }
 
 // ── Phase 5 content imports ────────────────────────────────────────────────────
@@ -188,7 +205,7 @@ const MERIDIAN_FULL: TimeBlock[] = [
   makeBlock('management-consultant', "management-consultant-meridian-full-d4-b2", 4, "10:00 AM to 12:00 PM", "Revise the deck section",            'independent'),
   makeBlock('management-consultant', "management-consultant-meridian-full-d4-b3", 4, "2:00 to 3:00 PM",      "Client stakeholder checkpoint",      'meeting'),
   makeBlock('management-consultant', "management-consultant-meridian-full-d4-b4", 4, "3:00 to 3:30 PM",      "Post-checkpoint debrief",            'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b5", 4, "6:30 to 8:00 PM",      "Team dinner with the client",        'learning', true),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b5", 4, "6:30 to 8:00 PM",      "Team dinner with the client",        'social', true),
   // Friday (day 5) — blocks 16–19
   makeBlock('management-consultant', "management-consultant-meridian-full-d5-b1", 5, "9:00 to 10:00 AM",     "Senior Manager deck review",         'team'),
   makeBlock('management-consultant', "management-consultant-meridian-full-d5-b2", 5, "10:30 AM to 12:00 PM", "Engagement economics",               'independent'),
@@ -204,6 +221,48 @@ const MERIDIAN_DITL: TimeBlock[] = [
   makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b4", 1, "11:30 AM to 12:30 PM", "Problem-solving session: theme shaping", 'team'),
   makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b5", 1, "1:00 to 3:00 PM",      "Deck section build",                 'independent'),
   makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b6", 1, "3:30 to 4:30 PM",      "Deck review with Marcus",            'team'),
+]
+
+// Greyed, non-enterable connector slots for the Full Simulation week (C14). These
+// fill the gaps around the 19 enterable blocks (lunch, heads-down time, email,
+// interviews Carly does not sit in on) to show the real shape of the week. They
+// are NOT activities and never count toward completion. Times use the same
+// business-day format as the block headers; the grid places each slot in time
+// order between the enterable blocks.
+const MERIDIAN_CONNECTORS: ConnectorSlot[] = [
+  // Monday (1)
+  { day: 1, start: '8:00',  end: '8:30',  label: 'Arrive, email, settle in' },
+  { day: 1, start: '12:30', end: '1:30',  label: 'Lunch' },
+  { day: 1, start: '3:30',  end: '5:30',  label: 'Heads-down, refining the guide and theme tracker' },
+  { day: 1, start: '5:30',  end: '6:30',  label: "Email, wrap, prep for tomorrow's interviews" },
+  // Tuesday (2)
+  { day: 2, start: '8:00',  end: '9:00',  label: 'Arrive, email, final interview prep' },
+  { day: 2, start: '10:45', end: '11:30', label: 'Investor interview (not entered)' },
+  { day: 2, start: '12:15', end: '1:15',  label: 'Lunch' },
+  { day: 2, start: '1:15',  end: '2:00',  label: 'Investor interview (not entered)' },
+  { day: 2, start: '2:00',  end: '3:30',  label: 'Heads-down, cleaning up interview notes' },
+  { day: 2, start: '3:30',  end: '4:15',  label: 'Investor interview (not entered)' },
+  { day: 2, start: '4:15',  end: '5:30',  label: 'Internal coordination, email' },
+  { day: 2, start: '5:30',  end: '6:30',  label: 'Wrap, prep for tomorrow' },
+  // Wednesday (3)
+  { day: 3, start: '8:00',  end: '9:00',  label: 'Arrive, email, prep' },
+  { day: 3, start: '9:00',  end: '9:45',  label: 'Investor interview (not entered)' },
+  { day: 3, start: '9:45',  end: '11:00', label: 'Heads-down, note cleanup and theme tracker updates' },
+  { day: 3, start: '12:00', end: '1:00',  label: 'Lunch' },
+  { day: 3, start: '3:00',  end: '5:00',  label: 'Heads-down, continuing the section, then sending the draft to Marcus' },
+  { day: 3, start: '5:00',  end: '6:30',  label: 'Email, wrap' },
+  // Thursday (4)
+  { day: 4, start: '8:00',  end: '9:00',  label: 'Arrive, email, prep for the deck review' },
+  { day: 4, start: '12:00', end: '1:00',  label: 'Lunch' },
+  { day: 4, start: '1:00',  end: '2:00',  label: 'Heads-down, finishing revisions and prepping for the client checkpoint' },
+  { day: 4, start: '3:30',  end: '5:30',  label: 'Heads-down, incorporating checkpoint feedback, email' },
+  { day: 4, start: '5:30',  end: '6:00',  label: 'Freshen up before dinner' },
+  // Friday (5)
+  { day: 5, start: '8:00',  end: '9:00',  label: 'Arrive, email, prep' },
+  { day: 5, start: '10:00', end: '10:30', label: "Quick reset, incorporating David's notes" },
+  { day: 5, start: '12:00', end: '1:00',  label: 'Lunch' },
+  { day: 5, start: '2:00',  end: '3:30',  label: "Heads-down, applying David's feedback to the deck" },
+  { day: 5, start: '4:00',  end: '5:00',  label: 'Email, wrap, Friday wind-down' },
 ]
 
 // ── CAREER_SIMS ─────────────────────────────────────────────────────────────────
@@ -288,6 +347,7 @@ export const CAREER_SIMS: CareerSim[] = [
           'day-in-life': MERIDIAN_DITL,
           full:          MERIDIAN_FULL,
         },
+        connectors: MERIDIAN_CONNECTORS,
       },
     ],
   },
@@ -432,6 +492,7 @@ export function getScenario(careerSlug: string, scenarioSlug: string): Simulatio
       'day-in-life': sc.tiers['day-in-life'],
       full:          sc.tiers.full,
     },
+    connectors: sc.connectors,
   }
 }
 

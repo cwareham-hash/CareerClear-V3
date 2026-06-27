@@ -431,7 +431,19 @@ export function ArtifactSection({ content }: { content: string }) {
 // The block body: renders only the sections that have content, in reading order
 // (Before → During → Commentary → Work Product → After). An empty `after` (or
 // any empty field) is omitted entirely, so there are no hollow section boxes.
-export function BlockBody({ content, briefing }: { content: TimeBlockContent; briefing?: boolean }) {
+export function BlockBody({
+  content,
+  briefing,
+  proseWidthClass,
+}: {
+  content: TimeBlockContent
+  briefing?: boolean
+  // C12: when set (the widened desktop artifact panel), the prose sections are
+  // constrained to this narrow, centered column for readability while the
+  // work-product artifact spans the panel's full width. Unset (mobile modal,
+  // Orientation reading) renders a single column exactly as before.
+  proseWidthClass?: string
+}) {
   const hasBefore     = !!content.before?.trim()
   const hasScript     = !!content.simulatedWork?.trim()
   const hasCommentary = !!content.commentary?.trim()
@@ -440,13 +452,37 @@ export function BlockBody({ content, briefing }: { content: TimeBlockContent; br
   // "During" label only when the script sits alongside other sections.
   const showDuringLabel = hasBefore || hasCommentary || hasArtifact || hasAfter
 
+  const before     = hasBefore     && <BeforeSection content={content.before} />
+  const script     = hasScript     && <ScriptSection content={content.simulatedWork} asProse={briefing} showLabel={showDuringLabel} />
+  const commentary = hasCommentary && <CommentarySection content={content.commentary} />
+  const artifact   = hasArtifact   && <ArtifactSection content={content.artifact!} />
+  const after      = hasAfter      && <AfterSection content={content.after} />
+
+  // Split layout: prose in a narrow centered column, artifact full width. Reading
+  // order (Before → During → Commentary → Work Product → After) is preserved.
+  if (proseWidthClass) {
+    return (
+      <>
+        {(before || script || commentary) && (
+          <div className={`${proseWidthClass} mx-auto w-full flex flex-col gap-5`}>
+            {before}
+            {script}
+            {commentary}
+          </div>
+        )}
+        {artifact}
+        {after && <div className={`${proseWidthClass} mx-auto w-full`}>{after}</div>}
+      </>
+    )
+  }
+
   return (
     <>
-      {hasBefore     && <BeforeSection content={content.before} />}
-      {hasScript     && <ScriptSection content={content.simulatedWork} asProse={briefing} showLabel={showDuringLabel} />}
-      {hasCommentary && <CommentarySection content={content.commentary} />}
-      {hasArtifact   && <ArtifactSection content={content.artifact!} />}
-      {hasAfter      && <AfterSection content={content.after} />}
+      {before}
+      {script}
+      {commentary}
+      {artifact}
+      {after}
     </>
   )
 }

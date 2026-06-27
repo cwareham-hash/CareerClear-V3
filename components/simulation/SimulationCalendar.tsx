@@ -1,7 +1,7 @@
 'use client'
 
 import type { CSSProperties } from 'react'
-import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock } from '@/lib/simulation'
+import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock, type ConnectorSlot } from '@/lib/simulation'
 
 // Indexed by day number directly: day 0 = Sunday (the full sim opens Sunday night).
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -24,11 +24,15 @@ const LEGEND_ITEMS: { label: string; type: keyof typeof ACTIVITY_COLORS }[] = [
   { label: 'Individual Work Block',   type: 'independent' },
   { label: 'Learning',                type: 'learning' },
   { label: 'Presentation',            type: 'presentation' },
+  { label: 'Social',                  type: 'social' },
 ]
 
 interface Props {
   // Blocks for the currently-selected tier (already chosen upstream — no filtering here).
   blocks: TimeBlock[]
+  // Greyed, non-enterable schedule slots (Full week grid only). Interleaved with
+  // the enterable blocks by time; never count toward completion, never clickable.
+  connectors?: ConnectorSlot[]
   completedIds: Set<string>
   activeBlockId: string | null
   mobileDay: number
@@ -36,6 +40,27 @@ interface Props {
   onBlockClick: (block: TimeBlock) => void
   isLoading?: boolean
 }
+
+// Minutes-from-midnight of a slot's START, used to order blocks and connectors
+// within a day. Accepts a full range ("11:00 AM to 12:30 PM") or a bare start
+// ("8:00"); for times without an explicit AM/PM, applies a business-day heuristic
+// (1–7 → afternoon; 8–11 → morning; 12 → noon) which covers the 8am–8pm schedule.
+function startMinutes(range: string): number {
+  const head = range.split(/\s+to\s+/i)[0].trim()
+  const m = /(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(head)
+  if (!m) return 0
+  let h = parseInt(m[1], 10)
+  const min = parseInt(m[2], 10)
+  const mer = m[3]?.toUpperCase()
+  if (mer === 'AM') { if (h === 12) h = 0 }
+  else if (mer === 'PM') { if (h !== 12) h += 12 }
+  else if (h >= 1 && h <= 7) h += 12
+  return h * 60 + min
+}
+
+type DaySlot =
+  | { kind: 'block'; key: string; sort: number; block: TimeBlock }
+  | { kind: 'connector'; key: string; sort: number; connector: ConnectorSlot }
 
 // ── Time Block Skeleton ────────────────────────────────────────────────────────
 
@@ -56,6 +81,7 @@ function TimeBlockSkeleton() {
 
 export default function SimulationCalendar({
   blocks,
+  connectors = [],
   completedIds,
   activeBlockId,
   mobileDay,
@@ -70,6 +96,18 @@ export default function SimulationCalendar({
 
   // Group by day
   const byDay = (day: number) => blocks.filter((b) => b.day === day)
+
+  // Enterable blocks + greyed connectors for one day, merged in time order. Used
+  // by the Full-week grid (desktop columns and the mobile day tabs).
+  const slotsForDay = (day: number): DaySlot[] => {
+    const blockSlots: DaySlot[] = blocks
+      .filter((b) => b.day === day)
+      .map((b) => ({ kind: 'block', key: b.id, sort: startMinutes(b.timeRange), block: b }))
+    const connectorSlots: DaySlot[] = connectors
+      .filter((c) => c.day === day)
+      .map((c, i) => ({ kind: 'connector', key: `conn-${day}-${i}`, sort: startMinutes(c.start), connector: c }))
+    return [...blockSlots, ...connectorSlots].sort((a, b) => a.sort - b.sort)
+  }
 
   // Ensure the active mobile day is one this tier actually has.
   const activeMobileDay = days.includes(mobileDay) ? mobileDay : days[0] ?? 1
@@ -164,19 +202,23 @@ export default function SimulationCalendar({
               <span className="font-sans text-[11px] text-muted ml-1">Day {day}</span>
             </div>
 
-            {/* Blocks */}
-            {byDay(day).length === 0 ? (
+            {/* Blocks + greyed connector slots, in time order */}
+            {slotsForDay(day).length === 0 ? (
               <p className="font-sans text-[12px] text-muted text-center py-4 italic">No blocks</p>
             ) : (
-              byDay(day).map((block) => (
-                <TimeBlockCard
-                  key={block.id}
-                  block={block}
-                  isCompleted={completedIds.has(block.id)}
-                  isActive={activeBlockId === block.id}
-                  onClick={() => onBlockClick(block)}
-                />
-              ))
+              slotsForDay(day).map((slot) =>
+                slot.kind === 'block' ? (
+                  <TimeBlockCard
+                    key={slot.key}
+                    block={slot.block}
+                    isCompleted={completedIds.has(slot.block.id)}
+                    isActive={activeBlockId === slot.block.id}
+                    onClick={() => onBlockClick(slot.block)}
+                  />
+                ) : (
+                  <ConnectorCard key={slot.key} connector={slot.connector} />
+                ),
+              )
             )}
           </div>
         ))}
@@ -202,22 +244,26 @@ export default function SimulationCalendar({
           })}
         </div>
 
-        {/* Blocks for active day */}
+        {/* Blocks + greyed connector slots for the active day, in time order */}
         <div className="flex flex-col gap-3">
-          {byDay(activeMobileDay).length === 0 ? (
+          {slotsForDay(activeMobileDay).length === 0 ? (
             <p className="font-sans text-[13px] text-muted text-center py-8 italic">
               No activities in this tier
             </p>
           ) : (
-            byDay(activeMobileDay).map((block) => (
-              <TimeBlockCard
-                key={block.id}
-                block={block}
-                isCompleted={completedIds.has(block.id)}
-                isActive={activeBlockId === block.id}
-                onClick={() => onBlockClick(block)}
-              />
-            ))
+            slotsForDay(activeMobileDay).map((slot) =>
+              slot.kind === 'block' ? (
+                <TimeBlockCard
+                  key={slot.key}
+                  block={slot.block}
+                  isCompleted={completedIds.has(slot.block.id)}
+                  isActive={activeBlockId === slot.block.id}
+                  onClick={() => onBlockClick(slot.block)}
+                />
+              ) : (
+                <ConnectorCard key={slot.key} connector={slot.connector} />
+              ),
+            )
           )}
         </div>
       </div>
@@ -251,6 +297,27 @@ function CalendarLegend() {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// ── Connector Slot (C14) ────────────────────────────────────────────────────────
+// A greyed, non-enterable schedule slot (lunch, heads-down, an interview not sat
+// in on). Rendered as a plain div — NOT a button — with no hover elevation, so it
+// can never open the panel/modal and reads as visibly de-emphasized background
+// context next to the colored, interactive blocks.
+
+function ConnectorCard({ connector }: { connector: ConnectorSlot }) {
+  return (
+    <div
+      className="w-full rounded-card border border-dashed border-border px-3 py-2.5 select-none"
+      style={{ backgroundColor: '#f3f4f6' }}
+      aria-disabled="true"
+    >
+      <p className="font-sans text-[12px] text-muted leading-snug">{connector.label}</p>
+      <p className="font-sans text-[11px] text-muted/70 mt-0.5">
+        {connector.start}–{connector.end}
+      </p>
     </div>
   )
 }

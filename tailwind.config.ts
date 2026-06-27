@@ -24,6 +24,7 @@ const config: Config = {
         // Used only for time block left-border color coding (§7.6.2)
         'block-green':  '#22c55e',
         'block-purple': '#8b5cf6',
+        'block-coral':  '#e76f51',
       },
 
       // ── §7.5.2 Typography ─────────────────────────────────────────────

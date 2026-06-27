@@ -37,6 +37,11 @@ export default function TimeBlockPanel({
     if (scrollRef.current) scrollRef.current.scrollTop = 0
   }, [block?.id])
 
+  // C12: blocks carrying a work-product artifact (a wide table/notes block) widen
+  // the desktop panel so the artifact fits without left-right scrolling, while the
+  // prose stays in a narrow readable column. Plain prose blocks keep the panel.
+  const hasArtifact = !!block?.content.artifact?.trim()
+
   // Dialog a11y (desktop instance only — gated by the lg breakpoint).
   const containerRef = useRef<HTMLDivElement>(null)
   const closeBtnRef  = useRef<HTMLButtonElement>(null)
@@ -80,7 +85,7 @@ export default function TimeBlockPanel({
               aria-labelledby={TITLE_ID}
               tabIndex={-1}
               className="bg-white flex flex-col overflow-hidden w-full pointer-events-auto focus:outline-none"
-              style={{ maxWidth: 640, maxHeight: '85dvh', borderRadius: 16, boxShadow: '0 24px 64px rgba(0,0,0,0.35)' }}
+              style={{ maxWidth: hasArtifact ? 800 : 640, maxHeight: '85dvh', borderRadius: 16, boxShadow: '0 24px 64px rgba(0,0,0,0.35)' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -113,11 +118,19 @@ export default function TimeBlockPanel({
                 </div>
               </div>
 
-              {/* Scrollable body — prose column capped to a comfortable line length */}
+              {/* Scrollable body. Prose stays capped to a comfortable line length;
+                  for artifact blocks the panel is wider and only the artifact uses
+                  the full width (C12). */}
               <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6">
-                <div className="mx-auto w-full max-w-[52ch] flex flex-col gap-5">
-                  <BlockBody content={block.content} briefing={block.briefing} />
-                </div>
+                {hasArtifact ? (
+                  <div className="mx-auto w-full flex flex-col gap-5">
+                    <BlockBody content={block.content} briefing={block.briefing} proseWidthClass="max-w-[52ch]" />
+                  </div>
+                ) : (
+                  <div className="mx-auto w-full max-w-[52ch] flex flex-col gap-5">
+                    <BlockBody content={block.content} briefing={block.briefing} />
+                  </div>
+                )}
               </div>
 
               {/* Footer */}

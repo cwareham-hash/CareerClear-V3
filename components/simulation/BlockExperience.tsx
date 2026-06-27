@@ -9,7 +9,7 @@
 // scenario slug. Progress/ratings keying is unchanged from before.
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import type { ReactNode } from 'react'
-import { type TimeBlock, type Tier } from '@/lib/simulation'
+import { type TimeBlock, type Tier, type ConnectorSlot } from '@/lib/simulation'
 import { CAREERS } from '@/lib/careers'
 import { useAuth } from '@/lib/auth'
 import { useFavorites } from '@/lib/useFavorites'
@@ -40,6 +40,7 @@ interface Props {
   widthClass?: string          // outer container width (default keeps the wide layout)
   variant?:    'calendar' | 'reading'  // 'reading' = Orientation list; default 'calendar'
   footer?:     (allComplete: boolean) => ReactNode  // optional CTA below the body
+  connectors?: ConnectorSlot[]         // greyed non-enterable schedule slots (Full week grid)
 }
 
 export default function BlockExperience({
@@ -55,6 +56,7 @@ export default function BlockExperience({
   widthClass = 'max-w-7xl',
   variant = 'calendar',
   footer,
+  connectors,
 }: Props) {
   const { user, userName } = useAuth()
   const { isFavorite, upgradeToActively } = useFavorites()
@@ -239,6 +241,7 @@ export default function BlockExperience({
           ) : (
             <SimulationCalendar
               blocks={blocks}
+              connectors={connectors}
               completedIds={completedIds}
               activeBlockId={activeBlockId}
               mobileDay={mobileDay}
