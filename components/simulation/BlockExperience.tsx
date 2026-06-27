@@ -137,7 +137,7 @@ export default function BlockExperience({
       return () => clearTimeout(t)
     }
     prevCompletedCountRef.current = completedCount
-  }, [completedCount, blocks.length])
+  }, [completedCount, blocks.length, tier])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   // Toggle a block complete/incomplete and persist the change to the shared

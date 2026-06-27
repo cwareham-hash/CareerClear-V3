@@ -94,9 +94,6 @@ export default function SimulationCalendar({
   const cols = Math.max(days.length, 1)
   const isSingleDay = days.length <= 1
 
-  // Group by day
-  const byDay = (day: number) => blocks.filter((b) => b.day === day)
-
   // Enterable blocks + greyed connectors for one day, merged in time order. Used
   // by the Full-week grid (desktop columns and the mobile day tabs).
   const slotsForDay = (day: number): DaySlot[] => {
