@@ -46,7 +46,7 @@ export interface Career {
   description: string
   /** 4–5 skill tags shown as teal pills on the card (§7.6.1) */
   skills: string[]
-  /** true = Simulation badge; false = Coming Soon badge (§6.1 vs §6.2) */
+  /** true = show the purple "Simulation" badge on the card; false = no badge */
   hasSimulation: boolean
 }
 

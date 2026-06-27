@@ -22,7 +22,8 @@ interface CareerCardProps {
  *   2. Title — 16px bold Inter #111827
  *   3. Description — 14px regular #6b7280, 2–3 lines
  *   4. Skill tags — teal filled pills (#2a9d8f bg, white text, 12px)
- *   5. Bottom row: industry badge (outline) + Simulation/Coming Soon badge | Explore →
+ *   5. Bottom row: industry badge (outline) + purple Simulation badge (only on
+ *      roles with a built sim) | Explore →
  *
  * Hover: shadow-card-hover + translateY(-2px), 200ms ease
  */
@@ -114,25 +115,16 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
               {industry}
             </span>
 
-            {/* Simulation OR Coming Soon badge
-                Decision: "Coming Soon" badge uses muted outline style to
-                clearly signal it's not yet available. The spec doesn't define
-                the demo-role badge style; user specified "Coming Soon". */}
-            {hasSimulation ? (
-              // Subtle "Simulation" tag — quiet teal-tint pill (reuses the
-              // career.hasSimulation flag, the same source that gates the sim routes).
+            {/* Simulation badge — filled purple pill (the Learning activity-type
+                purple, --color-block-purple) marking the one role that has a built
+                simulation. It reuses career.hasSimulation, the same flag that gates
+                the sim routes. Roles without a sim show no badge here at all. */}
+            {hasSimulation && (
               <span
-                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium"
-                style={{ backgroundColor: 'var(--color-tag-bg)', color: 'var(--color-teal)' }}
+                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium text-white"
+                style={{ backgroundColor: 'var(--color-block-purple)' }}
               >
                 Simulation
-              </span>
-            ) : (
-              <span
-                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium
-                  border border-muted text-muted"
-              >
-                Coming Soon
               </span>
             )}
 
