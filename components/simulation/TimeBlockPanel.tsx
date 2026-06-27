@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock } from '@/lib/simulation'
-import { BeforeSection, ScriptSection, CommentarySection, AfterSection } from './BlockContent'
+import { BlockBody } from './BlockContent'
 import { useDialog } from './useDialog'
 
 const TITLE_ID = 'timeblock-panel-title'
@@ -116,10 +116,7 @@ export default function TimeBlockPanel({
               {/* Scrollable body — prose column capped to a comfortable line length */}
               <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6">
                 <div className="mx-auto w-full max-w-[52ch] flex flex-col gap-5">
-                  <BeforeSection content={block.content.before} />
-                  <ScriptSection content={block.content.simulatedWork} asProse={block.briefing} />
-                  <CommentarySection content={block.content.commentary} />
-                  <AfterSection content={block.content.after} />
+                  <BlockBody content={block.content} briefing={block.briefing} />
                 </div>
               </div>
 

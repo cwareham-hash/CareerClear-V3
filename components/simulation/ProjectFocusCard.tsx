@@ -2,15 +2,19 @@
 
 // Focus-mode project card (projects-area revision). One prominent, fully-open
 // card for the SELECTED project: type label, codename, full description with
-// Read more, then the two tiers as a NUMBERED VERTICAL SEQUENCE linked by a thin
-// connector. The current step (earliest incomplete tier, Day → Full) is lit
-// (teal tint, filled number, primary button + "Start here" on Day); the later
-// step is quiet/de-emphasised. Completed tiers take a done/Replay treatment.
-// Button labels keep the Phase 3 logic and the Phase 2 soft gate via onTierClick.
+// Read more, then the project's experiential tiers as a NUMBERED VERTICAL
+// SEQUENCE (1 Orientation → 2 Day in the Life → 3 Full Simulation) linked by a
+// thin connector. Orientation is the project's FIRST step, in the same sequence
+// rather than a detached card. The current step (earliest incomplete tier) is lit
+// (teal tint, filled number, primary button + "Start here"); later steps are
+// quiet/de-emphasised. Completed tiers take a done/Replay treatment. The soft
+// gate (onTierClick) applies only to the Day/Full tiers, never to Orientation.
 import { useState } from 'react'
 import Link from 'next/link'
-import { CalendarDays, CalendarRange, ChevronDown, ChevronUp, Check, ArrowRight } from 'lucide-react'
+import { BookOpen, CalendarDays, CalendarRange, ChevronDown, ChevronUp, Check, ArrowRight } from 'lucide-react'
 import type { Scenario, TimeBlock } from '@/lib/simulation'
+
+type TierKey = 'orientation' | 'day-in-life' | 'full'
 
 interface Props {
   scenario:   Scenario
@@ -41,36 +45,53 @@ const ACTION_LABEL: Record<TierState, string> = {
 export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, onTierClick }: Props) {
   const [expanded, setExpanded] = useState(false)
 
+  // The project's three experiential tiers as one ordered sequence. Orientation
+  // is step 1. `gated: true` routes a click through the soft gate (Day/Full);
+  // Orientation is never gated. Only tiers with authored blocks are rendered, so
+  // a project shipping Full before its Day-in-the-Life shows no blank step.
   const tiers = [
     {
-      key:   'day-in-life' as const,
+      key:   'orientation' as TierKey,
+      href:  `/careers/${careerSlug}/simulate/${sc.slug}/orientation`,
+      label: 'Orientation',
+      base:  'Set the scene before the work',
+      Icon:  BookOpen,
+      gated: false,
+    },
+    {
+      key:   'day-in-life' as TierKey,
       href:  `/careers/${careerSlug}/simulate/${sc.slug}?experience=day-in-life`,
       label: 'Day in the Life',
       base:  'One representative day',
       Icon:  CalendarDays,
+      gated: true,
     },
     {
-      key:   'full' as const,
+      key:   'full' as TierKey,
       href:  `/careers/${careerSlug}/simulate/${sc.slug}?experience=full`,
       label: 'Full Simulation',
       base:  'The complete multi-day arc',
       Icon:  CalendarRange,
+      gated: true,
     },
-  ]
-  const states = tiers.map((t) => tierStateOf(sc.tiers[t.key], completed))
-  const dayDone  = states[0].state === 'completed'
-  const fullDone = states[1].state === 'completed'
-  // Current (lit) step = earliest incomplete tier in order Day → Full.
-  const currentKey: 'day-in-life' | 'full' | null =
-    !dayDone ? 'day-in-life' : !fullDone ? 'full' : null
+  ].filter((t) => sc.tiers[t.key].length > 0)
 
-  function subLine(i: number, prominent: boolean): string {
+  const states = tiers.map((t) => tierStateOf(sc.tiers[t.key], completed))
+  // Current (lit) step = earliest incomplete tier (among those present), in order.
+  const currentKey: TierKey | null =
+    (tiers.find((_, i) => states[i].state !== 'completed')?.key ?? null)
+
+  function subLine(i: number): string {
     const { state, done, total } = states[i]
-    const base = tiers[i].base
-    if (state === 'completed')   return `${base} · Completed`
-    if (state === 'in-progress') return `${base} · ${done} of ${total} done`
-    if (tiers[i].key === 'full' && !prominent) return `${base} · best after a Day in the Life`
-    return base
+    const t = tiers[i]
+    if (state === 'completed')   return `${t.base} · Completed`
+    if (state === 'in-progress') {
+      const noun = t.key === 'orientation' ? 'read' : 'done'
+      return `${t.base} · ${done} of ${total} ${noun}`
+    }
+    if (t.key === 'orientation') return `${t.base} · ${total} short reading${total === 1 ? '' : 's'}`
+    if (t.key === 'full' && currentKey !== 'full') return `${t.base} · best after a Day in the Life`
+    return t.base
   }
 
   return (
@@ -108,8 +129,14 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
             const isLast     = i === tiers.length - 1
             const prominent  = t.key === currentKey
             const done       = state === 'completed'
-            const sub        = subLine(i, prominent)
-            const showStartHere = prominent && t.key === 'day-in-life'
+            const sub        = subLine(i)
+            // "Start here" marks the current (lit) step — Orientation while it is
+            // the first incomplete tier, otherwise the next tier in sequence.
+            const showStartHere = prominent
+            // Orientation reads "Revisit" once done (a briefing you re-read), not "Replay".
+            const actionLabel = t.key === 'orientation' && state === 'completed'
+              ? 'Revisit'
+              : ACTION_LABEL[state]
 
             const circleCls = prominent
               ? 'bg-teal text-white'
@@ -125,7 +152,7 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
                     className={`relative z-10 flex items-center justify-center w-7 h-7 rounded-full
                       text-[12px] font-semibold ${circleCls}`}
                   >
-                    {done ? <Check size={14} strokeWidth={3} aria-hidden="true" /> : i + 2}
+                    {done ? <Check size={14} strokeWidth={3} aria-hidden="true" /> : i + 1}
                   </span>
                   {!isLast && <span className="w-px flex-1 bg-border my-1" aria-hidden="true" />}
                 </div>
@@ -170,7 +197,7 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
                       </div>
                       <Link
                         href={t.href}
-                        onClick={(e) => onTierClick?.(e, t.href)}
+                        onClick={t.gated ? (e) => onTierClick?.(e, t.href) : undefined}
                         className={`shrink-0 self-start sm:self-auto inline-flex items-center gap-1.5 rounded-btn px-4 py-2
                           font-sans font-semibold text-[13px] transition-colors duration-150
                           focus-visible:outline-none focus-visible:ring-2
@@ -179,7 +206,7 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
                             : 'border border-border text-dark hover:border-teal hover:text-teal'}`}
                       >
                         <t.Icon size={14} aria-hidden="true" />
-                        {ACTION_LABEL[state]}
+                        {actionLabel}
                         <ArrowRight size={14} aria-hidden="true" />
                       </Link>
                     </div>

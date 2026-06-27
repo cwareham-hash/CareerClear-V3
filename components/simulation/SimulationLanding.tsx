@@ -33,11 +33,12 @@ function scenarioBlocks(sc: Scenario) {
 }
 
 export default function SimulationLanding({ careerSim }: Props) {
-  const { careerId, careerSlug, title, orientation, scenarios } = careerSim
+  const { careerId, careerSlug, title } = careerSim
+  // Hidden projects never surface in any picker (grid, focus card, chips). Their
+  // data + routes still resolve by direct URL — see Scenario.hidden.
+  const scenarios = careerSim.scenarios.filter((s) => !s.hidden)
   const { user } = useAuth()
   const router = useRouter()
-
-  const orientationHref = `/careers/${careerSlug}/orientation`
 
   // ── LIVE STATE (Phase 2 + 3) ────────────────────────────────────────────────
   // One fetch of the career's completed block ids (the dashboard's source).
@@ -57,28 +58,9 @@ export default function SimulationLanding({ careerSim }: Props) {
     return () => { cancelled = true }
   }, [user, careerId])
 
-  // Orientation is complete when every orientation block id is in the set. No
-  // orientation content → treat as not-blocking. `null` set means still loading.
-  const orientationComplete =
-    completedSet === null
-      ? null
-      : orientation.length === 0 || orientation.every((b) => completedSet.has(b.id))
-
-  // Definitively incomplete (not just loading) — drives the gate, hint, banner.
-  const isIncomplete = orientationComplete === false
-
   // ── Soft gate ───────────────────────────────────────────────────────────────
   const [gateOpen, setGateOpen]     = useState(false)
   const [pendingHref, setPendingHref] = useState<string | null>(null)
-
-  function handleTierClick(e: React.MouseEvent, href: string) {
-    // Only intercept when we KNOW Orientation is incomplete. While loading
-    // (null) or once complete, the Link navigates normally.
-    if (!isIncomplete) return
-    e.preventDefault()
-    setPendingHref(href)
-    setGateOpen(true)
-  }
 
   function closeGate() {
     setGateOpen(false)
@@ -136,6 +118,30 @@ export default function SimulationLanding({ careerSim }: Props) {
   const orderedScenarios = selected
     ? [selected, ...scenarios.filter((s) => s.slug !== selected.slug)]
     : scenarios
+
+  // ── Per-project Orientation ─────────────────────────────────────────────────
+  // Orientation is now a property of the SELECTED project (no shared career-level
+  // orientation). Its completeness drives the banner, the soft gate, and step 1.
+  const orientation = selected?.tiers.orientation ?? []
+  const orientationHref = selected
+    ? `/careers/${careerSlug}/simulate/${selected.slug}/orientation`
+    : `/careers/${careerSlug}/simulate`
+
+  const orientationComplete =
+    completedSet === null
+      ? null
+      : orientation.length === 0 || orientation.every((b) => completedSet.has(b.id))
+  // Definitively incomplete (not just loading) — drives the gate, hint, banner.
+  const isIncomplete = orientationComplete === false
+
+  function handleTierClick(e: React.MouseEvent, href: string) {
+    // Only intercept when we KNOW the selected project's Orientation is
+    // incomplete. While loading (null) or once complete, the Link navigates.
+    if (!isIncomplete) return
+    e.preventDefault()
+    setPendingHref(href)
+    setGateOpen(true)
+  }
 
   // Per-project rollup for the chip status dot/check (both tiers combined).
   function scenarioStatus(sc: Scenario): 'not-started' | 'in-progress' | 'done' {
@@ -260,76 +266,8 @@ export default function SimulationLanding({ careerSim }: Props) {
           })}
         </ol>
 
-        {/* Shared, career-level Orientation. Prominent while incomplete; collapses
-            to a slim "complete · revisit" bar once finished, freeing space. */}
-        {orientation.length > 0 && (
-          orientationComplete ? (
-            // ── Complete: slim, quiet "done · revisit" bar ──────────────────────
-            <Link
-              href={orientationHref}
-              className="group flex items-center gap-3 rounded-card border shadow-card mb-8
-                px-4 py-3 transition-shadow duration-200 hover:shadow-card-hover
-                focus-visible:outline-none focus-visible:ring-2"
-              style={{ borderColor: 'var(--color-teal)', backgroundColor: 'var(--color-tag-bg)' }}
-            >
-              {/* Step "1" badge (flow numbering), styled like the tier step circles. */}
-              <span className="shrink-0 w-7 h-7 rounded-full bg-teal flex items-center justify-center
-                font-sans text-[12px] font-semibold text-white">
-                1
-              </span>
-              <span className="inline-flex items-center gap-1 font-sans text-[13px] font-semibold text-navy">
-                <Check size={13} strokeWidth={3} className="text-teal" aria-hidden="true" />
-                Orientation complete
-              </span>
-              <span className="font-sans text-[12px] text-dark/60">
-                · {orientation.length} of {orientation.length} readings complete
-              </span>
-              <span className="ml-auto font-sans text-[13px] font-semibold text-teal
-                inline-flex items-center gap-1">
-                Revisit
-                <ArrowRight
-                  size={14}
-                  className="transition-transform duration-200 group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
-              </span>
-            </Link>
-          ) : (
-            // ── Incomplete: prominent, lit starting action ──────────────────────
-            <Link
-              href={orientationHref}
-              className="group block rounded-card border-2 shadow-card overflow-hidden mb-10
-                transition-shadow duration-200 hover:shadow-card-hover
-                focus-visible:outline-none focus-visible:ring-2"
-              style={{ borderColor: 'var(--color-teal)', backgroundColor: 'var(--color-tag-bg)' }}
-            >
-              <div className="px-6 py-5 flex items-center gap-4">
-                {/* Step "1" badge (flow numbering), styled like the tier step circles. */}
-                <span className="shrink-0 w-10 h-10 rounded-full bg-teal flex items-center justify-center
-                  font-sans text-[16px] font-bold text-white">
-                  1
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-sans text-[11px] font-semibold text-teal uppercase tracking-wide mb-0.5">
-                    Recommended first step
-                  </p>
-                  <h2 className="font-sans font-bold text-[17px] text-navy mb-0.5">
-                    Start here — Orientation
-                  </h2>
-                  <p className="font-sans text-[13px] text-dark/70">
-                    Understand the role before any project · {orientation.length} short reading{orientation.length === 1 ? '' : 's'}
-                  </p>
-                </div>
-                <ArrowRight
-                  size={20}
-                  style={{ color: 'var(--color-teal)' }}
-                  className="shrink-0 transition-transform duration-200 group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
-              </div>
-            </Link>
-          )
-        )}
+        {/* Orientation is no longer a detached card here — it is the project's
+            FIRST step (1) inside ProjectFocusCard's numbered tier sequence. */}
 
         {/* Projects — type-first */}
         <div className="flex items-baseline justify-between gap-3 mb-1 flex-wrap">

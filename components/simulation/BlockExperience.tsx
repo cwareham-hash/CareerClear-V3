@@ -30,7 +30,7 @@ import RatingModal from './RatingModal'
 interface Props {
   careerId:    string
   accessLabel: string          // gate copy, e.g. "the Project Fresca simulation"
-  scenario:    string | null   // null = career-level Orientation; slug = a project
+  scenario:    string          // project slug (every tier, incl. Orientation, is project-scoped)
   tier:        Tier            // current tier (drives writes + the rating payload)
   blocks:      TimeBlock[]     // the blocks to render for the current tier
   header:      ReactNode       // left side of the overview card
@@ -69,8 +69,9 @@ export default function BlockExperience({
 
   const prevCompletedCountRef = useRef(0)
 
-  // Load completed block ids for this user. Orientation (scenario null) is
-  // career-level; a project loads its scenario-scoped (plus shared) rows.
+  // Load completed block ids for this user. Orientation is signalled by the tier
+  // (no longer by a null scenario) and reads that project's orientation rows; the
+  // other tiers read all of the project's rows.
   useEffect(() => {
     if (!user) {
       setIsLoaded(true)
@@ -78,8 +79,8 @@ export default function BlockExperience({
     }
     let active = true
     ;(async () => {
-      const ids = scenario === null
-        ? await getOrientationCompletedBlockIds(user.id, careerId)
+      const ids = tier === 'orientation'
+        ? await getOrientationCompletedBlockIds(user.id, careerId, scenario)
         : await getCompletedBlockIds(user.id, careerId, scenario)
       if (!active) return
       const idSet = new Set(ids)
@@ -93,7 +94,7 @@ export default function BlockExperience({
     })()
     return () => { active = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, careerId, scenario])
+  }, [user, careerId, scenario, tier])
 
   // ── Derived values ────────────────────────────────────────────────────────
   const activeBlockId = useMemo(

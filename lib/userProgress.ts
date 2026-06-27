@@ -2,11 +2,12 @@
 //
 // Tables: user_progress (one row per user/simulation/scenario/tier) and ratings.
 // `tier` is the experiential tier ('orientation' | 'day-in-life' | 'full').
-// `scenario` scopes Day-in-the-Life and Full to a specific scenario slug
-// (e.g. 'fresca'); Orientation is shared across scenarios and so is keyed at the
-// career level with scenario = null. Progress for a scenario page is read as the
-// UNION of completed_blocks across that career's Orientation row (scenario null)
-// and the rows for the scenario being viewed; writes target the current tier's row.
+// `scenario` scopes EVERY tier — including Orientation — to a specific project
+// slug (e.g. 'meridian'). (Orientation used to be career-level with scenario =
+// null; it is now per-project, so its rows are keyed by the project slug like the
+// other tiers. Pre-existing scenario = null orientation rows are NOT migrated —
+// accept-the-reset.) Progress for a project page is the completed_blocks across
+// that project's rows; writes target the current tier's row.
 
 import { supabase } from '@/lib/supabase'
 import type { Tier } from '@/lib/simulation'
@@ -107,8 +108,8 @@ interface ProgressRow {
 }
 
 /**
- * Union of completed block ids for ONE scenario page: the career's shared
- * Orientation (scenario = null) plus the rows for the scenario being viewed.
+ * Completed block ids for ONE project page: every row for that project slug
+ * (all of its tiers — orientation, day-in-life, full — share the slug).
  */
 export async function getCompletedBlockIds(
   userId: string,
@@ -120,7 +121,7 @@ export async function getCompletedBlockIds(
     .select('simulation_id, completed_blocks')
     .eq('user_id', userId)
     .eq('simulation_id', careerId)
-    .or(`scenario.is.null,scenario.eq.${scenario}`)
+    .eq('scenario', scenario)
   if (error) {
     console.error('[progress] getCompletedBlockIds failed:', error.message)
     return []
@@ -133,16 +134,21 @@ export async function getCompletedBlockIds(
 }
 
 /**
- * Completed block ids for the career-level Orientation (scenario IS NULL).
- * Orientation is shared across projects, so it is keyed at the career level.
+ * Completed block ids for ONE project's Orientation tier. Orientation is now
+ * per-project, so it is keyed by the project slug (not scenario = null).
  */
-export async function getOrientationCompletedBlockIds(userId: string, careerId: string): Promise<string[]> {
+export async function getOrientationCompletedBlockIds(
+  userId: string,
+  careerId: string,
+  scenario: string,
+): Promise<string[]> {
   const { data, error } = await supabase
     .from('user_progress')
     .select('completed_blocks')
     .eq('user_id', userId)
     .eq('simulation_id', careerId)
-    .is('scenario', null)
+    .eq('scenario', scenario)
+    .eq('tier', 'orientation')
   if (error) {
     console.error('[progress] getOrientationCompletedBlockIds failed:', error.message)
     return []

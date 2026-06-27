@@ -484,7 +484,9 @@ export default function DashboardPage() {
 
         // Day-in-the-Life and Full — one row per project, scoped to that project's
         // authored blocks (sc.tiers[tier]), matching the overview page's counts.
+        // Hidden projects are not surfaced here either.
         for (const sc of cs.scenarios) {
+          if (sc.hidden) continue
           for (const value of ['day-in-life', 'full'] as const) {
             const blocks         = sc.tiers[value]
             const completedCount = blocks.filter((b) => completedSet.has(b.id)).length

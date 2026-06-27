@@ -1,8 +1,8 @@
 'use client'
 
-// Career-level Orientation — a shared briefing, NOT a project. Renders as a
-// three-part numbered reading list (no calendar, no day header, no legend), and
-// ends with a forward step into a project so the briefing never dead-ends.
+// Per-project Orientation — the briefing that sets up ONE project. Renders as a
+// numbered reading list (no calendar, no day header, no legend), and ends with a
+// forward step into the project so the briefing never dead-ends.
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { type TimeBlock } from '@/lib/simulation'
@@ -10,18 +10,27 @@ import BlockExperience from './BlockExperience'
 import Breadcrumb from './Breadcrumb'
 
 interface Props {
-  careerId:    string
-  careerSlug:  string
-  careerTitle: string
-  blocks:      TimeBlock[]
+  careerId:     string
+  careerSlug:   string
+  careerTitle:  string
+  scenarioSlug: string   // project slug — scopes orientation progress
+  projectTitle: string   // e.g. "Project Meridian"
+  blocks:       TimeBlock[]
 }
 
 // Reading view shares the hub's centered ~two-thirds-width column (matches the
 // Day in the Life view; never applies to the Full Simulation grid).
 const READING_WIDTH = 'w-full lg:w-[min(66vw,1100px)]'
 
-export default function OrientationClient({ careerId, careerSlug, careerTitle, blocks }: Props) {
-  // Back-navigation: Explore › Career › Simulation (hub) › Orientation.
+export default function OrientationClient({
+  careerId,
+  careerSlug,
+  careerTitle,
+  scenarioSlug,
+  projectTitle,
+  blocks,
+}: Props) {
+  // Back-navigation: Explore › Career › Simulation (hub) › Project · Orientation.
   const breadcrumb = (
     <Breadcrumb
       className="mb-5"
@@ -29,7 +38,7 @@ export default function OrientationClient({ careerId, careerSlug, careerTitle, b
         { label: 'Explore', href: '/explore' },
         { label: careerTitle, href: `/careers/${careerSlug}` },
         { label: 'Simulation', href: `/careers/${careerSlug}/simulate` },
-        { label: 'Orientation' },
+        { label: `${projectTitle} · Orientation` },
       ]}
     />
   )
@@ -37,14 +46,13 @@ export default function OrientationClient({ careerId, careerSlug, careerTitle, b
   const header = (
     <>
       <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide mb-1">
-        {careerTitle}
+        {projectTitle}
       </p>
       <h1 className="font-serif text-[26px] lg:text-[30px] font-bold text-navy leading-tight mb-3">
         Orientation
       </h1>
       <p className="font-sans text-[14px] text-muted leading-relaxed max-w-2xl">
-        Start here to understand the role before stepping into a project. The same overview
-        applies to every project in this career.
+        Start here to set the scene for this project before stepping into the work itself.
       </p>
     </>
   )
@@ -93,8 +101,8 @@ export default function OrientationClient({ careerId, careerSlug, careerTitle, b
   return (
     <BlockExperience
       careerId={careerId}
-      accessLabel={`the ${careerTitle} orientation`}
-      scenario={null}
+      accessLabel={`the ${projectTitle} orientation`}
+      scenario={scenarioSlug}
       tier="orientation"
       blocks={blocks}
       progressNoun="readings"
