@@ -46,6 +46,7 @@ A historical note for context: the product spec document CareerClear_ProductSpec
 - **Collin is not a developer.** Explain everything in plain English. Keep recommendations honest and unpadded; clearly distinguish real issues from style preferences.
 - **Phase-gate workflow:** NEVER implement changes without first presenting a plan and getting explicit approval. Propose, wait, then act. One item at a time.
 - **Never commit or push without explicit instruction.** Pushing to `main` deploys straight to production (see Section 1), so this rule is critical.
+- **Branch workflow (dev/main):** Daily work happens on the `dev` branch. `main` is the stable, beta-tester-facing release branch. `main` changes ONLY via a deliberate `dev` → `main` merge when Collin decides to release. Pushing to `main` is a live production deploy.
 - **Visual verification:** for any visual change (layout, spacing, styling, new UI), use the Playwright MCP server to load http://localhost:3000, screenshot the affected page, and verify the result before reporting the work as done.
 - **Prompting style:** Collin prefers explicit, directive prompts and reviewing changes before and between phases.
 - **Keep this file alive:** when a new standing rule, decision, or reusable pattern emerges in a session, proactively propose adding it to this file at that moment — propose exact wording, wait for approval, never update it silently.
