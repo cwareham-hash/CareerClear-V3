@@ -5,6 +5,7 @@ import './globals.css'
 import { AuthProvider } from '@/lib/auth'
 import Navbar from '@/components/Navbar'
 import AuthModal from '@/components/AuthModal'
+import SiteFooter from '@/components/landing/SiteFooter'
 
 // ── §7.5.2 Google Fonts via next/font/google ─────────────────────────────────
 // Decision: using next/font/google rather than a raw <link> CDN tag.
@@ -53,6 +54,8 @@ export default function RootLayout({
           {/* Sticky nav renders above all page content (§7.3) */}
           <Navbar />
           <main>{children}</main>
+          {/* Shared footer, rendered once here so it appears on every page */}
+          <SiteFooter />
           {/* Single global auth modal, opened from navbar or simulation gate */}
           <AuthModal />
         </AuthProvider>

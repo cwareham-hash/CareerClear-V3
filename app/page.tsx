@@ -5,7 +5,6 @@ import ProblemSection from '@/components/landing/ProblemSection'
 import HowItWorks from '@/components/landing/HowItWorks'
 import DifferentiationStrip from '@/components/landing/DifferentiationStrip'
 import FinalCTA from '@/components/landing/FinalCTA'
-import SiteFooter from '@/components/landing/SiteFooter'
 
 export default function HomePage() {
   return (
@@ -15,7 +14,6 @@ export default function HomePage() {
       <HowItWorks />
       <DifferentiationStrip />
       <FinalCTA />
-      <SiteFooter />
     </>
   )
 }
