@@ -236,7 +236,11 @@ export async function middleware(req: NextRequest) {
     const next = safeNext(String(form.get('next') ?? '/'))
 
     if (safeEqual(submitted, password)) {
-      const res = NextResponse.redirect(new URL(next, req.url))
+      // 303 See Other forces the browser to follow with a GET. The default
+      // (307) preserves the POST method, which makes the browser re-POST to the
+      // destination page — a 405 in production, where pages are statically
+      // prerendered and only serve GET/HEAD.
+      const res = NextResponse.redirect(new URL(next, req.url), 303)
       res.cookies.set(COOKIE_NAME, expected, {
         httpOnly: true,
         secure: true,
