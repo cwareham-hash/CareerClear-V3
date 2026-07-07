@@ -287,10 +287,12 @@ export default function SimulationLanding({ careerSim }: Props) {
         {/* Orientation is no longer a detached card here — it is the project's
             FIRST step (1) inside ProjectFocusCard's numbered tier sequence. */}
 
-        {/* Projects — type-first */}
+        {/* Projects — type-first. Single-project case reads "The Engagement";
+            multi-project case keeps its current "Projects" wording (pending a
+            separate decision). */}
         <div className="flex items-baseline justify-between gap-3 mb-1 flex-wrap">
           <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide">
-            Projects
+            {isMulti ? 'Projects' : 'The Engagement'}
           </p>
           {/* Visible steer BEFORE the click, only while Orientation is incomplete. */}
           {isIncomplete && (
