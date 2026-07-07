@@ -175,7 +175,7 @@ function b(
 
 // Project Meridian — the new self-contained project. Four-reading per-project
 // Orientation (client/world; situation; engagement/cast; seat/vocabulary); the
-// full Monday-to-Friday Full Simulation (19 blocks); and the curated six-block
+// full Monday-to-Friday Full Simulation (20 blocks); and the curated six-block
 // Day-in-the-Life.
 const MERIDIAN_ORIENTATION: TimeBlock[] = [
   makeBlock('management-consultant', "management-consultant-meridian-orientation-b1", 1, "~3 min read", "The client and its world", 'learning', true),
@@ -184,85 +184,93 @@ const MERIDIAN_ORIENTATION: TimeBlock[] = [
   makeBlock('management-consultant', "management-consultant-meridian-orientation-b4", 1, "~4 min read", "Your seat and the vocabulary", 'learning', true),
 ]
 
-// Full Simulation — Monday (1) through Friday (5), blocks 1–19. The dinner (15)
-// and learning (18) blocks are info cards (briefing prose), not screenplay.
+// Full Simulation — Monday (1) through Friday (5), blocks 1–20. Times and titles
+// are transcribed from the V3 master's Week-at-a-glance table (the source of
+// truth). The dinner (block 16 = d4-b6) and learning (block 19 = d5-b3) blocks
+// are info cards (briefing prose), not screenplay.
 const MERIDIAN_FULL: TimeBlock[] = [
   // Monday (day 1) — blocks 1–5
-  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b1", 1, "8:30 to 9:15 AM",      "Team week-kickoff",                  'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b2", 1, "9:15 to 9:30 AM",      "Carly and Marcus debrief",           'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b3", 1, "9:30 to 11:00 AM",     "Interview prep",                     'independent'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b4", 1, "11:00 AM to 12:30 PM", "Theme analysis and synthesis",       'independent'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b5", 1, "1:30 to 3:30 PM",      "Ghost deck and storyline skeleton",  'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b1", 1, "8:30 to 9:00 AM",      "Team week-kickoff",                              'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b2", 1, "9:00 to 9:30 AM",      "Carly and Marcus debrief",                       'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b3", 1, "9:30 to 11:00 AM",     "Interview prep",                                 'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b4", 1, "11:00 AM to 12:30 PM", "Theme analysis and synthesis",                   'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d1-b5", 1, "1:00 to 3:00 PM",      "Skeleton deck and storyline",                    'independent'),
   // Tuesday (day 2) — blocks 6–8
-  makeBlock('management-consultant', "management-consultant-meridian-full-d2-b1", 2, "9:00 to 9:30 AM",      "Investor interview: Ellen",          'meeting'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d2-b2", 2, "9:45 to 10:45 AM",     "Note cleanup",                       'independent'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d2-b3", 2, "11:30 AM to 12:15 PM", "Investor interview: Raymond",        'meeting'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d2-b1", 2, "9:00 to 9:30 AM",      "Investor interview: Ellen",                      'meeting'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d2-b2", 2, "9:30 to 10:30 AM",     "Note cleanup",                                   'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d2-b3", 2, "11:00 to 11:30 AM",    "Investor interview #2: Raymond",                 'meeting'),
   // Wednesday (day 3) — blocks 9–10
-  makeBlock('management-consultant', "management-consultant-meridian-full-d3-b1", 3, "11:00 AM to 12:00 PM", "Problem-solving session: theme shaping", 'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d3-b2", 3, "1:00 to 3:00 PM",      "Deck section build",                 'independent'),
-  // Thursday (day 4) — blocks 11–15
-  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b1", 4, "9:00 to 10:00 AM",     "Deck review with Marcus",            'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b2", 4, "10:00 AM to 12:00 PM", "Revise the deck section",            'independent'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b3", 4, "2:00 to 3:00 PM",      "Client stakeholder checkpoint",      'meeting'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b4", 4, "3:00 to 3:30 PM",      "Post-checkpoint debrief",            'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b5", 4, "6:30 to 8:00 PM",      "Team dinner with the client",        'social', true),
-  // Friday (day 5) — blocks 16–19
-  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b1", 5, "9:00 to 10:00 AM",     "Senior Manager deck review",         'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b2", 5, "10:30 AM to 12:00 PM", "Engagement economics",               'independent'),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b3", 5, "1:00 to 2:00 PM",      "Learning block: private markets primer", 'learning', true),
-  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b4", 5, "3:30 to 4:00 PM",      "Week wrap",                          'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d3-b1", 3, "11:00 AM to 12:00 PM", "Internal problem-solving session, theme shaping", 'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d3-b2", 3, "1:00 to 3:00 PM",      "Deck section build",                             'independent'),
+  // Thursday (day 4) — blocks 11–16
+  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b1", 4, "10:00 to 11:00 AM",    "Deck review with Marcus",                        'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b2", 4, "11:00 AM to 12:30 PM", "Revise the deck section",                        'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b3", 4, "1:00 to 1:30 PM",      "Pre-checkpoint check-in with Marcus",            'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b4", 4, "2:00 to 3:00 PM",      "Client stakeholder checkpoint with Meridian",    'meeting'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b5", 4, "3:00 to 3:30 PM",      "Carly and Marcus post-checkpoint debrief",       'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d4-b6", 4, "6:30 to 8:00 PM",      "Team dinner with client",                        'social', true),
+  // Friday (day 5) — blocks 17–20
+  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b1", 5, "10:00 to 11:00 AM",    "Senior Manager deck review",                     'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b2", 5, "11:30 AM to 12:30 PM", "Engagement economics",                           'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b3", 5, "1:30 to 2:30 PM",      "Learning block",                                 'learning', true),
+  makeBlock('management-consultant', "management-consultant-meridian-full-d5-b4", 5, "4:00 to 4:30 PM",      "Week wrap",                                      'team'),
 ]
 
-// Day-in-the-Life — one curated representative day (6 blocks).
+// Day-in-the-Life — one curated representative day (6 blocks). Titles, times, and
+// content are transcribed from Meridian_Park_Day_in_the_Life_V3.md (its own
+// standalone numbering and single-day timing).
 const MERIDIAN_DITL: TimeBlock[] = [
-  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b1", 1, "8:30 to 9:15 AM",      "The team frames the day",            'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b2", 1, "9:30 to 10:00 AM",     "Investor interview: Ellen",          'meeting'),
-  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b3", 1, "10:00 to 11:00 AM",    "Note cleanup",                       'independent'),
-  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b4", 1, "11:30 AM to 12:30 PM", "Problem-solving session: theme shaping", 'team'),
-  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b5", 1, "1:00 to 3:00 PM",      "Deck section build",                 'independent'),
-  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b6", 1, "3:30 to 4:30 PM",      "Deck review with Marcus",            'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b1", 1, "8:30 to 9:00 AM",      "The team frames the day",                         'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b2", 1, "9:30 to 10:00 AM",     "The investor interview, Ellen",                   'meeting'),
+  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b3", 1, "10:00 to 11:00 AM",    "Note cleanup",                                    'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b4", 1, "11:30 AM to 12:30 PM", "Internal problem-solving session, theme shaping", 'team'),
+  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b5", 1, "1:00 to 3:00 PM",      "Deck section build",                              'independent'),
+  makeBlock('management-consultant', "management-consultant-meridian-dil-d1-b6", 1, "3:30 to 4:30 PM",      "Deck review with Marcus",                         'team'),
 ]
 
 // Greyed, non-enterable connector slots for the Full Simulation week (C14). These
-// fill the gaps around the 19 enterable blocks (lunch, heads-down time, email,
+// fill the gaps around the 20 enterable blocks (lunch, heads-down time, email,
 // interviews Carly does not sit in on) to show the real shape of the week. They
-// are NOT activities and never count toward completion. Times use the same
-// business-day format as the block headers; the grid places each slot in time
-// order between the enterable blocks.
+// are NOT activities and never count toward completion. Transcribed exactly from
+// the V3 master's Week-at-a-glance connector rows; the grid places each slot in
+// time order between the enterable blocks.
 const MERIDIAN_CONNECTORS: ConnectorSlot[] = [
   // Monday (1)
-  { day: 1, start: '8:00',  end: '8:30',  label: 'Arrive, email, settle in' },
-  { day: 1, start: '12:30', end: '1:30',  label: 'Lunch' },
-  { day: 1, start: '3:30',  end: '5:30',  label: 'Heads-down, refining the guide and theme tracker' },
-  { day: 1, start: '5:30',  end: '6:30',  label: "Email, wrap, prep for tomorrow's interviews" },
+  { day: 1, start: '8:00',  end: '8:30',  label: 'Arrive, email, settle in before the kickoff' },
+  { day: 1, start: '12:30', end: '1:00',  label: 'Lunch' },
+  { day: 1, start: '3:00',  end: '5:00',  label: 'Heads-down: the theme tracker, internal coordination, and early deck prep' },
+  { day: 1, start: '5:00',  end: '6:00',  label: "Email, wrap, prep for tomorrow's interviews" },
   // Tuesday (2)
-  { day: 2, start: '8:00',  end: '9:00',  label: 'Arrive, email, final interview prep' },
-  { day: 2, start: '10:45', end: '11:30', label: 'Investor interview (not entered)' },
-  { day: 2, start: '12:15', end: '1:15',  label: 'Lunch' },
-  { day: 2, start: '1:15',  end: '2:00',  label: 'Investor interview (not entered)' },
-  { day: 2, start: '2:00',  end: '3:30',  label: 'Heads-down, cleaning up interview notes' },
-  { day: 2, start: '3:30',  end: '4:15',  label: 'Investor interview (not entered)' },
-  { day: 2, start: '4:15',  end: '5:30',  label: 'Internal coordination, email' },
-  { day: 2, start: '5:30',  end: '6:30',  label: 'Wrap, prep for tomorrow' },
+  { day: 2, start: '8:00',  end: '9:00',  label: 'Arrive, email, final prep before the first interview' },
+  { day: 2, start: '10:30', end: '11:00', label: 'Reset and prep before the next interview' },
+  { day: 2, start: '11:30', end: '12:00', label: 'Investor interview' },
+  { day: 2, start: '12:00', end: '12:30', label: 'Lunch, a rushed thirty minutes at the desk' },
+  { day: 2, start: '12:30', end: '1:00',  label: 'Investor interview, immediately after the short lunch' },
+  { day: 2, start: '1:00',  end: '3:00',  label: "Heads-down: cleaning up the day's stacked interview notes (a bigger block, several interviews to process)" },
+  { day: 2, start: '3:00',  end: '4:00',  label: 'Internal coordination, email' },
+  { day: 2, start: '4:00',  end: '5:00',  label: 'Theme tracker updates' },
+  { day: 2, start: '5:00',  end: '6:00',  label: 'Wrap, prep for tomorrow' },
   // Wednesday (3)
   { day: 3, start: '8:00',  end: '9:00',  label: 'Arrive, email, prep' },
-  { day: 3, start: '9:00',  end: '9:45',  label: 'Investor interview (not entered)' },
-  { day: 3, start: '9:45',  end: '11:00', label: 'Heads-down, note cleanup and theme tracker updates' },
+  { day: 3, start: '9:00',  end: '9:30',  label: 'Investor interview' },
+  { day: 3, start: '9:30',  end: '10:00', label: 'Investor interview' },
+  { day: 3, start: '10:00', end: '11:00', label: 'Heads-down: note cleanup and theme tracker updates' },
   { day: 3, start: '12:00', end: '1:00',  label: 'Lunch' },
-  { day: 3, start: '3:00',  end: '5:00',  label: 'Heads-down, continuing the section, then sending the draft to Marcus' },
-  { day: 3, start: '5:00',  end: '6:30',  label: 'Email, wrap' },
+  { day: 3, start: '3:00',  end: '3:30',  label: 'Investor interview' },
+  { day: 3, start: '3:30',  end: '6:00',  label: 'Finish the deck section, then email the draft to Marcus as the last thing before leaving' },
   // Thursday (4)
   { day: 4, start: '8:00',  end: '9:00',  label: 'Arrive, email, prep for the deck review' },
-  { day: 4, start: '12:00', end: '1:00',  label: 'Lunch' },
-  { day: 4, start: '1:00',  end: '2:00',  label: 'Heads-down, finishing revisions and prepping for the client checkpoint' },
-  { day: 4, start: '3:30',  end: '5:30',  label: 'Heads-down, incorporating checkpoint feedback, email' },
-  { day: 4, start: '5:30',  end: '6:00',  label: 'Freshen up before dinner' },
+  { day: 4, start: '9:00',  end: '9:30',  label: 'Investor interview' },
+  { day: 4, start: '9:30',  end: '10:00', label: "Marcus reviews Carly's draft ahead of the walkthrough" },
+  { day: 4, start: '12:30', end: '1:00',  label: 'Lunch' },
+  { day: 4, start: '1:30',  end: '2:00',  label: "Travel to Meridian's office, an Uber across town, slow through midtown traffic" },
+  { day: 4, start: '3:30',  end: '6:00',  label: 'Heads-down in the client-site conference room: incorporating the checkpoint feedback, email, then heading to dinner' },
   // Friday (5)
-  { day: 5, start: '8:00',  end: '9:00',  label: 'Arrive, email, prep' },
-  { day: 5, start: '10:00', end: '10:30', label: "Quick reset, incorporating David's notes" },
-  { day: 5, start: '12:00', end: '1:00',  label: 'Lunch' },
-  { day: 5, start: '2:00',  end: '3:30',  label: "Heads-down, applying David's feedback to the deck" },
-  { day: 5, start: '4:00',  end: '5:00',  label: 'Email, wrap, Friday wind-down' },
+  { day: 5, start: '8:50',  end: '10:00', label: 'Arrive, a slower start after a late night with the client, email, prep for the deck review with David' },
+  { day: 5, start: '11:00', end: '11:30', label: "Quick reset, incorporating David's notes" },
+  { day: 5, start: '12:30', end: '1:30',  label: 'Lunch with a few others from her consulting class, not the project team' },
+  { day: 5, start: '2:30',  end: '4:00',  label: "Heads-down: applying David's feedback to the deck" },
+  { day: 5, start: '4:30',  end: '4:45',  label: 'Quick wind-down, then Carly heads out for the week' },
 ]
 
 // ── CAREER_SIMS ─────────────────────────────────────────────────────────────────
@@ -335,7 +343,7 @@ export const CAREER_SIMS: CareerSim[] = [
       {
         // ── Project Meridian (new, self-contained) ─────────────────────────
         // Complete: four-reading orientation, curated Day-in-the-Life (6 blocks),
-        // and the full Monday-to-Friday week (19 blocks).
+        // and the full Monday-to-Friday week (20 blocks).
         id:       'management-consultant-meridian',
         slug:     'meridian',
         title:    'Project Meridian',
