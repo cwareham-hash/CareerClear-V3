@@ -137,7 +137,7 @@ export default function OrientationClient({
               transition-colors duration-150 hover:text-teal"
             style={{ color: 'var(--color-muted)' }}
           >
-            Skip ahead to choose a project
+            Skip ahead
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </div>
