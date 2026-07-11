@@ -364,7 +364,7 @@ export const CAREER_SIMS: CareerSim[] = [
         slug:     'meridian',
         title:    'Project Meridian',
         type:     'Financial Services',
-        scenario: 'A six-week assessment of the Meridian Park investor portal — the platform thirty institutional investors use to pull statements, performance, and documents on the private-markets money Meridian manages for them. Leadership suspects the portal is falling behind and needs an outside, market-benchmarked read on what to fix and in what order. You shadow Carly, a first-year analyst, owning the interview synthesis and the first section of the recommendation deck. It is week 3 of 6.',
+        scenario: 'A six-week assessment of the Meridian Park investor portal — the platform thirty institutional investors use to pull statements, performance, and documents on the private-markets money Meridian manages for them. Leadership suspects the portal is falling behind and needs an outside, market-benchmarked read on what to fix and in what order. You shadow Carly, a first-year consultant, owning the interview synthesis and the first section of the recommendation deck. It is week 3 of 6.',
         project:  'Project Meridian — Investor Portal Assessment',
         tiers: {
           orientation:   MERIDIAN_ORIENTATION,
