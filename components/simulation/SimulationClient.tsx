@@ -145,7 +145,13 @@ export default function SimulationClient({ simulation, initialExperience = 'day-
       header={header}
       breadcrumb={breadcrumb}
       widthClass={widthClass}
-      connectors={experience === 'full' ? simulation.connectors : undefined}
+      connectors={
+        experience === 'full'
+          ? simulation.connectors
+          : experience === 'day-in-life'
+            ? simulation.ditlConnectors
+            : undefined
+      }
       footer={experience === 'day-in-life' ? renderDayFooter : undefined}
       selector={
         <>
