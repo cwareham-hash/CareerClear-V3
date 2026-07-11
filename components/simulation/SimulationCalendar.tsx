@@ -113,6 +113,8 @@ export default function SimulationCalendar({
   //    the container — chronological top-to-bottom, time on the rail, substantial
   //    cards. Width is set by the parent container (no narrow inner cap here). ──
   if (isSingleDay) {
+    // Enterable blocks + greyed connectors for the single day, merged in time order.
+    const timelineSlots = slotsForDay(days[0] ?? blocks[0]?.day ?? 1)
     return (
       <>
         {isLoading ? (
@@ -123,16 +125,24 @@ export default function SimulationCalendar({
           </div>
         ) : (
           <ol className="flex flex-col">
-            {blocks.map((block, i) => (
-              <TimelineRow
-                key={block.id}
-                block={block}
-                isCompleted={completedIds.has(block.id)}
-                isActive={activeBlockId === block.id}
-                isLast={i === blocks.length - 1}
-                onClick={() => onBlockClick(block)}
-              />
-            ))}
+            {timelineSlots.map((slot, i) =>
+              slot.kind === 'block' ? (
+                <TimelineRow
+                  key={slot.key}
+                  block={slot.block}
+                  isCompleted={completedIds.has(slot.block.id)}
+                  isActive={activeBlockId === slot.block.id}
+                  isLast={i === timelineSlots.length - 1}
+                  onClick={() => onBlockClick(slot.block)}
+                />
+              ) : (
+                <TimelineConnectorRow
+                  key={slot.key}
+                  connector={slot.connector}
+                  isLast={i === timelineSlots.length - 1}
+                />
+              ),
+            )}
           </ol>
         )}
         <CalendarLegend />
@@ -316,6 +326,52 @@ function ConnectorCard({ connector }: { connector: ConnectorSlot }) {
         {connector.start}–{connector.end}
       </p>
     </div>
+  )
+}
+
+// ── Timeline Connector Row (Day in the Life) ────────────────────────────────────
+// The single-day counterpart to ConnectorCard: a greyed, non-enterable slot
+// interleaved into the vertical timeline between the enterable blocks. It mirrors
+// TimelineRow's rail/node layout (so the timeline reads continuously) but renders
+// a plain div — NOT a button — with the dashed, de-emphasized ConnectorCard
+// treatment, a hollow node, and the time on the rail. Never opens the panel.
+
+function TimelineConnectorRow({
+  connector,
+  isLast,
+}: {
+  connector: ConnectorSlot
+  isLast: boolean
+}) {
+  return (
+    <li className="flex gap-3 sm:gap-4">
+      {/* Time on the rail, muted to match the de-emphasized slot */}
+      <div className="shrink-0 w-[60px] sm:w-[82px] pt-4 text-right">
+        <span className="font-sans text-[12px] sm:text-[13px] font-medium text-muted leading-tight">
+          {connector.start}–{connector.end}
+        </span>
+      </div>
+
+      {/* Node + connector line (hollow, smaller than a block's node) */}
+      <div className="shrink-0 w-4 flex flex-col items-center">
+        <span
+          className="mt-[18px] shrink-0 w-2.5 h-2.5 rounded-full border border-border bg-white z-10"
+          aria-hidden="true"
+        />
+        {!isLast && <span className="w-px flex-1 bg-border mt-1.5" aria-hidden="true" />}
+      </div>
+
+      {/* Greyed, non-enterable card — matches ConnectorCard's dashed treatment */}
+      <div className={`flex-1 min-w-0 ${isLast ? '' : 'pb-4'}`}>
+        <div
+          className="w-full rounded-card border border-dashed border-border px-5 py-3 select-none"
+          style={{ backgroundColor: '#f3f4f6' }}
+          aria-disabled="true"
+        >
+          <p className="font-sans text-[13px] text-muted leading-snug">{connector.label}</p>
+        </div>
+      </div>
+    </li>
   )
 }
 

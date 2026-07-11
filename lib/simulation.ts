@@ -92,6 +92,10 @@ export interface Scenario {
   }
   // Greyed, non-enterable schedule slots for the Full Simulation week grid only.
   connectors?: ConnectorSlot[]
+  // Greyed, non-enterable schedule slots for the single-day Day-in-the-Life
+  // timeline (day 1). Same ConnectorSlot shape as the full week; interleaved into
+  // the DITL timeline by time. Absent on tiers/projects that don't use them.
+  ditlConnectors?: ConnectorSlot[]
 }
 
 // A career's simulation: many self-contained Scenarios (each owns its own
@@ -117,7 +121,8 @@ export interface Simulation {
     'day-in-life': TimeBlock[]
     full:          TimeBlock[]
   }
-  connectors?: ConnectorSlot[]   // Full-week grey schedule slots (non-enterable)
+  connectors?: ConnectorSlot[]      // Full-week grey schedule slots (non-enterable)
+  ditlConnectors?: ConnectorSlot[]  // Day-in-the-Life grey timeline slots (non-enterable)
 }
 
 // ── Phase 5 content imports ────────────────────────────────────────────────────
@@ -273,6 +278,17 @@ const MERIDIAN_CONNECTORS: ConnectorSlot[] = [
   { day: 5, start: '4:30',  end: '4:45',  label: 'Quick wind-down, then Carly heads out for the week' },
 ]
 
+// Greyed, non-enterable connector slots for the single-day Day-in-the-Life
+// timeline (all day 1). Transcribed from the four inline connectors added in the
+// V4 DITL file so the representative day tiles 8:30–4:30 with no unexplained gaps
+// between the six enterable blocks. Non-clickable, never counted toward completion.
+const MERIDIAN_DITL_CONNECTORS: ConnectorSlot[] = [
+  { day: 1, start: '9:00',  end: '9:30', label: 'Reset after the kickoff, a last look at the interview guide before the call.' },
+  { day: 1, start: '11:00', end: '11:30', label: 'A short buffer, letting the interview notes settle and a quick pass through the inbox.' },
+  { day: 1, start: '12:30', end: '1:00',  label: 'Lunch.' },
+  { day: 1, start: '3:00',  end: '3:30',  label: 'A breather, then walking the drafted section over to Marcus for the review.' },
+]
+
 // ── CAREER_SIMS ─────────────────────────────────────────────────────────────────
 
 export const CAREER_SIMS: CareerSim[] = [
@@ -348,14 +364,15 @@ export const CAREER_SIMS: CareerSim[] = [
         slug:     'meridian',
         title:    'Project Meridian',
         type:     'Financial Services',
-        scenario: 'A six-week assessment of the Meridian Park investor portal — the platform thirty institutional investors use to pull statements, performance, and documents on the private-markets money Meridian manages for them. Leadership suspects the portal is falling behind and needs an outside, market-benchmarked read on what to fix and in what order. You shadow Carly, a first-year analyst, owning the interview synthesis and the first section of the recommendation deck. It is week 3 of 6.',
+        scenario: 'A six-week assessment of the Meridian Park investor portal — the platform thirty institutional investors use to pull statements, performance, and documents on the private-markets money Meridian manages for them. Leadership suspects the portal is falling behind and needs an outside, market-benchmarked read on what to fix and in what order. You shadow Carly, a first-year consultant, owning the interview synthesis and the first section of the recommendation deck. It is week 3 of 6.',
         project:  'Project Meridian — Investor Portal Assessment',
         tiers: {
           orientation:   MERIDIAN_ORIENTATION,
           'day-in-life': MERIDIAN_DITL,
           full:          MERIDIAN_FULL,
         },
-        connectors: MERIDIAN_CONNECTORS,
+        connectors:     MERIDIAN_CONNECTORS,
+        ditlConnectors: MERIDIAN_DITL_CONNECTORS,
       },
     ],
   },
@@ -501,6 +518,7 @@ export function getScenario(careerSlug: string, scenarioSlug: string): Simulatio
       full:          sc.tiers.full,
     },
     connectors: sc.connectors,
+    ditlConnectors: sc.ditlConnectors,
   }
 }
 
