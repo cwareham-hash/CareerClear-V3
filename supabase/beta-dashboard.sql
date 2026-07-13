@@ -12,6 +12,11 @@
 --
 -- Note: both queries read auth.users for email, which only works from the SQL
 -- Editor's admin role — keep these for your eyes only, not the client app.
+--
+-- Note: career-quiz participation is NOT counted here. Quiz results live only in
+-- the browser's localStorage (key cc_quiz_history), not in the database, so
+-- there is nothing to query. Add a quiz column once the quiz-persistence build
+-- lands and quiz attempts are written to Postgres.
 -- ============================================================================
 
 
@@ -54,18 +59,28 @@ order by last_activity desc nulls last;
 
 
 -- ────────────────────────────────────────────────────────────────────────────
--- QUERY 2 — Beta Headline: single row of totals
+-- QUERY 2 — Beta Headline: single-row per-tier funnel
 -- ────────────────────────────────────────────────────────────────────────────
--- Total signups, users with any Meridian progress, users who finished all 4
--- orientation readings, and users who finished all 20 full-simulation blocks.
+-- Total signups, then a started/finished pair for each Meridian tier so you can
+-- read drop-off across the funnel. "started" = at least one block done;
+-- "finished" = all blocks in that tier done (orientation 4, DITL 6, full 20).
 select
   (select count(*) from public.profiles) as total_signups,
   (select count(distinct user_id) from public.user_progress
      where simulation_id = 'management-consultant' and scenario = 'meridian'
-       and jsonb_array_length(completed_blocks) > 0) as users_with_progress,
+       and tier = 'orientation' and jsonb_array_length(completed_blocks) > 0) as started_orientation,
   (select count(*) from public.user_progress
      where simulation_id = 'management-consultant' and scenario = 'meridian'
        and tier = 'orientation' and jsonb_array_length(completed_blocks) >= 4) as finished_orientation,
+  (select count(distinct user_id) from public.user_progress
+     where simulation_id = 'management-consultant' and scenario = 'meridian'
+       and tier = 'day-in-life' and jsonb_array_length(completed_blocks) > 0) as started_ditl,
+  (select count(*) from public.user_progress
+     where simulation_id = 'management-consultant' and scenario = 'meridian'
+       and tier = 'day-in-life' and jsonb_array_length(completed_blocks) >= 6) as finished_ditl,
+  (select count(distinct user_id) from public.user_progress
+     where simulation_id = 'management-consultant' and scenario = 'meridian'
+       and tier = 'full' and jsonb_array_length(completed_blocks) > 0) as started_full,
   (select count(*) from public.user_progress
      where simulation_id = 'management-consultant' and scenario = 'meridian'
        and tier = 'full' and jsonb_array_length(completed_blocks) >= 20) as finished_full;
