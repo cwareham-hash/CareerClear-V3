@@ -45,6 +45,9 @@ interface Props {
 // within a day. Accepts a full range ("11:00 AM to 12:30 PM") or a bare start
 // ("8:00"); for times without an explicit AM/PM, applies a business-day heuristic
 // (1–7 → afternoon; 8–11 → morning; 12 → noon) which covers the 8am–8pm schedule.
+// Some days (e.g. the IB week) run past midnight, so an after-midnight time
+// (12:00am–5:59am) is the late-night TAIL of the same working day; it gets +24h so
+// it orders after the evening rather than jumping to the top.
 function startMinutes(range: string): number {
   const head = range.split(/\s+to\s+/i)[0].trim()
   const m = /(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(head)
@@ -55,7 +58,9 @@ function startMinutes(range: string): number {
   if (mer === 'AM') { if (h === 12) h = 0 }
   else if (mer === 'PM') { if (h !== 12) h += 12 }
   else if (h >= 1 && h <= 7) h += 12
-  return h * 60 + min
+  let mins = h * 60 + min
+  if (mins < 6 * 60) mins += 24 * 60 // after-midnight late-night tail sorts last
+  return mins
 }
 
 type DaySlot =

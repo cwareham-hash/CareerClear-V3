@@ -115,7 +115,7 @@ export default function TimeBlockModal({
             </div>
 
             {/* Scrollable body — prose column capped to a comfortable line length */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5" style={{ backgroundColor: 'var(--color-cream)' }}>
               <div className="mx-auto w-full max-w-[52ch] flex flex-col gap-5">
                 <BlockBody content={block.content} briefing={block.briefing} />
               </div>

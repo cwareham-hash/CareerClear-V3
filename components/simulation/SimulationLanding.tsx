@@ -234,8 +234,10 @@ export default function SimulationLanding({ careerSim }: Props) {
               {selected?.title ?? scenarios[0]?.title ?? 'Project'}
             </h1>
             <p className="font-sans text-[14px] text-muted leading-relaxed max-w-2xl mb-6">
-              A six-week financial services consulting engagement for an alternative asset
-              manager, Meridian Park. Start with a short orientation to get your bearings, then
+              {(selected?.scenario ?? scenarios[0]?.scenario) && (
+                <>{selected?.scenario ?? scenarios[0]?.scenario}{' '}</>
+              )}
+              Start with a short orientation to get your bearings, then
               try a day in the life, or commit to the full simulation.
             </p>
           </>

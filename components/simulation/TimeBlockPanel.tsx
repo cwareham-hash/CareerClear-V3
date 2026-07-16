@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock } from '@/lib/simulation'
+import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, panelMaxWidthFor, type TimeBlock } from '@/lib/simulation'
 import { BlockBody } from './BlockContent'
 import { useDialog } from './useDialog'
 
@@ -37,10 +37,16 @@ export default function TimeBlockPanel({
     if (scrollRef.current) scrollRef.current.scrollTop = 0
   }, [block?.id])
 
-  // C12: blocks carrying a work-product artifact (a wide table/notes block) widen
-  // the desktop panel so the artifact fits without left-right scrolling, while the
-  // prose stays in a narrow readable column. Plain prose blocks keep the panel.
-  const hasArtifact = !!block?.content.artifact?.trim()
+  // C12: any block with an artifact uses the split reading layout — prose in a
+  // narrow readable column, artifact breaking out to the panel's full width.
+  const hasArtifact =
+    !!block?.content.artifact?.trim() ||
+    (!!block?.content.artifactsHtml && Object.keys(block.content.artifactsHtml).length > 0)
+
+  // Panel width is per-artifact-type (Phase 4c): powerpoint/excel → wide profile;
+  // markdown or document-type HTML → the narrow 800px artifact width; no artifact
+  // → the 640px base. The prose column stays 52ch regardless.
+  const panelMaxWidth = block ? panelMaxWidthFor(block.content) : 640
 
   // Dialog a11y (desktop instance only — gated by the lg breakpoint).
   const containerRef = useRef<HTMLDivElement>(null)
@@ -85,7 +91,7 @@ export default function TimeBlockPanel({
               aria-labelledby={TITLE_ID}
               tabIndex={-1}
               className="bg-white flex flex-col overflow-hidden w-full pointer-events-auto focus:outline-none"
-              style={{ maxWidth: hasArtifact ? 800 : 640, maxHeight: '85dvh', borderRadius: 16, boxShadow: '0 24px 64px rgba(0,0,0,0.35)' }}
+              style={{ maxWidth: panelMaxWidth, maxHeight: '85dvh', borderRadius: 16, boxShadow: '0 24px 64px rgba(0,0,0,0.35)' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -121,7 +127,7 @@ export default function TimeBlockPanel({
               {/* Scrollable body. Prose stays capped to a comfortable line length;
                   for artifact blocks the panel is wider and only the artifact uses
                   the full width (C12). */}
-              <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6" style={{ backgroundColor: 'var(--color-cream)' }}>
                 {hasArtifact ? (
                   <div className="mx-auto w-full flex flex-col gap-5">
                     <BlockBody content={block.content} briefing={block.briefing} proseWidthClass="max-w-[52ch]" />
