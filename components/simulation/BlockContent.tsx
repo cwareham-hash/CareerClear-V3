@@ -8,7 +8,6 @@
 import type { ReactNode } from 'react'
 import { Clock, Lightbulb, CheckCircle, FileText } from 'lucide-react'
 import type { TimeBlockContent, ArtifactType, HtmlArtifactSpec } from '@/lib/simulation'
-import { ARTIFACT_TYPES } from '@/lib/simulation'
 import { HtmlArtifact } from './HtmlArtifact'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -445,14 +444,16 @@ function ScriptLines({ content, asProse }: { content: string; asProse?: boolean 
   )
 }
 
-// A self-contained HTML artifact with its "Artifact N — {Type}" caption. Renders
-// full width (it breaks out of the narrow prose column in the split layout), with
-// no Meridian "Work Product" card chrome (the artifact brings its own).
-function InlineHtmlArtifact({ n, html, type }: { n: number; html: string; type: ArtifactType }) {
+// A self-contained HTML artifact with its "Artifact N" caption. Renders full
+// width (it breaks out of the narrow prose column in the split layout), with no
+// Meridian "Work Product" card chrome (the artifact brings its own). The artifact
+// type is retained in the data model and still drives the panel width profile
+// (see panelMaxWidthFor); it is intentionally no longer shown in the caption.
+function InlineHtmlArtifact({ n, html }: { n: number; html: string }) {
   return (
     <div className="w-full">
       <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-2">
-        Artifact {n} — {ARTIFACT_TYPES[type].label}
+        Artifact {n}
       </p>
       <HtmlArtifact html={html} />
     </div>
@@ -583,7 +584,7 @@ export function BlockBody({
           f.kind === 'prose' ? (
             <div key={f.key} className={`${proseWidthClass} mx-auto w-full`}>{f.node}</div>
           ) : (
-            <InlineHtmlArtifact key={f.key} n={f.n} html={f.html} type={f.type} />
+            <InlineHtmlArtifact key={f.key} n={f.n} html={f.html} />
           ),
         )}
         {markdownArtifact}
@@ -598,7 +599,7 @@ export function BlockBody({
         f.kind === 'prose' ? (
           <div key={f.key}>{f.node}</div>
         ) : (
-          <InlineHtmlArtifact key={f.key} n={f.n} html={f.html} type={f.type} />
+          <InlineHtmlArtifact key={f.key} n={f.n} html={f.html} />
         ),
       )}
       {markdownArtifact}
