@@ -1,6 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { motion } from 'framer-motion'
+import { Maximize2, Minimize2 } from 'lucide-react'
 
 // Renders a self-contained HTML artifact (a complete <!DOCTYPE html> document,
 // e.g. the CIM exec-summary mock) inline, fully style-isolated.
@@ -17,17 +20,40 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // it down with a CSS transform to fit the container width, and set the wrapper
 // height to the scaled height so content below flows in normal order. A
 // ResizeObserver keeps it correct when the panel width changes.
+//
+// Expand: a top-right control blows the artifact up to a full-viewport overlay
+// portaled to document.body (so the reading panel's open/exit transform can never
+// trap it). Two portal realities shape the implementation:
+//   1. This app's React event-delegation root does NOT contain document.body, so
+//      React onClick on the portaled overlay never fires. The backdrop, the stage,
+//      and the collapse button are therefore wired with NATIVE onclick via refs,
+//      and Escape via a native document listener — all fire regardless of
+//      delegation.
+//   2. framer's AnimatePresence exit machinery (PopChild) does not complete for
+//      this portaled subtree (the node gets stuck mid-exit), so we do NOT use
+//      AnimatePresence. The overlay animates IN with framer initial/animate and
+//      simply unmounts on collapse (quick and clean). Without AnimatePresence there
+//      is no PopChild, which also makes refs on the motion elements safe.
 
 // The CIM (and the artifact convention that follows it) lays out inside an
 // `.app` wrapper capped at 1360px. Used as the scale basis; height is measured.
 const FALLBACK_NATURAL_WIDTH = 1360
 const FALLBACK_NATURAL_HEIGHT = 720
 
+// Breathing room between the expanded artifact and the viewport edges.
+const EXPAND_MARGIN = 48
+
 export function HtmlArtifact({ html }: { html: string }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null)
   const [scale, setScale] = useState(1)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [viewport, setViewport] = useState<{ w: number; h: number } | null>(null)
+  // Portals need the DOM; gate on a client-only mounted flag so SSR never touches
+  // document.body.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   // Measure the framed document's intrinsic size. Only fonts are system fonts,
   // so layout is stable by load; re-measured on load in case of reflow.
@@ -59,8 +85,68 @@ export function HtmlArtifact({ html }: { html: string }) {
   const naturalH = natural?.h ?? FALLBACK_NATURAL_HEIGHT
   const scaledH = Math.round(naturalH * scale)
 
+  // While expanded: track the viewport, lock body scroll, and swallow Escape in the
+  // CAPTURE phase so the panel's own document-level Escape handler in useDialog
+  // never fires — Escape collapses the artifact only. Torn down on collapse OR
+  // unmount (e.g. the panel closes while expanded), so nothing is left orphaned.
+  useEffect(() => {
+    if (!isExpanded) return
+
+    setViewport({ w: window.innerWidth, h: window.innerHeight })
+    const onResize = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
+    window.addEventListener('resize', onResize)
+
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const onKeyDownCapture = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        e.preventDefault()
+        setIsExpanded(false)
+      }
+    }
+    document.addEventListener('keydown', onKeyDownCapture, true)
+
+    return () => {
+      window.removeEventListener('resize', onResize)
+      document.removeEventListener('keydown', onKeyDownCapture, true)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [isExpanded])
+
+  // Expanded scale: fit to BOTH viewport dimensions (minus a margin). Deliberately
+  // NOT clamped to 1 — the artifact scales UP on large screens, since legibility
+  // is the whole point. One formula covers every artifact type (width is uniform
+  // at ~1360; only height varies), so no per-type branching.
+  const expandAvailW = (viewport?.w ?? 0) - EXPAND_MARGIN * 2
+  const expandAvailH = (viewport?.h ?? 0) - EXPAND_MARGIN * 2
+  const expandedScale = viewport
+    ? Math.min(expandAvailW / naturalW, expandAvailH / naturalH)
+    : 1
+  const expandedW = Math.round(naturalW * expandedScale)
+  const expandedH = Math.round(naturalH * expandedScale)
+
+  // Native click handlers for the portaled overlay (React onClick is dead there).
+  // Callback refs set el.onclick once on mount.
+  const setBackdropRef = useCallback((el: HTMLDivElement | null) => {
+    if (el) el.onclick = () => setIsExpanded(false)
+  }, [])
+  const setStageRef = useCallback((el: HTMLDivElement | null) => {
+    // A click on the artifact itself must NOT collapse — stop it reaching the backdrop.
+    if (el) el.onclick = (e) => e.stopPropagation()
+  }, [])
+  const setCollapseBtnRef = useCallback((el: HTMLButtonElement | null) => {
+    if (el) el.onclick = (e) => { e.stopPropagation(); setIsExpanded(false) }
+  }, [])
+
+  const controlChip =
+    'flex items-center justify-center w-8 h-8 rounded-btn border border-border ' +
+    'bg-white/85 backdrop-blur-sm text-navy shadow-sm transition-colors ' +
+    'hover:bg-white focus-visible:outline-none focus-visible:ring-2'
+
   return (
-    <div ref={wrapperRef} className="w-full overflow-hidden" style={{ height: scaledH }}>
+    <div ref={wrapperRef} className="relative w-full overflow-hidden" style={{ height: scaledH }}>
       <iframe
         ref={iframeRef}
         srcDoc={html}
@@ -82,6 +168,69 @@ export function HtmlArtifact({ html }: { html: string }) {
           pointerEvents: 'none',
         }}
       />
+
+      {/* Expand control — sibling of the (pointer-events:none) iframe, so it
+          receives clicks normally. In the non-portaled panel, React onClick fires. */}
+      <button
+        type="button"
+        onClick={() => setIsExpanded(true)}
+        aria-label="Expand artifact"
+        className={`absolute top-2 right-2 z-10 ${controlChip}`}
+      >
+        <Maximize2 size={16} aria-hidden="true" />
+      </button>
+
+      {/* Full-viewport expanded overlay, portaled to document.body so no ancestor
+          transform (the panel's open/exit animation) can contain or clip it.
+          Enter-animated with framer; collapse unmounts immediately. */}
+      {mounted &&
+        isExpanded &&
+        createPortal(
+          <motion.div
+            ref={setBackdropRef}
+            className="fixed inset-0 z-[100] flex items-center justify-center"
+            style={{ backgroundColor: 'rgba(0,0,0,0.72)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+          >
+            {/* Artifact stage. Native onclick stopPropagation means a click on the
+                artifact does nothing; only the backdrop collapses. */}
+            <motion.div
+              ref={setStageRef}
+              className="relative"
+              style={{ width: expandedW, height: expandedH }}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <iframe
+                srcDoc={html}
+                title="Work product (expanded)"
+                sandbox="allow-same-origin"
+                scrolling="no"
+                style={{
+                  width: naturalW,
+                  height: naturalH,
+                  border: 0,
+                  display: 'block',
+                  transform: `scale(${expandedScale})`,
+                  transformOrigin: 'top left',
+                  pointerEvents: 'none',
+                }}
+              />
+              <button
+                ref={setCollapseBtnRef}
+                type="button"
+                aria-label="Collapse artifact"
+                className={`absolute top-2 right-2 z-10 ${controlChip}`}
+              >
+                <Minimize2 size={16} aria-hidden="true" />
+              </button>
+            </motion.div>
+          </motion.div>,
+          document.body,
+        )}
     </div>
   )
 }
