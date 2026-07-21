@@ -1,5 +1,22 @@
 import type { TimeBlockContent } from '../simulation'
-import { halloranCimExecSumHtml } from './artifacts/halloran-cim-execsum'
+import { artifact01Html } from './artifacts/artifact-01-cim-storyboard'
+import { artifact02Html } from './artifacts/artifact-02-cim-execsummary'
+import { artifact03Html } from './artifacts/artifact-03-model-cascade'
+import { artifact04Html } from './artifacts/artifact-04-diligencetracker'
+import { artifact05Html } from './artifacts/artifact-05-buyerlist'
+import { artifact06Html } from './artifacts/artifact-06-cim-execsummary-markup'
+import { artifact07Html } from './artifacts/artifact-07-cim-markup-priya'
+import { artifact08Html } from './artifacts/artifact-08-model-deep'
+import { artifact09Html } from './artifacts/artifact-09-cim-financialsection'
+import { artifact10Html } from './artifacts/artifact-10-cim-growthsection'
+import { artifact11Html } from './artifacts/artifact-11-nda-log'
+import { artifact12Html } from './artifacts/artifact-12-runningstatus'
+import { artifact13Html } from './artifacts/artifact-13-buyerlist-scrub'
+import { artifact14Html } from './artifacts/artifact-14-cim-markup-warren'
+import { artifact15Html } from './artifacts/artifact-15-cim-projections'
+import { artifact16Html } from './artifacts/artifact-16-addbackschedule'
+import { artifact17Html } from './artifacts/artifact-17-cim-growthexhibit'
+import { artifact18Html } from './artifacts/artifact-18-turntracker'
 
 // Investment Banking — Project Kestrel (Larkin Reed sell-side M&A for Halloran
 // Foods, a founder-owned premium sauces and condiments maker). Per-project content.
@@ -138,6 +155,8 @@ Sabrina: Got it. Front of the book first.
 
 [Danny turns the laptop so she can see the outline.]
 
+{{artifact:1}}
+
 Danny: Here's the skeleton. I built the section order and dropped in what pulls from where. The products and management sections you mostly lift from the management materials and the last template and tweak, don't spend real time there. The exec summary and the financials are the two you actually write, and those are the two that turn a hundred times, so budget for that. The operating model, the three-statement model that projects the financials, is the source for every number in the financial section, so anything in the book has to tie back to the model, not to a number you remember.
 
 Danny: The model's mostly where it needs to be. There'll be a comment or two from me on it today, but draft off it as it stands and I'll flag anything that moves.
@@ -157,14 +176,13 @@ Danny: One more thing, and it's the bar for the whole book. Priya reads it cold 
 
 The week's set, and the front of the book is first. I check what Danny just named against my own list, so the exec summary and the financials go to the top, the buyer list sits under it for later today, and the tracker stays live in the background. Next I open the skeleton he sent and start on the exec summary, because that's the one I need to send him by this evening.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact01Html } },
   },
   'ib-analyst-kestrel-full-d1-b2': {
     before: `The desk-side sync is over and Danny is back at his own desk. Sabrina, the first-year Analyst, is at her desk on the Larkin Reed floor, starting the first real build of the morning: the executive summary of the CIM, the front-of-book section a buyer reads first. Danny's section skeleton is open on one screen, a blank exec-summary page beside it, and the operating model open in a third window for the numbers. This is a heads-down individual work block, the first draft that has to reach Danny by this evening, and it runs until a comment from him interrupts it.`,
     simulatedWork: `[The skeleton is open on the left, a blank exec-summary page on the right. The operating model is open in a third window, parked on its summary tab.]
 
 Sabrina: The exec summary is a page, maybe two, that says in order what a buyer needs to hear to want to keep reading: what the company is, why it's worth owning, what the numbers look like, and what you'd do with it. I'm writing four or five short blocks, not a wall of text, because a sponsor skims this in ninety seconds before deciding whether to hand it to an analyst for a real read.
-
-{{artifact:1}}
 
 Sabrina: First block, what the company is, and I have to write it so a stranger gets it in one line. Halloran Foods makes premium sauces and condiments, sells them into grocery chains and foodservice at real scale, has its own plants and production capacity. That's the description. But I don't lead the description with the plants, because a buyer doesn't fall in love with a factory. I lead with what they'd repeat to their investment committee: a premium, branded platform with shelf position and the margins to prove it. The plants come right after, as how it's delivered, not as the reason to care.
 
@@ -174,11 +192,15 @@ Sabrina: Second block is the money, and every number in it comes out of the mode
 
 Sabrina: Then the reason-to-own block, which is really the growth story compressed to three lines. The whole growth section further back lists every opportunity the company has. Up here in the summary I can only fit the two a buyer would actually underwrite, so I pick the two that stand on business the company already has: the club-store program annualizing, which is revenue from a win they already booked landing in full next year, and the committed new lines going into the co-packing capacity. I leave the pricing upside out of the summary entirely, because that's the soft piece and the summary is not where you lead with the soft piece. Leading with the biggest and most defensible is the same instinct as the first line: give them the thing that matters and let the detail follow.
 
+{{artifact:1}}
+
 [A new-mail chime. She reads it and stops what she is doing.]
 
 Sabrina: And there's a comment in from Danny, and it's on the model, not the book. He wants a line in the model reworked, and the reason I turn it right now instead of finishing this paragraph is that the model is the source for the numbers I'm writing into this exact section. If I keep drafting off the old model and turn his comment afterward, I've written numbers that are already a version behind. The summary goes on hold, mid-block, and I go into the model first.
 
 [She switches to the model, finds the flagged line, and works the comment.]
+
+{{artifact:2}}
 
 Sabrina: His comment is on one of the revenue build lines. He wants the club-store business split out so it's visible on its own rather than buried in the total, which is the kind of thing a buyer wants to see broken out anyway, because it's the piece that annualizes and they'll want to size it themselves. I go into the build, find the line, and separate the club-store volume out onto its own row so it flows through cleanly to the summary tab. The thing I watch when I do this is what moves downstream, because a change to one line in the model isn't one change. It ripples into the revenue subtotal that line feeds, into the total below that, and into every place in the book that pulls from those totals.
 
@@ -207,11 +229,7 @@ Sabrina: That's as far as I get on the financial section before lunch, because i
 
 The exec summary's drafted and it ties to the model, Danny's model comment is turned and chased through everywhere it flowed, and the financial section's bridge is laid out even if it isn't finished. Next it's the buyer list this afternoon while Danny reads, and the whole draft goes up to him before dinner so his comments come back tonight for me to turn.`,
     after: ``,
-    // The morning's work product: the CIM exec-summary draft with Danny's review
-    // comments, a self-contained HTML artifact in an isolated iframe. Placed inline
-    // via the {{artifact:1}} marker in simulatedWork, right after Sabrina describes
-    // what the exec summary is.
-    artifactsHtml: { 1: { type: 'powerpoint', html: halloranCimExecSumHtml } },
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact02Html }, 2: { type: 'excel', html: artifact03Html } },
   },
   'ib-analyst-kestrel-full-d1-b3': {
     before: `The first full CIM draft is up with Danny, the Associate, who is reading it in his review queue, so Sabrina, the first-year Analyst, moves to the next thing that does not need him. Lunch is a salad eaten at the desk with one hand. The buyer list is open, a working spreadsheet with three tier headers and only a few names under them, partially filled from this morning. Capital IQ is open in the other window; it is the paid database bankers screen companies and investors in, the tool an analyst lives in to find and sort potential buyers by industry, size, and geography. The floor is mid-afternoon quiet, the seniors out at appointments.`,
@@ -241,6 +259,8 @@ Sabrina: And there's the afternoon getting away from me. That's Marisol, the CFO
 
 [She opens the diligence tracker, the running checklist of every document requested from the client.]
 
+{{artifact:1}}
+
 Sabrina: The tracker is my checklist of everything we've asked the client for, what's in, what's still outstanding, and who owns it. I find the line for the customer contracts, it's been sitting on outstanding with a chase date next to it, and I move it to received and stamp today's date. Then the part that actually matters, which is getting the documents into the data room correctly, because how they go in is not obvious and getting it wrong is the kind of mistake a buyer's lawyers find.
 
 [She opens what Marisol sent and reads what is in it before touching the data room.]
@@ -269,15 +289,20 @@ Sabrina: And then the part nobody warns you about, which is that a name in a tie
 
 [She saves the sheet and reads back down the tier column one time.]
 
-Sabrina: By the end of the afternoon it's not a finished list and it's nowhere near it, but it's a real first pass, names in tiers with a reason next to each, which is what it has to be before it goes anywhere near a senior.`,
+Sabrina: By the end of the afternoon it's not a finished list and it's nowhere near it, but it's a real first pass, names in tiers with a reason next to each, which is what it has to be before it goes anywhere near a senior.
+
+{{artifact:2}}`,
     commentary: `The draft's up with Danny, so while he reads it I move to the thing that doesn't need him, which is the buyer list. This is the list of everyone we might take the company to when we launch, the strategics who'd want to own a premium sauce maker and the private equity funds who'd want to own the cash flow. Right now it's a spreadsheet with almost nothing in it. This afternoon I run the screens, pull the names, and start sorting them into tiers, until Priya and Warren scrub it later in the week and add the names they know personally, the ones a screen won't make stand out.
 
 The list is a first pass now, tiers and rationales, and it turns a few more times before it's real. The contracts folder is handled, executed versions in the room, the draft flagged for Danny. Next the draft comes back from Danny with his comments, probably late afternoon once he's had a full read, and that turn becomes tonight. The list I pick back up later in the week when the seniors scrub it.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'excel', html: artifact04Html }, 2: { type: 'excel', html: artifact05Html } },
   },
   'ib-analyst-kestrel-full-d1-b4': {
     before: `It is evening on the Larkin Reed floor, and dinner is cleared off the desk. The first full draft of the book went up to Danny, the Associate, before dinner, and it came back marked up, his comments running down the margin of the printed pages. Sabrina, the first-year Analyst, is at her desk with the markup open beside the live draft. This is an individual work block, the first turn the book goes through, and the plan for the night is to work down every one of Danny's marks and get the draft back up to him clean so it can climb to Priya in the morning.`,
     simulatedWork: `[The markup is open on the left, the draft on the right. Danny's comments run down the margin, some circled, some with a line pulling to a spot in the text, some a lowercase note.]
+
+{{artifact:1}}
 
 Sabrina: Starting at the top. The first one's on the opening line of the exec summary, and it's a rewrite, not a note. He's circled my first sentence and written "still a description, punch it." I led with the branded-platform line and thought that was the hook, and reading his mark I can see it still opens with what the company is instead of why a buyer cares. I rewrite it so the first clause is the claim a buyer repeats to their committee, the shelf position and the margin, and the description of what it makes comes second in the same sentence. That's what "the story" means on this desk, the order the reader meets the company in, and the first line is the one that has to earn the second.
 
@@ -312,6 +337,7 @@ Sabrina: Then the two passes that close every turn. First, back to the top, down
 
 The draft's back with Danny now, and it goes up to Priya in the morning. Before I pack up I check with him that nothing else is landing tonight, because you don't just leave, and then I head out and it's the car home. I'll keep half an eye on the inbox from home in case a last thing comes in, but the turn itself is done. Tomorrow the book climbs to the VP.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact06Html } },
   },
   'ib-analyst-kestrel-full-d2-b1': {
     before: `The first full CIM draft went up to Priya, the VP, overnight, after Sabrina turned Danny's comments into it and sent it back up the chain. Priya sits a level above Danny, the Associate, and she reads the book cold, the way a buyer will, so her comments are the higher-altitude ones about whether the story lands, not the marks in the margin Danny gives. The walk-through happens in a small conference room off the main floor, where Priya, Danny, and Sabrina each have the draft up on their own screen. A VP walk-through of the book is short, twenty-five minutes or so, where she talks through the shape of the draft while the analyst captures every note to turn afterward. Warren, the MD, is not on this one; the book does not go to him until it reads clean. Danny, the Associate, is in the room. Sabrina, the first-year Analyst, has the draft open on her own screen, following Priya's scroll.`,
@@ -367,6 +393,8 @@ Danny and I sit down now and sequence the moves before I touch a word, and then 
     before: `The VP walk-through wrapped a few minutes ago, and Danny and Sabrina sat down straight after to sequence Priya's comments in the order to work them. Now Sabrina, the first-year Analyst, is back at her desk on the Larkin Reed floor with the book open beside the short list of Priya's notes. These are the VP's higher-altitude comments, about whether the story lands and whether the order is right, not the margin marks Danny gives, so this is a structural turn. It is an individual work block that runs until an ASAP from a senior interrupts it.`,
     simulatedWork: `[The book is open, and beside it the short list Danny and Sabrina built of Priya's comments in the order to do them.]
 
+{{artifact:1}}
+
 Sabrina: Priya's biggest note is the front of the book, and it's the one I do first because everything downstream sits on it. She wants the exec summary to lead with the demand and the margin, the reason to own it, and push the plants and capacity underneath as how it's delivered. I'd drafted it leaning that way already, and Danny had me punch the opening line last night, but Priya wants the whole opening block re-cut harder, so the very first thing a buyer meets is the shelf position and the retailer pull, and the operations move down to support it. Same facts, the order a buyer meets them in changes, and that order is the whole point of a front page.
 
 [She moves to the market section.]
@@ -400,6 +428,7 @@ Sabrina: With the structural moves done I read the front third straight through,
 
 Priya's structural comments are turned, the front re-cut and the market moved and every cross-reference chased. Warren's got his buyer count for his call. Next the book goes back up to Priya tonight, not to Warren yet, and this afternoon I'm on the buyer list and the tracker while the front of the book settles.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact07Html } },
   },
   'ib-analyst-kestrel-full-d2-b3': {
     before: `Lunch is done and the morning's turned book is back up with Danny, the Associate, so Sabrina, the first-year Analyst, is at her desk on the two workstreams that do not need him this afternoon: the buyer list and the diligence tracker. The buyer list is open to yesterday's tiers, and the tracker, the running checklist of every document requested from the client, is open in the other window with a few items still outstanding. This is an individual work block, tiering the list a level deeper and chasing the last open documents from Marisol, the client CFO's side.`,
@@ -443,6 +472,8 @@ The list is a real second pass now, tighter tiers, sharper reasons, most of the 
     before: `It is evening and dinner is cleared off the desk. The floor is thinning out. One of the updated schedules Marisol, the client CFO, sent over came in this afternoon and moves a number in the operating model, and a changed number never stays put: it flows into the financial section of the book and every exhibit that draws off it. Sabrina, the first-year Analyst, is at her desk with the model open on one screen and the financial section open beside it. This is a night individual work block, working the cascade from the model out through the book and then a QC pass, on the version that is climbing toward Priya the VP and then Warren the MD.`,
     simulatedWork: `[The model is open on the left, the financial section of the book on the right. The floor is thinning out.]
 
+{{artifact:1}}
+
 Sabrina: Start in the model, because that's the source and everything downstream depends on getting it right here first. The schedule Marisol sent updates the historical numbers on one revenue line, actuals that came in firmer than the placeholder we'd been carrying. I take the updated figures into the model's historical tab, one year at a time, and the thing I watch is that the change lands only where it should and then flows where it must. It updates the history, and because the projections build off the history, the projected lines move with it, and because the summary tab totals all of it, the total moves.
 
 Sabrina: Now I have to chase it. The number moved in the model. That means the revenue figure in the exec summary is now a version behind. The same figure in the financial section is behind. The adjusted-earnings bridge that builds off it is behind, because the base moved. And any exhibit, any chart, that draws off these is behind. One number in the model, and it's stale in four or five places in the book, all of which said the right thing an hour ago and don't now.
@@ -452,6 +483,8 @@ Sabrina: Now I have to chase it. The number moved in the model. That means the r
 Sabrina: I go find each one, with the model open beside the book so I'm bringing the current number across and not a remembered one. Exec summary first, the money block, pull the current total across off the summary tab. Then the same figure inside the reason-to-own lines up there, because it appears twice on that page and the two can't disagree. Then the financial section, the historical row that changed and the projected rows that moved off it. Then the bridge, where the base moved, so I re-walk it from reported at the bottom up through each add-back and confirm it still lands on the right adjusted number at the top. Each one I don't retype, I pull, because the whole failure I'm preventing is a number that's one digit off from the model it's supposed to match.
 
 [She rebuilds one exhibit that a chart is driven off.]
+
+{{artifact:2}}
 
 Sabrina: One of these is a chart, not a cell, the revenue-trend exhibit in the financial section, and it's driven off the schedule I just changed, so the bars are drawn on the old numbers. A chart doesn't update itself when the source moves unless it's linked, and this one I have to refresh so the trend line matches the table under it. I refresh the exhibit off the current data, and then I check the last two bars against the table cells they're supposed to equal, one at a time, because a chart that looks refreshed and a chart that is refreshed are not the same thing, and a chart that disagrees with the table right beside it is exactly the kind of thing a buyer notices and a senior catches.
 
@@ -470,6 +503,7 @@ Sabrina: Last pass, I read the financial section and the summary once more, top 
 
 The number's current everywhere it lives, the book ties end to end, and the file's up with Danny bound for Priya and then Warren. I'll check with Danny that nothing else is landing before I head out, and keep half an eye on the inbox from home in case a last thing comes in. Tomorrow the book reaches the top of the chain.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'excel', html: artifact08Html }, 2: { type: 'powerpoint', html: artifact09Html } },
   },
   'ib-analyst-kestrel-full-d3-b1': {
     before: `It is Wednesday morning, and the book is up with Priya, the VP, and heading to Warren, the MD, so for a stretch it is out of Sabrina's hands. Sabrina, the first-year Analyst, is at her desk producing the back sections that do not depend on the turn coming back: the growth section and the risk factors, the two sections a buyer reads to figure out the upside and what could go wrong, both still mostly skeleton. The management materials and the operating model are open alongside the draft. This is an individual work block, drafting those two sections with a stretch of buyer-list maintenance in between, and it runs until an NDA status change interrupts it.`,
@@ -478,6 +512,8 @@ The number's current everywhere it lives, the book ties end to end, and the file
 Sabrina: The growth section is where a buyer decides how much upside they're paying for, so it can't read like a wish list, it has to read like a plan the company could actually execute. I've already got the top two ranked from the front-of-book work, the club-store annualization and the committed new lines, so the discipline back here is to build each one out properly: what it is, why it's real, what it's worth roughly, and what it depends on. The annualization first, because it's the most defensible. It's revenue from business already won that lands in full next year, so I write it as arithmetic on signed business, not a forecast: the program ran partway through last year, so the piece that wasn't in the full-year number lands next year, and I pull the run-rate off the model rather than estimating it, because a buyer's diligence team can hold that up against the contracts, which is exactly what makes it strong.
 
 Sabrina: Then the committed new lines into the co-packing capacity, which is real but softer, because "committed" is a claim a buyer will test. I write it carefully, pinned to what's actually committed rather than what the company hopes it becomes, because those are two different numbers and the second one falls apart in diligence. And I flag in my own note, in the margin of the draft where Danny will see it, that this one needs the actual purchase commitments behind it before it's final, so it's on the list to firm up rather than sitting as a confident number I can't back. The rest of the opportunities go into a ranked list underneath, each with a one-line size and a note on what it depends on, so a buyer sees we've thought about size and sequence instead of treating a new product and a new channel as the same thing. And the pricing upside, the soft piece, I keep out of the ranked opportunities and name it separately at the end as a lever a buyer can underwrite themselves, because the moment pricing sits inside the growth number a buyer discounts the whole thing.
+
+{{artifact:1}}
 
 [She moves to the risk factors section.]
 
@@ -493,6 +529,8 @@ Sabrina: And this one I stop for the second I see it, because it's the NDA track
 
 [She opens the NDA tracker and logs the signed agreement.]
 
+{{artifact:2}}
+
 Sabrina: The buyer list goes on hold and I go to the NDA log, which is its own tracker, the running record of who we sent the teaser and NDA to, who signed, and the date each one executed. I find the name, move it from sent to signed, and stamp today's date, and here's the trap I check before I mark it clean: the name on the executed signature page isn't quite the name on our list. Our list has the parent, and the NDA came back signed by a subsidiary entity, because if the party who signed isn't the party we think signed, the release status is wrong and we could send the book to an entity that never actually bound itself. I read the signature block against the entity on the list, confirm the subsidiary is the right signing arm of the parent we tracked, and note the exact signing entity on the log so the record is precise. Then I update the release status to say this party is cleared to receive the CIM once we launch. Logged, dated, entity confirmed, status updated. That one couldn't wait, and now it's on the record while I'm still the person who saw it land.
 
 [She goes back to the buyer list and finds where she left off.]
@@ -506,6 +544,7 @@ Sabrina: With the list settled I go back and finish the risk section, because I 
 
 The growth and risk sections are drafted and the list's ready for the scrub, and the signed NDA is logged and the release status current. Next is the process call this afternoon, where Priya runs the team through where every workstream stands, and after that the seniors scrub the buyer list. The book's still up with Warren, so I'll find out where his comments land later.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact10Html }, 2: { type: 'excel', html: artifact11Html } },
   },
   'ib-analyst-kestrel-full-d3-b2': {
     before: `Once a week the whole deal team gets on a call to take stock of where every workstream stands and what has to happen next, and it is run by Priya, the VP, who quarterbacks the deal day to day. On the call are Priya; Danny, the Associate; and Sabrina, the first-year Analyst. Warren, the MD, drops on for the top of it and then has to jump. This is a status-and-timeline call, not a working session: Priya drives the agenda, Danny reports on the deliverables, and Sabrina stays near-silent, giving a tight status only if she is asked a specific number. Sabrina has her running status list open, the one that tracks every open item across the book, the model, the buyer list, and the trackers, which is exactly what she checks against as each workstream comes up. Going into the call, that list shows the book climbing to Warren and the client session set for tomorrow.`,
@@ -552,12 +591,17 @@ Priya: Good. Short one. Back to it.
 [The call ends. Sabrina updates her status list against what was just confirmed.]`,
     commentary: `My job on this call is to have the right number ready if Priya turns to me, and to catch any gap between what the seniors think is done and what I'm actually carrying. As each workstream comes up I check what Priya and Danny say against my own list, so if there's a mismatch, I know it and can say it if asked. The whole call is really about getting everything lined up for the client session tomorrow.
 
+{{artifact:1}}
+
 Nothing on the call moved off what I already had, everyone's read of where things stand matches mine. The one thing to hold is that the outstanding tracker items don't block tomorrow, which I confirmed in the room. Next is the buyer-list scrub with Priya and Warren this afternoon, where the names I tiered meet the relationships only they can see.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'document', html: artifact12Html } },
   },
   'ib-analyst-kestrel-full-d3-b3': {
     before: `The buyer list Sabrina built and tiered gets its first senior scrub this afternoon, and this is where the names a screen can surface meet the relationships only the senior bankers carry. In the room are Warren, the MD, who owns the client relationship and knows the buyer universe personally; Priya, the VP, who runs the deal day to day; and Sabrina, the first-year Analyst, whose list is on the screen. Danny, the Associate, is on another call and not in this one. Sabrina does not present the list and does not pitch names; she has it open, keeps it current as Warren and Priya add and cut, and captures every change exactly as they land. The list she built is the starting point, and the seniors are about to add names off relationships and cut names on judgment a screen never had.`,
     simulatedWork: `[The buyer list is up on the screen, Sabrina's tiers and rationales visible. Warren has it open on his own screen too.]
+
+{{artifact:1}}
 
 Warren: Okay, let's go through it. Strategics first. The branded-foods houses, these are right, these are the calls we lead with. Add Coleman to Tier 1. They're not obvious off a screen because they've been quiet, but I know they've been looking to get into premium condiments and they've got the shelf space to make it work. Put them at the top.
 
@@ -600,10 +644,13 @@ Warren: Good. Get me the clean version and I'll do a last pass before we take co
 
 The list is the seniors' list now, their names added and their cuts made, and the two things I'm carrying out of it are the clean version for Warren's last pass and the one name flagged for Rick to decide. Next I clean it up and get it back to Warren, and the book's still up the chain with him for tonight.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'excel', html: artifact13Html } },
   },
   'ib-analyst-kestrel-full-d3-b4': {
     before: `Dinner is long cleared off the desk. The book climbed the chain all week, and this afternoon it reached the top of it: Warren, the MD, took the VP-cleared version after his external appointments and sent his top-of-chain markup back a little after seven. This is the clearance turn, the last internal pass before the book goes to the client tomorrow, and the client only ever sees a version Warren has blessed. His marks are the highest-altitude of the week, fewer than the junior reviewers' but bigger and blunter, each one pulling to a whole section. There are a lot of them, and they landed late. The floor has emptied out. A few analysts are still heads-down. Sabrina pulls Warren's markup up beside the draft.`,
     simulatedWork: `[Warren's markup is open on the left, the draft on the right.]
+
+{{artifact:1}}
 
 Sabrina: Starting at the top, and his first mark is on the exec-summary open, which I've already re-cut twice this week, once on Danny's "punch it" and once on Priya's re-cut to lead with demand. Warren's is a level above both. He's written that the first line still sounds like a company describing itself, and he wants it to sound like the reason a buyer picks up the phone. Even the demand-first version Priya landed on reads, to him, like we're telling the buyer what we are instead of what they get. I re-cut the opening so the very first clause is the thing a strategic repeats to their board, the shelf position and the pull, and the branded-platform description falls in behind it as support. Same facts a third time, a higher altitude on the order each time, and Warren's is the one that clears.
 
@@ -642,6 +689,7 @@ Sabrina: Last thing, the note up, and tonight it carries more than the usual "he
 
 The book's cleared Warren, which means it's the version that goes to Rick tomorrow, and the note up names what moved so it reads clean first thing. I'll check with Danny that nothing else is landing before I go, because even at this hour you don't just leave, and then it's the car home. Tomorrow the book's in front of the client.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact14Html } },
   },
   'ib-analyst-kestrel-full-d4-b1': {
     before: `The video call connects, and the client side comes on. On the Larkin Reed side, Warren, the MD, and Priya, the VP, are together in a small conference room off the main floor; Danny, the Associate, and Sabrina, the first-year Analyst, are dialed in from their desks. On the Halloran Foods side are Rick, who founded the company and owns it, Marisol, the CFO, and Diane, the company's outside M&A counsel, who is on for the disclosure language.
@@ -650,6 +698,8 @@ The book in front of everyone is the version that came off Sabrina's desk past o
 
 Sabrina is on mute, her camera on, the draft open on one screen and a running list of changes on the other. She does not have a speaking part today. Her job is to catch every change the room lands on and to have the right page up the second Warren or Priya reaches for it.`,
     simulatedWork: `Warren: Rick, Marisol, Diane, thank you all for the time. We sent the current draft over last night. I'd suggest we spend most of this on the projections and the adjusted-EBITDA build, because that's where the real work is, and then Diane, we'll get to your marks on the risk language. Rick, do you want to start us on the growth section, since that's the piece you and I have been going back and forth on.
+
+{{artifact:1}}
 
 Rick: I do, because I read it again this morning and I still think it's rich. You've got us at twenty-two percent top-line growth in year two. We have never done twenty-two. We did fourteen last year and that was a good year, and it was a good year because we won the club-store rollout, which is a thing that happened once.
 
@@ -752,6 +802,7 @@ Warren: You'll have it the moment we do.`,
 
 The one I can't do anything with is the private-label clause. It's not a change I can turn, it's a legal read that's out with Diane now, and it doesn't come back as a number I drop into a paragraph, it comes back as an answer nobody in that room had yet. It goes on my tracker as its own open line, out with counsel, and it sits there open. That's the one thing off this call I'm carrying that I can't close myself.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact15Html } },
   },
   'ib-analyst-kestrel-full-d4-b2': {
     before: `The client CIM review session wrapped an hour ago, and Danny, the Associate, pulled Sabrina into a quick debrief straight after to sort what turns this afternoon and what waits for tonight. Now Sabrina, the first-year Analyst, is back at her desk on the Larkin Reed floor with the book open, the running list of changes from the debrief beside it, and the ledger of open items in a third window. This is the widest turn of the week, because the client room touched almost everything. It is an individual work block, working the client's changes into the CIM, and it runs until an ASAP from a senior interrupts it.`,
@@ -768,6 +819,8 @@ Sabrina: Exec summary first, because it's the front and the client re-cut it dir
 Sabrina: Then the projections, and this is where I have to be careful about what I can finish and what waits. The room landed on taking the headline off twenty-two down to around eighteen, built on the annualization and the committed lines, with pricing shown separately. But the exact eighteen isn't mine to set, it's a bridge Marisol and Priya are rebuilding on their side after the call, because it depends on pinning the committed lines to the actual purchase commitments, not the sales team's hopes. I can't drop a final number in yet. What I can do is set the structure the number lands into: pull the pricing out of the ranked base so the base stands only on signed business, name pricing separately as the upside lever, and leave the base figure marked as pending Marisol and Priya's rebuilt bridge. That way the moment their number comes, tonight, it drops into a book that's already shaped for it, instead of me building the shape twice. I note on the ledger that the base figure is waiting on their bridge, so I know exactly what's provisional.
 
 [She moves to the add-back schedule.]
+
+{{artifact:1}}
 
 Sabrina: Then the three add-back marks, and these are precise, because the add-back schedule is the thing a buyer's quality-of-earnings people read with a pen. The owner comp stays as is, so I leave it and confirm its market-comp footnote is intact. The ERP line is the split: right now the whole system cost is added back as one-time, and Marisol was clear that's not clean, because there's a recurring license and support cost riding in with it. I split it on the schedule into two named lines, the one-time implementation and integration that adds back, and the recurring license and support that stays in as an operating expense, and I name each explicitly so nobody reading it thinks we tried to slip the recurring piece through. Then the settlement footnote, where Diane sent exact language: I replace the old footnote, the one that described the underlying matter too specifically, with her wording, which says it's a resolved, non-recurring legal expense and no more, and then I check the number the footnote sits next to still matches the schedule line, because the wording changed but the add-back itself stands.
 
@@ -786,6 +839,7 @@ Sabrina: Then the market overview and the business description, which the room r
 
 The client's changes are mostly turned, the exec summary re-cut, the add-back schedule split and reworded, the disclosure sweep done, the market and business sections reworked, and the projections shaped for the number that lands tonight. What's still open is the eighteen-percent base, waiting on Marisol and Priya's bridge, and the private-label clause, which isn't a turn at all, it's still out with counsel on my tracker. Tonight I finish the client turn so it can recirculate up the chain in the morning.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'excel', html: artifact16Html } },
   },
   'ib-analyst-kestrel-full-d4-b3': {
     before: `It is evening, dinner is cleared, and the floor is thinning out. The afternoon got most of the client turn done, but two pieces were waiting: the eighteen-percent base that Marisol, the client CFO, and Priya, the VP, were rebuilding on their side, and the QC that ties the whole revised book back together. Both came into reach after dinner, when Marisol and Priya sent the rebuilt bridge over. Sabrina, the first-year Analyst, is at her desk with the operating model open, the financial section beside it, and the rebuilt bridge in a third window. This is a night individual work block, a normal one and not the marathon of the night before, finishing the client turn end to end so it can recirculate up the chain in the morning.`,
@@ -798,6 +852,8 @@ Sabrina: The rebuilt bridge came in, and it lands the base at the eighteen the r
 Sabrina: I chase it, place by place, model open beside the book so I'm pulling the current number and not a remembered one. The exec-summary money block, the base across from the summary tab. The same figure inside the reason-to-own lines, because it lives twice on that page and can't disagree with itself. The financial section, the historical rows are unchanged but the projected rows all move off the new base. The growth section's two ranked items, because their sizes are stated off the base. And the bridge itself, where I re-walk from reported at the bottom up through each add-back, including the ERP split I set this afternoon, so it lands on the new adjusted number at the top. Each one pulled, not retyped, because the failure I'm preventing is a number one digit off from the model it's supposed to match.
 
 [She rebuilds the growth exhibit that the pricing split changed.]
+
+{{artifact:1}}
 
 Sabrina: One of these is a chart, not a cell, the growth exhibit in the front of the book, and it changed shape today, not just value, because pricing came out of the base and into its own lever. The base bars have to drop the pricing piece and the pricing shows as a separate named element, not baked into the growth number. I rebuild the exhibit off the current data so the base is only the signed business and the pricing sits beside it labeled as upside, and then I check the base bars against the table cells they're supposed to equal, one at a time, because a chart that looks refreshed and a chart that is refreshed aren't the same thing, and a chart that disagrees with the table beside it is exactly what a buyer catches.
 
@@ -816,6 +872,7 @@ Sabrina: Last pass, I read the changed sections top to bottom now that the numbe
 
 The client turn's finished end to end, the eighteen's in and ties everywhere, and the file's ready to recirculate up the chain in the morning. I'll check with Danny that nothing else is landing tonight before I head out, and then it's the car home, with half an eye on the inbox from there in case a last thing comes in. Tomorrow the revised book goes back up, and then it's back to the client next cycle.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact17Html } },
   },
   'ib-analyst-kestrel-full-d5-b1': {
     before: `It is Friday morning, and Danny, the Associate, and Sabrina synced a few minutes ago on what is left before the weekend: the client-revised book goes back up the chain today, to Priya, the VP, and Warren, the MD. Sabrina, the first-year Analyst, is at her desk with the current book open and the running ledger of the week's turns beside it. The book has been turned so many times this week that the pieces need reconciling into a single clean version before it moves. This is an individual work block, consolidating the turns, QC-ing the whole thing as a document, and sending it back up as a recirculation, one cycle in the loop and not a final.`,
@@ -833,6 +890,8 @@ Sabrina: Then a spot-check on the numbers, not the full tie-out I ran last night
 
 [She updates the ledger to one clean state before sending up.]
 
+{{artifact:1}}
+
 Sabrina: Now the ledger, and I reconcile it to one clean state, because all week it's been carrying multiple in-flight versions and now there's one. It reads: one consolidated version, client changes incorporated, out for recirculation to Priya and Warren. And the line that shows what this actually is, that this recirculation is one cycle in the loop, the book goes up, clears, goes back to the client, and does it again, because they'll see this book several more times before it ever goes to a buyer. The one item that stays open on the ledger isn't a version thing, it's the clause out with counsel, and that's still open, but it doesn't hold up this recirculation because it isn't in the book either way until counsel reads it.
 
 [She sends the consolidated book up the chain with a note.]
@@ -842,6 +901,7 @@ Sabrina: The file goes up to Priya and Warren, and the note with it names what's
 
 The book's consolidated to one clean version and it's back up the chain with Priya and Warren for the recirculation. Next this afternoon is the braid I've been carrying alongside the book all week, the buyer list to finalize off the scrub, the model to refresh, and the tracker to close out before the weekend.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'excel', html: artifact18Html } },
   },
   'ib-analyst-kestrel-full-d5-b2': {
     before: `It is Friday afternoon, and the book is up the chain with Priya and Warren for the recirculation, so Sabrina, the first-year Analyst, turns to the three workstreams she has carried alongside it all week. At her desk she has the scrubbed buyer list open in one window, the operating model in another, and the diligence tracker in a third. This is an individual work block, finalizing the list off Wednesday's scrub, refreshing the model with a number that finally has its final version, and closing out the tracker before the weekend. Danny, the Associate, comes over partway through on the one open item she cannot close.`,
