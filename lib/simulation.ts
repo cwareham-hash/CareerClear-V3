@@ -35,6 +35,22 @@ export const TIERS: { value: Tier; display: string; label: string }[] = [
   { value: 'full',        display: 'Full Simulation',  label: 'Complete multi-day arc' },
 ]
 
+// Artifact types drive both a display label ("Artifact 1 — PowerPoint") and the
+// reading-panel width profile. Adding a new type is a one-line addition here.
+export type ArtifactType = 'powerpoint' | 'excel' | 'document'
+
+export const ARTIFACT_TYPES: Record<ArtifactType, { label: string; width: 'wide' | 'narrow' }> = {
+  powerpoint: { label: 'PowerPoint', width: 'wide' },
+  excel:      { label: 'Excel',      width: 'wide' },
+  document:   { label: 'Document',   width: 'narrow' },
+}
+
+// A self-contained HTML artifact: the document plus its type.
+export interface HtmlArtifactSpec {
+  type: ArtifactType
+  html: string
+}
+
 export interface TimeBlockContent {
   before:        string
   simulatedWork: string
@@ -44,6 +60,31 @@ export interface TimeBlockContent {
   // fences, bold, and bullets — rendered as a styled "Work Product" panel. Used by
   // individual-work blocks whose output is the artifact rather than dialogue.
   artifact?:     string
+  // Optional work product(s) delivered as self-contained HTML documents (complete
+  // <!DOCTYPE html> files), each rendered in an isolated iframe with no "Work
+  // Product" card chrome. Keyed by artifact number N, matching an inline
+  // {{artifact:N}} marker placed in the prose (before/simulatedWork/commentary) at
+  // the exact spot the artifact should appear; any artifact with no marker renders
+  // at the end of the block. Each carries its ArtifactType (label + width profile).
+  // Sibling to `artifact` (Markdown); a block uses at most one of the two kinds.
+  artifactsHtml?: Record<number, HtmlArtifactSpec>
+}
+
+// Reading-panel max widths (px number, or a CSS length string).
+export const PANEL_MAX_WIDTH = {
+  wide:     'min(80vw, 1400px)', // powerpoint / excel — a full slide needs room
+  artifact: 800,                 // markdown work-product & document-type HTML (pre-4b width)
+  plain:    640,                 // no artifact
+} as const
+
+// The reading-panel max width for a block: the widest artifact-type present wins.
+// A markdown artifact counts as the narrow 'artifact' width; a wide HTML type
+// (powerpoint/excel) upgrades the whole panel to the wide profile.
+export function panelMaxWidthFor(content: TimeBlockContent): number | string {
+  const html = content.artifactsHtml ? Object.values(content.artifactsHtml) : []
+  if (html.some((a) => ARTIFACT_TYPES[a.type].width === 'wide')) return PANEL_MAX_WIDTH.wide
+  const hasArtifact = !!content.artifact?.trim() || html.length > 0
+  return hasArtifact ? PANEL_MAX_WIDTH.artifact : PANEL_MAX_WIDTH.plain
 }
 
 export interface TimeBlock {
@@ -128,12 +169,15 @@ export interface Simulation {
 // ── Phase 5 content imports ────────────────────────────────────────────────────
 
 import { ibAnalystContent }                    from './content/ib-analyst'
+import { ibAnalystKestrelContent }             from './content/ib-analyst-kestrel'
 import { managementConsultantMeridianContent } from './content/management-consultant-meridian'
 import { lawAssociateContent }                 from './content/law-associate'
 import { productManagerContent }               from './content/product-manager'
 
 const CONTENT_LOOKUP: Record<string, Record<string, TimeBlockContent>> = {
-  'ib-analyst':             ibAnalystContent,
+  // IB has two projects' content: legacy Apex (ib-analyst-d*-b*) and Kestrel
+  // (ib-analyst-kestrel-*). Ids are disjoint, so spreading both is collision-free.
+  'ib-analyst':             { ...ibAnalystContent, ...ibAnalystKestrelContent },
   'management-consultant':  managementConsultantMeridianContent,
   'law-associate':          lawAssociateContent,
   'product-manager':        productManagerContent,
@@ -289,6 +333,113 @@ const MERIDIAN_DITL_CONNECTORS: ConnectorSlot[] = [
   { day: 1, start: '3:00',  end: '3:30',  label: 'A breather, then walking the drafted section over to Marcus for the review.' },
 ]
 
+// ── Investment Banking — Project Kestrel ───────────────────────────────────────
+
+// Project Kestrel — Larkin Reed sell-side M&A (Halloran Foods). Ids follow the
+// Meridian scheme with a "kestrel" project segment. All three tiers are now real:
+// the four Orientation readings, the full Monday-to-Saturday week, and the curated
+// five-block Day-in-the-Life, all transcribed in lib/content/ib-analyst-kestrel.ts.
+const KESTREL_ORIENTATION: TimeBlock[] = [
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-orientation-b1', 1, '~3 min read', 'The industry and the firm',    'learning', true),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-orientation-b2', 1, '~3 min read', 'The deal',                     'learning', true),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-orientation-b3', 1, '~4 min read', 'The people',                   'learning', true),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-orientation-b4', 1, '~4 min read', 'The language of the work',     'learning', true),
+]
+
+// The full Project Kestrel week — 19 enterable blocks, Monday through the Saturday
+// touch, transcribed from IB_SellSide_Full_Week_Master_V2.md into the content file.
+const KESTREL_FULL: TimeBlock[] = [
+  // Monday (day 1) — Blocks 1–4
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d1-b1', 1, '10:00 to 10:20 AM', 'Associate desk-side week kickoff', 'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d1-b2', 1, '10:20 AM to 1:00 PM', 'CIM executive-summary build',    'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d1-b3', 1, '1:30 to 4:30 PM',    'Buyer-list build',                'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d1-b4', 1, '7:30 to 10:30 PM', "Turn Danny's comments", 'independent'),
+  // Tuesday (day 2) — Blocks 5–8
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d2-b1', 2, '10:15 to 10:45 AM', "VP walk-through of the book", 'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d2-b2', 2, '10:45 AM to 1:00 PM', "Turn the VP comments", 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d2-b3', 2, '1:30 to 5:30 PM', "Buyer-list tiering and tracker chase", 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d2-b4', 2, '7:30 to 11:00 PM', "Late-night production, the model-to-CIM cascade", 'independent'),
+  // Wednesday (day 3) — Blocks 9–12
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d3-b1', 3, '10:00 AM to 1:00 PM', "CIM growth-and-risk build, and buyer-list breather", 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d3-b2', 3, '1:30 to 2:15 PM', "Weekly deal process call", 'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d3-b3', 3, '2:30 to 3:30 PM', "Buyer-list scrub with VP and MD", 'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d3-b4', 3, '7:30 PM to 1:00 AM', "Turn the MD comments", 'independent'),
+  // Thursday (day 4) — Blocks 13–15
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d4-b1', 4, '11:00 AM to 12:00 PM', "The Client CIM Review Session", 'meeting'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d4-b2', 4, '1:00 to 5:00 PM', "Turn the client changes into the CIM", 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d4-b3', 4, '7:30 to 11:30 PM', "Late-night production, finishing the client-revised turn", 'independent'),
+  // Friday (day 5) — Blocks 16–18
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d5-b1', 5, '10:30 AM to 1:00 PM', "CIM consolidation, recirculation turn, and QC", 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d5-b2', 5, '1:30 to 4:00 PM', "Buyer-list finalization, model refresh, tracker close-out", 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d5-b3', 5, '4:30 to 7:00 PM', "Danny release check and lighter Friday finish", 'independent'),
+  // Saturday (day 6) — Block 19
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-full-d6-b1', 6, '10:00 to 11:30 AM', "Saturday production touch", 'independent'),
+]
+
+// Greyed, non-enterable connector slots for the Kestrel Full week (C1–C32),
+// transcribed from the master. Times carry explicit AM/PM because the working day
+// runs from a 9am arrival past midnight; startMinutes treats pre-6am slots as the
+// late-night tail so they order after the evening blocks.
+const KESTREL_CONNECTORS: ConnectorSlot[] = [
+  // Monday (1)
+  { day: 1, start: '9:00 AM',   end: '10:00 AM', label: 'Arrival and overnight triage' },
+  { day: 1, start: '1:00 PM',   end: '1:30 PM',  label: 'Desk lunch' },
+  { day: 1, start: '4:30 PM',   end: '6:45 PM',  label: 'Draft send-up and second-wave landing' },
+  { day: 1, start: '6:45 PM',   end: '7:30 PM',  label: 'Desk dinner' },
+  { day: 1, start: '10:30 PM',  end: '11:15 PM', label: 'Wrap with Danny and commute home' },
+  { day: 1, start: '11:15 PM',  end: '11:45 PM', label: 'From-home late finish' },
+  // Tuesday (2)
+  { day: 2, start: '9:00 AM',   end: '10:15 AM', label: 'Arrival and overnight triage' },
+  { day: 2, start: '1:00 PM',   end: '1:30 PM',  label: 'Desk lunch' },
+  { day: 2, start: '5:30 PM',   end: '6:45 PM',  label: 'Draft send-up and second-wave landing' },
+  { day: 2, start: '6:45 PM',   end: '7:30 PM',  label: 'Desk dinner' },
+  { day: 2, start: '11:00 PM',  end: '11:45 PM', label: 'Commute home' },
+  { day: 2, start: '11:45 PM',  end: '12:15 AM', label: 'From-home late finish' },
+  // Wednesday (3)
+  { day: 3, start: '9:00 AM',   end: '10:00 AM', label: 'Arrival and overnight triage' },
+  { day: 3, start: '1:00 PM',   end: '1:30 PM',  label: 'Desk lunch' },
+  { day: 3, start: '2:15 PM',   end: '2:30 PM',  label: 'Reset between the process call and the scrub' },
+  { day: 3, start: '3:30 PM',   end: '5:30 PM',  label: 'Afternoon production while the book goes to the MD' },
+  { day: 3, start: '5:30 PM',   end: '7:30 PM',  label: 'MD clearance markup lands, second-wave, and dinner' },
+  { day: 3, start: '1:00 AM',   end: '1:45 AM',  label: 'Commute home' },
+  // Thursday (4)
+  { day: 4, start: '9:00 AM',   end: '10:00 AM', label: 'Arrival and overnight triage' },
+  { day: 4, start: '10:00 AM',  end: '10:20 AM', label: 'Internal pre-client huddle' },
+  { day: 4, start: '10:20 AM',  end: '11:00 AM', label: 'Prep for the client session' },
+  { day: 4, start: '12:00 PM',  end: '12:20 PM', label: 'Post-session debrief with Danny' },
+  { day: 4, start: '12:20 PM',  end: '1:00 PM',  label: 'Desk lunch' },
+  { day: 4, start: '5:00 PM',   end: '6:45 PM',  label: 'Draft send-up and second-wave landing' },
+  { day: 4, start: '6:45 PM',   end: '7:30 PM',  label: 'Desk dinner' },
+  { day: 4, start: '11:30 PM',  end: '12:15 AM', label: 'Commute home' },
+  { day: 4, start: '12:15 AM',  end: '12:45 AM', label: 'From-home late finish' },
+  // Friday (5)
+  { day: 5, start: '9:00 AM',   end: '10:15 AM', label: 'Arrival and overnight triage' },
+  { day: 5, start: '10:15 AM',  end: '10:30 AM', label: 'Danny desk-side sync' },
+  { day: 5, start: '1:00 PM',   end: '1:30 PM',  label: 'Desk lunch' },
+  { day: 5, start: '4:00 PM',   end: '4:30 PM',  label: 'Short reset before the release check' },
+  { day: 5, start: '7:00 PM',   end: '7:45 PM',  label: 'Release granted, commute home' },
+]
+
+// Day-in-the-Life — one curated representative day (5 blocks), transcribed from
+// IB_SellSide_Day_in_the_Life_V1.md. The day is assembled from full-week master
+// Blocks 3, 9, 10, 11, and 12 threaded into one continuous Wednesday, so it has
+// its own standalone numbering and single-day timing. [Individual Work Block]
+// maps to 'independent' and [Internal Team Meeting] to 'team', as in the week.
+const KESTREL_DITL: TimeBlock[] = [
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b1', 1, '9:30 to 11:30 AM',  'Building the buyer list',                'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b2', 1, '11:30 AM to 1:00 PM', 'Drafting the growth and risk sections', 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b3', 1, '1:30 to 2:15 PM',   'The weekly process call',                'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b4', 1, '2:30 to 3:30 PM',   'The buyer-list scrub',                   'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b5', 1, '7:30 PM to 1:00 AM', "Turning the MD's marks, past midnight", 'independent'),
+]
+
+// The single greyed, non-enterable connector the DITL source defines, between the
+// buyer-list scrub and the night turn. Times carry explicit AM/PM to match the
+// Kestrel week, whose day runs past midnight.
+const KESTREL_DITL_CONNECTORS: ConnectorSlot[] = [
+  { day: 1, start: '3:30 PM', end: '7:30 PM', label: 'The VP-cleared book goes up to Warren, who gets to it only after his external appointments; his top-of-chain markup lands a little after seven, and dinner is at the desk before the turn.' },
+]
+
 // ── CAREER_SIMS ─────────────────────────────────────────────────────────────────
 
 export const CAREER_SIMS: CareerSim[] = [
@@ -298,12 +449,34 @@ export const CAREER_SIMS: CareerSim[] = [
     careerId:   'ib-analyst',
     careerSlug: 'investment-banking-analyst',
     title:      'Investment Banking Analyst',
-    // IB is hidden behind "Coming Soon"; no orientation authored yet.
     scenarios: [
+      // Project Kestrel — the live IB project. Larkin Reed's sell-side M&A
+      // engagement for Halloran Foods: four-reading Orientation and the full
+      // Monday-to-Saturday week (19 blocks, 32 connectors), plus the curated
+      // five-block Day-in-the-Life (1 connector). It is IB's only VISIBLE project
+      // (Apex below is hidden), so the hub uses single-project framing.
+      {
+        id:       'ib-analyst-project-kestrel',
+        slug:     'kestrel',
+        title:    'Project Kestrel',
+        scenario: 'Larkin Reed, a boutique investment bank, is running the sale of Halloran Foods, a founder-owned premium sauces and condiments maker. You are shadowing the first-year analyst on the deal team as they take the business to market.',
+        project:  'Halloran Foods Sell-Side M&A — Project Kestrel',
+        tiers: {
+          orientation:   KESTREL_ORIENTATION,
+          'day-in-life': KESTREL_DITL,
+          full:          KESTREL_FULL,
+        },
+        connectors:     KESTREL_CONNECTORS,
+        ditlConnectors: KESTREL_DITL_CONNECTORS,
+      },
+      // Project Apex — legacy IB demo (TechVentures buy-side). Hidden so it is not
+      // surfaced in any picker; data + direct-URL routes still resolve. Superseded by
+      // Kestrel; kept (not deleted) pending a decision to remove it later.
       {
         id:       'ib-analyst-project-apex',
         slug:     'project-apex',
         title:    'Project Apex',
+        hidden:   true,
         scenario: 'GlobalCorp has retained your bank to advise on a potential $2.5B acquisition of TechVentures Inc., a high-growth SaaS company. You are the lead analyst on the deal team.',
         project:  'TechVentures Acquisition — Project Apex',
         tiers: {

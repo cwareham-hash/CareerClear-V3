@@ -94,7 +94,7 @@ export const CAREERS: Career[] = [
     description:
       'Support senior bankers in executing mergers, acquisitions, and capital raises through advanced financial modeling, pitch book creation, and rigorous due diligence work.',
     skills: ['Financial Modeling', 'Valuation', 'Excel', 'Due Diligence', 'PowerPoint'],
-    hasSimulation: false,
+    hasSimulation: true,
   },
   {
     id: 'management-consultant',

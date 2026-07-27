@@ -7,7 +7,8 @@
 
 import type { ReactNode } from 'react'
 import { Clock, Lightbulb, CheckCircle, FileText } from 'lucide-react'
-import type { TimeBlockContent } from '@/lib/simulation'
+import type { TimeBlockContent, ArtifactType, HtmlArtifactSpec } from '@/lib/simulation'
+import { HtmlArtifact } from './HtmlArtifact'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -350,18 +351,20 @@ function ScriptLineItem({ line, index }: { line: ScriptLine; index: number }) {
 
 // ── Exported section components ───────────────────────────────────────────────
 
-export function BeforeSection({ content }: { content: string }) {
+export function BeforeSection({ content, showHeader = true }: { content: string; showHeader?: boolean }) {
   return (
     <div
       className="rounded-[10px] p-4"
-      style={{ backgroundColor: '#f7f7f5', border: '1px solid #e5e7eb' }}
+      style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
     >
-      <div className="flex items-center gap-2 mb-3">
-        <Clock size={13} aria-hidden="true" style={{ color: 'var(--color-muted)', flexShrink: 0 }} />
-        <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide">
-          Before: Setting the Scene
-        </p>
-      </div>
+      {showHeader && (
+        <div className="flex items-center gap-2 mb-3">
+          <Clock size={13} aria-hidden="true" style={{ color: 'var(--color-muted)', flexShrink: 0 }} />
+          <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide">
+            Before: Setting the Scene
+          </p>
+        </div>
+      )}
       <p className="font-sans text-[15px] text-dark leading-relaxed">{content}</p>
     </div>
   )
@@ -428,9 +431,84 @@ export function ArtifactSection({ content }: { content: string }) {
   )
 }
 
+// Renders a chunk of screenplay/prose text (no "During" label). Used to render
+// the text segments on either side of an inline artifact marker.
+function ScriptLines({ content, asProse }: { content: string; asProse?: boolean }) {
+  if (asProse) return <Markdown source={content} />
+  return (
+    <>
+      {parseScriptLines(content).map((line, i) => (
+        <ScriptLineItem key={i} line={line} index={i} />
+      ))}
+    </>
+  )
+}
+
+// A self-contained HTML artifact with its "Artifact N" caption. Renders full
+// width (it breaks out of the narrow prose column in the split layout), with no
+// Meridian "Work Product" card chrome (the artifact brings its own). The artifact
+// type is retained in the data model and still drives the panel width profile
+// (see panelMaxWidthFor); it is intentionally no longer shown in the caption.
+function InlineHtmlArtifact({ n, html }: { n: number; html: string }) {
+  return (
+    <div className="w-full">
+      <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-2">
+        Artifact {n}
+      </p>
+      <HtmlArtifact html={html} />
+    </div>
+  )
+}
+
+// One item in a block's vertical flow: a prose segment (narrow in the split
+// layout) or a full-width HTML artifact.
+type FlowNode =
+  | { kind: 'prose'; key: string; node: ReactNode }
+  | { kind: 'artifact'; key: string; n: number; html: string; type: ArtifactType }
+
+// Split one section's raw text on {{artifact:N}} markers into flow nodes: prose
+// segments (each rendered via renderSegment) interleaved with the referenced HTML
+// artifacts, in reading order. A marker whose artifact exists is recorded in
+// `consumed` (so it is not also rendered at the end); a marker with no matching
+// artifact renders nothing and does not error.
+function splitSectionOnMarkers(
+  source: string,
+  artifacts: Record<number, HtmlArtifactSpec> | undefined,
+  consumed: Set<number>,
+  keyPrefix: string,
+  renderSegment: (text: string, isFirst: boolean) => ReactNode,
+): FlowNode[] {
+  const flow: FlowNode[] = []
+  const re = /\{\{artifact:(\d+)\}\}/g
+  let last = 0
+  let seg = 0
+  let m: RegExpExecArray | null
+
+  const pushProse = (text: string) => {
+    if (!text.trim()) return
+    flow.push({ kind: 'prose', key: `${keyPrefix}-t${seg}`, node: renderSegment(text, seg === 0) })
+    seg++
+  }
+
+  while ((m = re.exec(source)) !== null) {
+    pushProse(source.slice(last, m.index))
+    const n = Number(m[1])
+    const spec = artifacts?.[n]
+    if (spec) {
+      flow.push({ kind: 'artifact', key: `${keyPrefix}-a${n}`, n, html: spec.html, type: spec.type })
+      consumed.add(n)
+    }
+    last = m.index + m[0].length
+  }
+  pushProse(source.slice(last))
+  return flow
+}
+
 // The block body: renders only the sections that have content, in reading order
 // (Before → During → Commentary → Work Product → After). An empty `after` (or
 // any empty field) is omitted entirely, so there are no hollow section boxes.
+// HTML artifacts render inline at their {{artifact:N}} marker (breaking out of
+// the narrow prose column), or — if unmarked — at the end of the block.
 export function BlockBody({
   content,
   briefing,
@@ -444,33 +522,72 @@ export function BlockBody({
   // Orientation reading) renders a single column exactly as before.
   proseWidthClass?: string
 }) {
-  const hasBefore     = !!content.before?.trim()
-  const hasScript     = !!content.simulatedWork?.trim()
-  const hasCommentary = !!content.commentary?.trim()
-  const hasArtifact   = !!content.artifact?.trim()
-  const hasAfter      = !!content.after?.trim()
+  const hasBefore        = !!content.before?.trim()
+  const hasScript        = !!content.simulatedWork?.trim()
+  const hasCommentary    = !!content.commentary?.trim()
+  const hasArtifact      = !!content.artifact?.trim()
+  const artifactsHtml    = content.artifactsHtml
+  const hasHtmlArtifacts = !!artifactsHtml && Object.keys(artifactsHtml).length > 0
+  const hasAnyArtifact   = hasArtifact || hasHtmlArtifacts
+  const hasAfter         = !!content.after?.trim()
   // "During" label only when the script sits alongside other sections.
-  const showDuringLabel = hasBefore || hasCommentary || hasArtifact || hasAfter
+  const showDuringLabel = hasBefore || hasCommentary || hasAnyArtifact || hasAfter
 
-  const before     = hasBefore     && <BeforeSection content={content.before} />
-  const script     = hasScript     && <ScriptSection content={content.simulatedWork} asProse={briefing} showLabel={showDuringLabel} />
-  const commentary = hasCommentary && <CommentarySection content={content.commentary} />
-  const artifact   = hasArtifact   && <ArtifactSection content={content.artifact!} />
-  const after      = hasAfter      && <AfterSection content={content.after} />
+  // Build the vertical flow, placing HTML artifacts at their inline markers.
+  const consumed = new Set<number>()
+  const flow: FlowNode[] = []
 
-  // Split layout: prose in a narrow centered column, artifact full width. Reading
-  // order (Before → During → Commentary → Work Product → After) is preserved.
+  if (hasBefore) {
+    flow.push(...splitSectionOnMarkers(content.before, artifactsHtml, consumed, 'before',
+      (t, first) => <BeforeSection content={t} showHeader={first} />))
+  }
+  if (hasScript) {
+    flow.push(...splitSectionOnMarkers(content.simulatedWork, artifactsHtml, consumed, 'script',
+      (t, first) => (
+        <div>
+          {first && showDuringLabel && (
+            <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-3">
+              During
+            </p>
+          )}
+          <ScriptLines content={t} asProse={briefing} />
+        </div>
+      )))
+  }
+  if (hasCommentary) {
+    flow.push(...splitSectionOnMarkers(content.commentary, artifactsHtml, consumed, 'commentary',
+      (t) => <CommentarySection content={t} />))
+  }
+
+  // Fallback: any HTML artifact not placed by a marker renders at the end of the
+  // block (Phase 4 behavior), in ascending artifact-number order.
+  if (hasHtmlArtifacts) {
+    for (const key of Object.keys(artifactsHtml!).map(Number).sort((a, b) => a - b)) {
+      if (!consumed.has(key)) {
+        const spec = artifactsHtml![key]
+        flow.push({ kind: 'artifact', key: `end-a${key}`, n: key, html: spec.html, type: spec.type })
+      }
+    }
+  }
+
+  // Markdown artifact (Meridian) is unchanged: its "Work Product" card renders at
+  // the end. A block is expected to use at most one artifact kind.
+  const markdownArtifact = hasArtifact ? <ArtifactSection content={content.artifact!} /> : null
+  const after = hasAfter ? <AfterSection content={content.after} /> : null
+
+  // Split layout: prose segments in a narrow centered column, artifacts full
+  // width. Non-split (mobile / Orientation): single column, artifacts inline.
   if (proseWidthClass) {
     return (
       <>
-        {(before || script || commentary) && (
-          <div className={`${proseWidthClass} mx-auto w-full flex flex-col gap-5`}>
-            {before}
-            {script}
-            {commentary}
-          </div>
+        {flow.map((f) =>
+          f.kind === 'prose' ? (
+            <div key={f.key} className={`${proseWidthClass} mx-auto w-full`}>{f.node}</div>
+          ) : (
+            <InlineHtmlArtifact key={f.key} n={f.n} html={f.html} />
+          ),
         )}
-        {artifact}
+        {markdownArtifact}
         {after && <div className={`${proseWidthClass} mx-auto w-full`}>{after}</div>}
       </>
     )
@@ -478,10 +595,14 @@ export function BlockBody({
 
   return (
     <>
-      {before}
-      {script}
-      {commentary}
-      {artifact}
+      {flow.map((f) =>
+        f.kind === 'prose' ? (
+          <div key={f.key}>{f.node}</div>
+        ) : (
+          <InlineHtmlArtifact key={f.key} n={f.n} html={f.html} />
+        ),
+      )}
+      {markdownArtifact}
       {after}
     </>
   )
@@ -494,7 +615,9 @@ export function CommentarySection({ content }: { content: string }) {
       className="rounded-[10px] p-4"
       style={{
         backgroundColor: 'var(--color-tag-bg)',
-        border: '1px solid #c8e6e2',
+        // Darker teal border (was #c8e6e2) so the light-teal box stays distinct
+        // against the cream reading field. Background + structure unchanged.
+        border: '1px solid #7fc8bd',
       }}
     >
       <div className="flex items-center gap-2 mb-3">
