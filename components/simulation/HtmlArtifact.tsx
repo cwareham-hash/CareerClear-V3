@@ -23,7 +23,12 @@ import { Maximize2, Minimize2 } from 'lucide-react'
 //
 // Expand: a top-right control blows the artifact up to a full-viewport overlay
 // portaled to document.body (so the reading panel's open/exit transform can never
-// trap it). Two portal realities shape the implementation:
+// trap it). The expanded artifact is scaled to FIT THE VIEWPORT WIDTH (minus a
+// margin) and nothing else: height never enters the scale. Fitting both axes made
+// tall artifacts (long OneNote pages, multi-slide decks) expand SMALLER than they
+// rendered inline, which defeats the point of expanding. A tall artifact therefore
+// overflows the viewport and the overlay scrolls it vertically; a short one is
+// centered as before. Two portal realities shape the implementation:
 //   1. This app's React event-delegation root does NOT contain document.body, so
 //      React onClick on the portaled overlay never fires. The backdrop, the stage,
 //      and the collapse button are therefore wired with NATIVE onclick via refs,
@@ -115,21 +120,27 @@ export function HtmlArtifact({ html }: { html: string }) {
     }
   }, [isExpanded])
 
-  // Expanded scale: fit to BOTH viewport dimensions (minus a margin). Deliberately
-  // NOT clamped to 1 — the artifact scales UP on large screens, since legibility
-  // is the whole point. One formula covers every artifact type (width is uniform
-  // at ~1360; only height varies), so no per-type branching.
+  // Expanded scale: fit to the viewport WIDTH (minus a margin), height ignored.
+  // Deliberately NOT clamped to 1 — the artifact scales UP on large screens, since
+  // legibility is the whole point. Because height is not a factor, a tall artifact
+  // ends up taller than the viewport; the overlay scrolls it (see below). One
+  // formula covers every artifact type (width is uniform at ~1360), so no
+  // per-type branching.
   const expandAvailW = (viewport?.w ?? 0) - EXPAND_MARGIN * 2
-  const expandAvailH = (viewport?.h ?? 0) - EXPAND_MARGIN * 2
-  const expandedScale = viewport
-    ? Math.min(expandAvailW / naturalW, expandAvailH / naturalH)
-    : 1
+  const expandedScale = viewport ? expandAvailW / naturalW : 1
   const expandedW = Math.round(naturalW * expandedScale)
+  // Real layout height for the wrapper. A CSS transform does not change layout
+  // size, so without this the scroll range would be computed from the artifact's
+  // UNSCALED height and the bottom would be unreachable (or overshoot). Same
+  // reason the inline wrapper sets `height: scaledH`.
   const expandedH = Math.round(naturalH * expandedScale)
 
   // Native click handlers for the portaled overlay (React onClick is dead there).
   // Callback refs set el.onclick once on mount.
-  const setBackdropRef = useCallback((el: HTMLDivElement | null) => {
+  // The scroll region doubles as the backdrop: it fills the overlay, so a click on
+  // any dimmed space around the artifact (the side margins, and the area above and
+  // below it) collapses. Clicks on the artifact itself are stopped by the stage.
+  const setScrollRef = useCallback((el: HTMLDivElement | null) => {
     if (el) el.onclick = () => setIsExpanded(false)
   }, [])
   const setStageRef = useCallback((el: HTMLDivElement | null) => {
@@ -187,47 +198,71 @@ export function HtmlArtifact({ html }: { html: string }) {
         isExpanded &&
         createPortal(
           <motion.div
-            ref={setBackdropRef}
-            className="fixed inset-0 z-[100] flex items-center justify-center"
+            className="fixed inset-0 z-[100]"
             style={{ backgroundColor: 'rgba(0,0,0,0.72)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
-            {/* Artifact stage. Native onclick stopPropagation means a click on the
-                artifact does nothing; only the backdrop collapses. */}
-            <motion.div
-              ref={setStageRef}
-              className="relative"
-              style={{ width: expandedW, height: expandedH }}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+            {/* The scroll region. Vertical only — a fit-to-width artifact is never
+                wider than the viewport, so horizontal scrolling is disabled outright.
+                The iframe sets pointer-events: none, so a wheel event over the
+                artifact falls through to this container and scrolls it.
+                The side margins come from the stage's own `margin: auto`, NOT from
+                horizontal padding here: a vertical scrollbar shrinks this element's
+                content box, and padding-based margins would then squeeze the artifact
+                a scrollbar-width narrower than the width the scale was computed from.
+                Vertical padding is safe (it cannot affect width) and gives the top and
+                bottom breathing room. */}
+            <div
+              ref={setScrollRef}
+              className="absolute inset-0 overflow-y-auto overflow-x-hidden flex"
+              style={{ paddingTop: EXPAND_MARGIN, paddingBottom: EXPAND_MARGIN }}
             >
-              <iframe
-                srcDoc={html}
-                title="Work product (expanded)"
-                sandbox="allow-same-origin"
-                scrolling="no"
-                style={{
-                  width: naturalW,
-                  height: naturalH,
-                  border: 0,
-                  display: 'block',
-                  transform: `scale(${expandedScale})`,
-                  transformOrigin: 'top left',
-                  pointerEvents: 'none',
-                }}
-              />
-              <button
-                ref={setCollapseBtnRef}
-                type="button"
-                aria-label="Collapse artifact"
-                className={`absolute top-2 right-2 z-10 ${controlChip}`}
+              {/* Artifact stage. `margin: auto` inside the flex container centers a
+                  short artifact on both axes and collapses to zero once the artifact
+                  is taller than the region, so a tall one starts at its top and
+                  scrolls rather than having its head clipped (which is what
+                  align-items: center would do). Native onclick stopPropagation means
+                  a click on the artifact does nothing; only the backdrop collapses. */}
+              <motion.div
+                ref={setStageRef}
+                className="relative shrink-0"
+                style={{ width: expandedW, height: expandedH, margin: 'auto' }}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
               >
-                <Minimize2 size={16} aria-hidden="true" />
-              </button>
-            </motion.div>
+                <iframe
+                  srcDoc={html}
+                  title="Work product (expanded)"
+                  sandbox="allow-same-origin"
+                  scrolling="no"
+                  style={{
+                    width: naturalW,
+                    height: naturalH,
+                    border: 0,
+                    display: 'block',
+                    transform: `scale(${expandedScale})`,
+                    transformOrigin: 'top left',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </motion.div>
+            </div>
+
+            {/* Collapse control. Deliberately a SIBLING of the scroll region rather
+                than a child of the stage, so it is positioned against the fixed
+                overlay and stays put at the top right of the viewport no matter how
+                far the artifact is scrolled. */}
+            <button
+              ref={setCollapseBtnRef}
+              type="button"
+              aria-label="Collapse artifact"
+              className={`absolute top-4 right-4 z-10 ${controlChip}`}
+            >
+              <Minimize2 size={16} aria-hidden="true" />
+            </button>
           </motion.div>,
           document.body,
         )}
