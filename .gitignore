@@ -41,3 +41,7 @@ next-env.d.ts
 
 # content integration scratch drafts (source .md + generator, not shipped)
 /_content-integration/
+
+# local audit reports and pre-edit file backups (working notes, not shipped)
+/.audit/
+/.backups/

@@ -336,10 +336,9 @@ const MERIDIAN_DITL_CONNECTORS: ConnectorSlot[] = [
 // ── Investment Banking — Project Kestrel ───────────────────────────────────────
 
 // Project Kestrel — Larkin Reed sell-side M&A (Halloran Foods). Ids follow the
-// Meridian scheme with a "kestrel" project segment. PHASE 3 SLICE: the four real
-// Orientation readings and the first three real Full-Simulation blocks (Monday,
-// Blocks 1–3) are transcribed in lib/content/ib-analyst-kestrel.ts. The rest of
-// the week is Phase 5; the Day-in-the-Life tier is still a stub (see below).
+// Meridian scheme with a "kestrel" project segment. All three tiers are now real:
+// the four Orientation readings, the full Monday-to-Saturday week, and the curated
+// five-block Day-in-the-Life, all transcribed in lib/content/ib-analyst-kestrel.ts.
 const KESTREL_ORIENTATION: TimeBlock[] = [
   makeBlock('ib-analyst', 'ib-analyst-kestrel-orientation-b1', 1, '~3 min read', 'The industry and the firm',    'learning', true),
   makeBlock('ib-analyst', 'ib-analyst-kestrel-orientation-b2', 1, '~3 min read', 'The deal',                     'learning', true),
@@ -421,9 +420,24 @@ const KESTREL_CONNECTORS: ConnectorSlot[] = [
   { day: 5, start: '7:00 PM',   end: '7:45 PM',  label: 'Release granted, commute home' },
 ]
 
+// Day-in-the-Life — one curated representative day (5 blocks), transcribed from
+// IB_SellSide_Day_in_the_Life_V1.md. The day is assembled from full-week master
+// Blocks 3, 9, 10, 11, and 12 threaded into one continuous Wednesday, so it has
+// its own standalone numbering and single-day timing. [Individual Work Block]
+// maps to 'independent' and [Internal Team Meeting] to 'team', as in the week.
 const KESTREL_DITL: TimeBlock[] = [
-  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b1', 1, '9:00 to 9:30 AM',  'Placeholder — DITL stand-up',  'team'),
-  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b2', 1, '10:00 to 1:00 PM', 'Placeholder — DITL deep work', 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b1', 1, '9:30 to 11:30 AM',  'Building the buyer list',                'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b2', 1, '11:30 AM to 1:00 PM', 'Drafting the growth and risk sections', 'independent'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b3', 1, '1:30 to 2:15 PM',   'The weekly process call',                'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b4', 1, '2:30 to 3:30 PM',   'The buyer-list scrub',                   'team'),
+  makeBlock('ib-analyst', 'ib-analyst-kestrel-dil-d1-b5', 1, '7:30 PM to 1:00 AM', "Turning the MD's marks, past midnight", 'independent'),
+]
+
+// The single greyed, non-enterable connector the DITL source defines, between the
+// buyer-list scrub and the night turn. Times carry explicit AM/PM to match the
+// Kestrel week, whose day runs past midnight.
+const KESTREL_DITL_CONNECTORS: ConnectorSlot[] = [
+  { day: 1, start: '3:30 PM', end: '7:30 PM', label: 'The VP-cleared book goes up to Warren, who gets to it only after his external appointments; his top-of-chain markup lands a little after seven, and dinner is at the desk before the turn.' },
 ]
 
 // ── CAREER_SIMS ─────────────────────────────────────────────────────────────────
@@ -438,9 +452,9 @@ export const CAREER_SIMS: CareerSim[] = [
     scenarios: [
       // Project Kestrel — the live IB project. Larkin Reed's sell-side M&A
       // engagement for Halloran Foods: four-reading Orientation and the full
-      // Monday-to-Saturday week (19 blocks, 32 connectors). It is IB's only VISIBLE
-      // project (Apex below is hidden), so the hub uses single-project framing. The
-      // Day-in-the-Life tier is still a stub, pending its own curated source.
+      // Monday-to-Saturday week (19 blocks, 32 connectors), plus the curated
+      // five-block Day-in-the-Life (1 connector). It is IB's only VISIBLE project
+      // (Apex below is hidden), so the hub uses single-project framing.
       {
         id:       'ib-analyst-project-kestrel',
         slug:     'kestrel',
@@ -452,7 +466,8 @@ export const CAREER_SIMS: CareerSim[] = [
           'day-in-life': KESTREL_DITL,
           full:          KESTREL_FULL,
         },
-        connectors: KESTREL_CONNECTORS,
+        connectors:     KESTREL_CONNECTORS,
+        ditlConnectors: KESTREL_DITL_CONNECTORS,
       },
       // Project Apex — legacy IB demo (TechVentures buy-side). Hidden so it is not
       // surfaced in any picker; data + direct-URL routes still resolve. Superseded by

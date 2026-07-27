@@ -28,6 +28,7 @@ import { artifact18Html } from './artifacts/artifact-18-turntracker'
 // Sources (transcribed verbatim; prose not paraphrased or trimmed):
 //   IB_SellSide_Orientation_V1.md        (four briefing readings)
 //   IB_SellSide_Full_Week_Master_V2.md   (full week; Blocks 1–3 here)
+//   IB_SellSide_Day_in_the_Life_V1.md    (the curated five-block Day in the Life)
 //
 // Field mapping per block (see BlockContent.tsx for how each renders):
 //   ORIENTATION readings render as briefing prose (the briefing flag in
@@ -984,5 +985,277 @@ Sabrina: Last thing, I note what I pick up first Monday, so the setup's real and
 
 The small comment's turned and Monday's set up, and the one real thing still open is the clause, out with counsel, not resolved and not pretending to be. Monday the book starts climbing the chain again on its next cycle.`,
     after: ``,
+  },
+  // ── Day in the Life (five curated blocks, one continuous Wednesday) ────────
+  // Transcribed from IB_SellSide_Day_in_the_Life_V1.md. The day is assembled
+  // from full-week master Blocks 3, 9, 10, 11, and 12; its seven artifacts are
+  // the same modules those master blocks use (Globals 4, 5, 10, 11, 12, 13, 14),
+  // renumbered per block from 1 as the source tokens do.
+  'ib-analyst-kestrel-dil-d1-b1': {
+    before: `The book is up the chain and out of Sabrina's hands for a stretch, so she moves to the thing that does not need it, which is the buyer list. The buyer list is open, a working spreadsheet with three tier headers and only a few names under them. Capital IQ is open in the other window; it is the paid database bankers screen companies and investors in, the tool an analyst lives in to find and sort potential buyers by industry, size, and geography.`,
+    simulatedWork: `[The buyer list is open. Three tier headers, Tier 1, Tier 2, Tier 3, and under them almost nothing.]
+
+Sabrina: I start on the strategic side, because that screen is cleaner. In Capital IQ I'm filtering for companies in packaged food and condiments, revenue big enough to write a two-hundred-million check without it being a bet-the-company deal for them, headquartered somewhere that makes sense, North America first. The screen kicks back a few dozen names.
+
+[She works down the screen output, name by name.]
+
+Sabrina: Take the big branded-foods houses, the ones that already sell a dozen sauces and dressings into the same grocery aisles Halloran sits in. One of those goes straight into Tier 1, and the reason goes right next to it. They already own the shelf space and the distribution, so buying Halloran isn't a bet on whether they can sell it, it's just folding one more line into trucks and relationships they already run. A strategic that can plug it into what they've already got pays the most, because the deal is worth more in their hands than in anybody else's. That's what a Tier 1 is, the buyer the whole process is built to reach.
+
+[She stops on a different name, looks at it, and pulls up its ownership before doing anything with it.]
+
+Sabrina: Here's one that looks like the same thing on the screen and isn't. There's a company right in the adjacency, makes salad dressings and marinades, exactly the kind of strategic you'd want to lead with. But I half remember it got bought by a sponsor a couple of years ago, so before I write it into Tier 1 I pull its ownership in Capital IQ, because if I'm right that changes everything. And I'm right, it's sponsor-owned now. That means it's not a strategic with its own balance sheet anymore, it's a portfolio company that has to go back to its private equity owner and ask for the money, which is a slower, less certain buyer. That's why it comes off the strategic tier and drops into a note instead, a possible sponsor-backed add-on, which is a different call for a different day. The screen would have left it sitting in Tier 1 looking perfect. Checking the ownership before I trust the screen is the difference between a real name and a wrong one.
+
+[She scrolls back up the strategic screen and stops on one more name before switching sides.]
+
+Sabrina: One more on the strategic side that's a judgment call, not a screen result. There's a foreign player, a European condiments group, right size, right products, exactly the kind of name a broad process wants in the room. But it's a cross-border deal for a founder-owned business, which means a slower diligence, a foreign buyer's committee, currency and financing that all take longer. It stays on the list, because a foreign strategic can pay up to get into the U.S. market and that's worth having at the table, but it gets a note next to it that says cross-border, longer timeline, not a first call. That's the kind of thing the screen can't tell me and the seniors will want flagged, not buried three tiers down with no reason.
+
+[She switches windows to the sponsor side of the list.]
+
+Sabrina: Now the financial sponsors, the private equity funds, and this side is messier, because there are hundreds of funds and the screen alone gives me noise. I filter for funds that do food and consumer, in the right check size, and that already own something in the space, because a fund with a condiment company or a specialty-food platform already has a thesis and a management team who could actually run Halloran. Those are the ones who move fast. I pull maybe fifteen and start a one-line rationale next to each, because when Warren scrubs this he's not going to read a name with no reason next to it, and a name with no rationale is a name I'll have to defend later.
+
+[A new-mail chime. She glances at it and stops.]
+
+Sabrina: That's Marisol, the CFO's side, and she's finally sent over the customer contracts folder, the one we've been chasing for a week. This can't sit, and here's why. A client document like this arrives, lands in an inbox, and gets buried under the next thing, and then two weeks from now a buyer asks for it in diligence and we're the ones who lost it. The rule is you log it and index it the moment it lands, while you're still the person who knows it landed. The buyer list goes on hold, mid-rationale, and I go deal with the folder.
+
+[She opens the diligence tracker, the running checklist of every document requested from the client.]
+
+{{artifact:1}}
+
+Sabrina: The tracker is my checklist of everything we've asked the client for, what's in, what's still outstanding, and who owns it. I find the line for the customer contracts, it's been sitting on outstanding with a chase date next to it, and I move it to received and stamp today's date. Then the part that actually matters, which is getting the documents into the data room correctly, because how they go in is not obvious and getting it wrong is the kind of mistake a buyer's lawyers find.
+
+[She opens what Marisol sent and reads what is in it before touching the data room.]
+
+Sabrina: Here's what's actually in the folder, because it's never one clean file. There are a couple of executed contracts, signed, dated, final. There's one that's clearly a draft, marked draft in the footer, no signatures. And there are two that are the same agreement scanned twice at slightly different times. The data room is the online folder a buyer's lawyers get to read once they're in diligence, and the discipline is that it holds final and executed versions only, nothing else, because a buyer's lawyers read whatever is in there literally, as if we put it there on purpose. A draft sitting next to the signed version invites the question of why the terms are different and which one is real, and that is not a question you want to create.
+
+[She sorts the folder before anything goes near the room.]
+
+Sabrina: The executed contracts go into the data room, into the customer-contracts section, which is where a buyer's lawyer goes looking for exactly this. And they get named the way the room names everything, counterparty then date, so a stranger scrolling the folder sees them in an order that makes sense instead of whatever the client happened to call the file. The draft and the duplicate scan do not go in. They sit in a holding folder on our side, and I put one line in the tracker flagging that we've received a draft of the biggest customer contract and should ask Marisol whether it ever got signed, because if an executed version exists we want it in the room, and if it doesn't, that's a fact about the deal we need to know before a buyer finds it for us. I'm not the one who decides what that means. But I'm the one who noticed, so it goes in writing where Danny will see it.
+
+[She closes the tracker and the mail, and pulls the buyer list back up to where she left it.]
+
+Sabrina: Right, back to the list, and I've lost my thread a little. I was mid-rationale on the sponsor names. I find the fund I was on, finish its one-liner, and keep going down the fifteen. A couple of them I cut on a second look, because their food platform turns out to be in beverages or snacks, not center-of-plate condiments, and adjacency that's really just food-broadly isn't a reason a fund pays up for this. Those come out. The tighter the list is now, the less of Warren's time it burns when he scrubs it.
+
+[She fills the tier column as she goes, deciding each name rather than just listing it.]
+
+Sabrina: Take a name like the mid-sized regional foods company two states over. It makes sauces, it's the right size, and on the screen it looks respectable. But it isn't in Halloran's grocery aisles, its distribution is mostly foodservice, and it's never bought anything, so there's no evidence it even wants to. It's not a wrong name, it's a real buyer, so it doesn't come off the list. It just isn't a Tier 1, because Tier 1 is the buyer who pays the most and moves the fastest, and this one is neither. It goes into Tier 2, worth including, worth a reason next to it, not worth Warren's first phone call.
+
+[She scrolls to a fund near the bottom of the fifteen and looks at it for a second.]
+
+Sabrina: And then a name like the big generalist buyout fund with no food platform at all. Huge, plenty of money, could obviously write the check. But nothing in the space, no management team who knows the category, no thesis I can point to. That's a Tier 3. Not because it's a bad buyer, but because the only reason it's on the list is optionality, one more body at the table so the process looks competitive, which matters, because a buyer who thinks they're the only one bidding doesn't pay full price. That's the whole job of Tier 3, and it's a real job, it's just not a name I'd lead with. It goes in, with one honest line next to it that says exactly that, rounds out the field, no existing platform.
+
+[She works down the last of the names, then starts a second, less interesting column on the strategic tab.]
+
+Sabrina: And then the part nobody warns you about, which is that a name in a tier isn't a name we can reach yet. For the Tier 1 strategics I go find who actually gets the first call, the head of corporate development or the CFO, not the general info line, and there's no clean database for that. It's the company's own site, a press release naming who ran their last acquisition, sometimes a LinkedIn check to confirm the person is still there. I get maybe half of them clean and leave the rest with a blank in the contact column, because a wrong name in that column is worse than an empty one when Warren is about to pick up the phone.
+
+[She saves the sheet and reads back down the tier column one time.]
+
+Sabrina: It's not a finished list and it's nowhere near it, but it's a real first pass, names in tiers with a reason next to each, which is what it has to be before it goes anywhere near a senior.
+
+{{artifact:2}}`,
+    commentary: `This is the list of everyone we might take the company to when we launch, the strategics who'd want to own a premium sauce maker and the private equity funds who'd want to own the cash flow. Right now it's a spreadsheet with almost nothing in it. This morning I run the screens, pull the names, and start sorting them into tiers. I will send the first pass to Danny for a look when it holds together, and it goes in front of Priya and Warren later today, when they scrub it and add the names they know personally, the ones a screen won't make stand out.
+
+The list is a first pass now, tiers and rationales, and it turns a few more times before it's real. The contracts folder is handled, executed versions in the room, the draft flagged for Danny. Next it goes to Danny for a first read.
+
+---`,
+    after: ``,
+    artifactsHtml: { 1: { type: 'excel', html: artifact04Html }, 2: { type: 'excel', html: artifact05Html } },
+  },
+  'ib-analyst-kestrel-dil-d1-b2': {
+    before: `It is Wednesday morning, and the book is up the chain and out of Sabrina's hands for a stretch. Sabrina, the first-year Analyst, is at her desk producing the back sections that do not depend on the turn coming back: the growth section and the risk factors, the two sections a buyer reads to figure out the upside and what could go wrong, both still mostly skeleton. The management materials and the operating model are open alongside the draft. This is an individual work block, drafting those two sections with a stretch of buyer-list maintenance in between, and it runs until an NDA status change interrupts it.`,
+    simulatedWork: `[The growth section is open, mostly headers and a few bullets. The management materials and the model are open alongside.]
+
+Sabrina: The growth section is where a buyer decides how much upside they're paying for, so it can't read like a wish list, it has to read like a plan the company could actually execute. I've already got the top two ranked from the front-of-book work, the club-store annualization and the committed new lines, so the discipline back here is to build each one out properly: what it is, why it's real, what it's worth roughly, and what it depends on. The annualization first, because it's the most defensible. It's revenue from business already won that lands in full next year, so I write it as arithmetic on signed business, not a forecast: the program ran partway through last year, so the piece that wasn't in the full-year number lands next year, and I pull the run-rate off the model rather than estimating it, because a buyer's diligence team can hold that up against the contracts, which is exactly what makes it strong.
+
+Sabrina: Then the committed new lines into the co-packing capacity, which is real but softer, because "committed" is a claim a buyer will test. I write it carefully, pinned to what's actually committed rather than what the company hopes it becomes, because those are two different numbers and the second one falls apart in diligence. And I flag in my own note, in the margin of the draft where Danny will see it, that this one needs the actual purchase commitments behind it before it's final, so it's on the list to firm up rather than sitting as a confident number I can't back. The rest of the opportunities go into a ranked list underneath, each with a one-line size and a note on what it depends on, so a buyer sees we've thought about size and sequence instead of treating a new product and a new channel as the same thing. And the pricing upside, the soft piece, I keep out of the ranked opportunities and name it separately at the end as a lever a buyer can underwrite themselves, because the moment pricing sits inside the growth number a buyer discounts the whole thing.
+
+{{artifact:1}}
+
+[She moves to the risk factors section.]
+
+Sabrina: Then risk factors. A CIM that pretends there's no risk reads as either naive or hiding something, and both cost trust. The job is to name the real risks in a way that's honest but framed, the same move as the customer concentration up front. Customer concentration is the first one, and I can point it back to how the concentration paragraph up top already frames it, the long relationship and the term left on the contract, so the risk section names the exposure plainly and puts the mitigant right next to it rather than re-litigating the whole thing. Then the ordinary ones for a business like this. Input-cost exposure, because the commodities that go into a sauce move with the market and a buyer wants to know the company can pass cost through, so I name it and note the pricing mechanism that mitigates it. Food-safety and regulatory surface, because any manufacturer that puts food on grocery shelves carries it, so I name it plainly and note the compliance record. Each stated plainly, each with the mitigant next to it where there's a real one, because a risk with a credible mitigant reassures a buyer more than a risk left unmentioned.
+
+[She saves the section and switches to the buyer list for the breather.]
+
+Sabrina: I've been in prose for a couple of hours, so I switch to the buyer list for a stretch, which is a different kind of work, more sorting than writing. This isn't a re-tier, the tiers are set from the morning build, it's the maintenance: filling the last contact-detail gaps on the Tier 1 names I left blank and cleaning up the rationales so they read consistently, because Priya and Warren scrub this later today and a list where half the reasons are one style and half another looks sloppy. I go down and make each rationale the same shape, what the buyer is, why they're in this tier, what the catch is if there is one, so a senior reading down the column isn't re-parsing the format on every line.
+
+[A new-mail chime, and this one she stops for immediately.]
+
+Sabrina: And this one I stop for the second I see it, because it's the NDA tracker and it's a status change that can't sit. A buyer signed the NDA. That means a name that was a prospect is now a party who's allowed to receive materials, and the moment that happens the release status has to be updated so we know exactly who is cleared for what and when they cleared. This is the kind of thing that has to be logged the instant it happens, because two weeks from now, when we're distributing the book, the record of who signed and when is the thing that says whether it was okay to send it to them, and reconstructing that after the fact is how mistakes happen.
+
+[She opens the NDA tracker and logs the signed agreement.]
+
+{{artifact:2}}
+
+Sabrina: The buyer list goes on hold and I go to the NDA log, which is its own tracker, the running record of who we sent the teaser and NDA to, who signed, and the date each one executed. I find the name, move it from sent to signed, and stamp today's date, and here's the trap I check before I mark it clean: the name on the executed signature page isn't quite the name on our list. Our list has the parent, and the NDA came back signed by a subsidiary entity, because if the party who signed isn't the party we think signed, the release status is wrong and we could send the book to an entity that never actually bound itself. I read the signature block against the entity on the list, confirm the subsidiary is the right signing arm of the parent we tracked, and note the exact signing entity on the log so the record is precise. Then I update the release status to say this party is cleared to receive the CIM once we launch. Logged, dated, entity confirmed, status updated. That one couldn't wait, and now it's on the record while I'm still the person who saw it land.
+
+[She goes back to the buyer list and finds where she left off.]
+
+Sabrina: Back to the list, and I find the rationale I was mid-cleaning when the NDA landed. I finish standardizing the reasons down the Tier 1 names, fill the last two contact gaps I could confirm off a recent press release, and leave the ones I couldn't confirm blank rather than guess. The list's in good shape for the scrub now, tiers set, reasons consistent, most contacts found.
+
+[She returns to the risk section to finish it.]
+
+Sabrina: With the list settled I go back and finish the risk section, because I left it mid-way for the buyer-list stretch. I add the last couple of risk factors and their mitigants, a note on customer concentration on the retail side beyond the top account, and a line on the ordinary supply-chain exposure, then I read the section through once as a buyer would and make sure every risk named has a mitigant next to it and none of them reads as a company apologizing for itself. It reads right. Growth built, risk built, the list maintained, and the NDA event caught and logged with the right entity.`,
+    commentary: `This is my chance to draft the two back sections for real, the growth section and the risk factors, while the book is out of my hands up the chain. They're mostly still skeleton, so this morning is building them out, with a stretch on the buyer list in between. I start on growth, because it's the one that has to carry weight.
+
+The growth and risk sections are drafted and the list's ready for the scrub, and the signed NDA is logged and the release status current. Next is the process call this afternoon, where Priya runs the team through where every workstream stands, and after that the seniors scrub the buyer list. The book's still up the chain, so I'll find out where the comments land later.
+
+---`,
+    after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact10Html }, 2: { type: 'excel', html: artifact11Html } },
+  },
+  'ib-analyst-kestrel-dil-d1-b3': {
+    before: `Once a week the whole deal team gets on a call to take stock of where every workstream stands and what has to happen next, and it is run by Priya, the VP, who quarterbacks the deal day to day. On the call are Priya; Danny, the Associate; and Sabrina, the first-year Analyst. Warren, the MD, drops on for the top of it and then has to jump. This is a status-and-timeline call, not a working session: Priya drives the agenda, Danny reports on the deliverables, and Sabrina stays near-silent, giving a tight status only if she is asked a specific number. Sabrina has her running status list open, the one that tracks every open item across the book, the model, the buyer list, and the trackers, which is exactly what she checks against as each workstream comes up. Going into the call, that list shows the book climbing to Warren and the client session set for tomorrow.`,
+    simulatedWork: `[Priya is running the call. Warren is on but half in another window.]
+
+Priya: Let's keep this tight, I know everyone's mid-turn. Where's the book. Danny.
+
+Danny: Up with you as of this morning, heading to Warren today. It's been through the analyst turn and your structural comments, and the model-to-book cascade on the updated schedule from Marisol's side. Front's re-cut, market's moved up, growth's ranked and pinned to committed business, risk section drafted this morning. It's in good shape to go to the client tomorrow once Warren's cleared it.
+
+Priya: Good. Warren, you'll have it this afternoon. I'd like your marks tonight so it clears before the client call, because they're seeing the version you've blessed, not a version in flight. That's the whole reason the sequence runs this way, the book has to be off your desk before it's in front of Rick.
+
+Warren: You'll have them tonight. I've got the two external things this afternoon but I'll get to the book after. Keep the growth section honest, that's the one they'll push on tomorrow. If the number leans on pricing anywhere, pull it out and show it separately, because Rick will see a rich top line and assume we baked in price he can't hold.
+
+Priya: It's ranked and pinned to committed business, and the pricing's broken out as its own lever, not baked into the base. We'll walk the specifics before the call so we're aligned going in.
+
+Warren: Good. Then the front page, I want the demand leading and the plant underneath, the way we talked about. That's the version I'll clear.
+
+Priya: That's how it's cut. Buyer list. Where does that stand.
+
+Danny: First pass tiered. Sabrina, the count on Tier 1?
+
+Sabrina: About a dozen names across strategics and sponsors, with a reason next to each, and most of the Tier 1 contacts found.
+
+Priya: That's fine, leave the blanks rather than guess. Warren and I scrub it this afternoon, so I don't need it finished, I need it reasoned, which it sounds like it is. The blanks we'll fill from names we know anyway.
+
+Warren: I'll want the strategics ordered the way you and I talked about when we scrub it, and I've got a couple of names to add off relationships that won't be on any screen. I've got to jump. Priya, you've got the rest. Good work on the turn, all of you.
+
+[Warren drops off.]
+
+Priya: Tracker and data room. Anything still hanging.
+
+Danny: The customer contracts came in, executed versions are in the room. A few smaller items still outstanding, updated schedules, a supplier agreement, an org chart. Sabrina chased Marisol on those.
+
+Priya: Any of those block the book going to the client tomorrow?
+
+Danny: No. Sabrina held the one that was still a draft out of the room until we get the final, and the rest are diligence housekeeping that doesn't feed the current draft.
+
+Priya: Good call holding the draft out. Then we're clear for tomorrow. Timeline: book to Warren today, his marks tonight, cleared version to the client tomorrow, then we turn whatever they give us. The list gets scrubbed this afternoon and finalized later in the week. Danny, you're on the pre-client huddle in the morning to make sure we're aligned on which pages they're walking. Everyone knows their piece. Anything I'm missing.
+
+Danny: Nothing from me. We're on track.
+
+Priya: Good. Short one. Back to it.
+
+[The call ends. Sabrina updates her status list against what was just confirmed.]`,
+    commentary: `My job on this call is to have the right number ready if Priya turns to me, and to catch any gap between what the seniors think is done and what I'm actually carrying. As each workstream comes up I check what Priya and Danny say against my own list, so if there's a mismatch, I know it and can say it if asked. The whole call is really about getting everything lined up for the client session tomorrow.
+
+{{artifact:1}}
+
+Nothing on the call moved off what I already had, everyone's read of where things stand matches mine. The one thing to hold is that the outstanding tracker items don't block tomorrow, which I confirmed in the room. Next is the buyer-list scrub with Priya and Warren this afternoon, where the names I tiered meet the relationships only they can see.
+
+---`,
+    after: ``,
+    artifactsHtml: { 1: { type: 'document', html: artifact12Html } },
+  },
+  'ib-analyst-kestrel-dil-d1-b4': {
+    before: `The buyer list Sabrina built and tiered gets its first senior scrub this afternoon, and this is where the names a screen can surface meet the relationships only the senior bankers carry. In the room are Warren, the MD, who owns the client relationship and knows the buyer universe personally; Priya, the VP, who runs the deal day to day; and Sabrina, the first-year Analyst, whose list is on the screen. Danny, the Associate, is on another call and not in this one. Sabrina does not present the list and does not pitch names; she has it open, keeps it current as Warren and Priya add and cut, and captures every change exactly as they land. The list she built is the starting point, and the seniors are about to add names off relationships and cut names on judgment a screen never had.`,
+    simulatedWork: `[The buyer list is up on the screen, Sabrina's tiers and rationales visible. Warren has it open on his own screen too.]
+
+{{artifact:1}}
+
+Warren: Okay, let's go through it. Strategics first. The branded-foods houses, these are right, these are the calls we lead with. Add Coleman to Tier 1. They're not obvious off a screen because they've been quiet, but I know they've been looking to get into premium condiments and they've got the shelf space to make it work. Put them at the top.
+
+[Sabrina adds the name to Tier 1.]
+
+Priya: They came up on my screen too low because their public numbers understate the segment. Warren's right, they belong at the top.
+
+Warren: The European group, you've got them flagged cross-border, longer timeline. Keep them, that flag's right, but I'd move them up half a tier. A foreign strategic that wants into the U.S. market pays up, and this one specifically has tried to buy into the category twice and missed. They're more motivated than the flag makes them sound. Keep the note, though, the diligence really will run longer, a buyer needs to know that going in.
+
+[She moves the name up half a tier and keeps the note attached.]
+
+Priya: The regional foods maker two states over, you've got in Tier 2. That's right. They'd want it but they can't really pay for it, so they're a name that fills the room, not a name that wins it. Leave them exactly where they are.
+
+Warren: Agreed. And cut the generalist buyout fund with no platform. I know you put it in Tier 3 for optionality, and the logic's fine, but I don't want to spend a process managing a name that has no reason to lean in. We've got enough real optionality in the sponsors who actually own something in the space. Take it off. If we need bodies later we'll add them back, but I don't want it cluttering the first call list.
+
+[She removes the name.]
+
+Warren: Now, the one that matters. Rick's been clear he does not want the two direct competitors in this. There's one on your strategic tier, the one that makes the private-label lines for the same retailers. Cut it. Rick will not have his numbers sitting in a direct competitor's hands, and he's right, because if the deal doesn't happen, that competitor now knows his margins and his contracts. That's the client's call and it's a hard line.
+
+Priya: There's a second one that's close to that line, the ingredients supplier that's been moving downstream into finished product. Not a direct competitor today, but heading there.
+
+Warren: Leave that one on for now, but flag it, and I'll raise it with Rick before we send anything. His veto's absolute on the direct one, the borderline one I want him to make the call on, not us. Don't send either of those anywhere until Rick's confirmed the second one.
+
+[She cuts the direct competitor and flags the ingredients supplier as pending Rick's confirmation.]
+
+Priya: On the sponsors, the ones that own a real center-of-plate platform are the right Tier 1. Add Brightwater, they closed a specialty-foods platform last year that this would slot straight into, they just haven't shown up on a screen yet because the deal was private.
+
+Warren: Good add on Brightwater. A fund without a real platform in the category is a slow buyer that asks for too much diligence and pays like a financial buyer, not a strategic one. The ones you flagged as adjacency-that-isn't, keep them low, that's the right read.
+
+[She adds Brightwater to Tier 1.]
+
+Priya: That's the list, more or less. Sabrina, you've got all of it captured?
+
+Sabrina: All of it. Coleman and Brightwater into Tier 1, the European group up half a tier with the note kept, the direct competitor cut, the ingredients supplier flagged for Rick, the generalist fund off.
+
+Warren: Good. Get me the clean version and I'll do a last pass before we take contact strategy to Rick. Nice work on the reasons, made this fast.
+
+[Warren closes the list on his screen. Priya stays on to sort the next thing with Sabrina.]`,
+    commentary: `My job for the next hour is to hold the pen, not to defend my list. Warren and Priya add and cut on relationships and judgment a screen never had, and I capture every change exactly as it lands and keep the sheet clean while they decide. If I get a single change down wrong, the seniors act on the wrong list later, so the whole job is getting it exactly right in the moment.
+
+The list is the seniors' list now, their names added and their cuts made, and the two things I'm carrying out of it are the clean version for Warren's last pass and the one name flagged for Rick to decide. Next I clean it up and get it back to Warren, and the book's still up the chain with him for tonight.
+
+---
+
+> Connector (not entered). Late afternoon into evening. The VP-cleared book goes up to Warren, who gets to it only after his external appointments; his top-of-chain markup lands a little after seven, and dinner is at the desk before the turn.
+
+---`,
+    after: ``,
+    artifactsHtml: { 1: { type: 'excel', html: artifact13Html } },
+  },
+  'ib-analyst-kestrel-dil-d1-b5': {
+    before: `Dinner is long cleared off the desk. The book climbed the chain, and this afternoon it reached the top of it. Warren, the MD, took the VP-cleared version after his external appointments and sent his top-of-chain markup back a little after seven. This is the clearance turn, the last internal pass before the book goes to the client tomorrow, and the client only ever sees a version Warren has blessed. His marks are the highest-altitude of the week, fewer than the junior reviewers' but bigger and blunter, each one pulling to a whole section. There are a lot of them, and they landed late. The floor has emptied out. A few analysts are still heads-down. Sabrina pulls Warren's markup up beside the draft.`,
+    simulatedWork: `[Warren's markup is open on the left, the draft on the right.]
+
+{{artifact:1}}
+
+Sabrina: Starting at the top, and his first mark is on the exec-summary open, which I've already re-cut twice this week, once on Danny's "punch it" and once on Priya's re-cut to lead with demand. Warren's is a level above both. He's written that the first line still sounds like a company describing itself, and he wants it to sound like the reason a buyer picks up the phone. Even the demand-first version Priya landed on reads, to him, like we're telling the buyer what we are instead of what they get. I re-cut the opening so the very first clause is the thing a strategic repeats to their board, the shelf position and the pull, and the branded-platform description falls in behind it as support. Same facts a third time, a higher altitude on the order each time, and Warren's is the one that clears.
+
+[He has bracketed the whole growth section with a note.]
+
+Sabrina: Warren's marked the growth section and written that the ranking leans too hard on the pricing upside, pull it out of the base entirely and show it separately. I make the change: pricing comes out of the ranked base, the base now stands only on the club-store annualization and the committed lines, the business that's already signed, and pricing gets named separately underneath as a lever a buyer can underwrite on their own. It's a re-cut of how the ranked growth reads, so I note in the margin exactly what moved and why, per Warren's mark, so the next person up the chain sees on the first read that the ranking changed and doesn't have to reverse-engineer it.
+
+[She moves into the model, because the pricing change is not only words.]
+
+Sabrina: And that change isn't just a paragraph, because pricing being in the base or out of it is a number, not a sentence. It lives in the model. I go into the model, find where the pricing assumption feeds the projected revenue, and pull it out of the base build into its own line so the base number is only the signed business. That moves the projected total. Which means the growth figure in the book is now a version behind the model, the same cascade as always. I chase it: the base growth number in the exec summary, in the financial section, and in the growth section itself, each pulled across from the model, not retyped, so the book and the model agree on a base that no longer leans on price.
+
+[One of Warren's marks is a circled number with "doesn't tie, source it" beside it, the same shorthand Danny uses.]
+
+Sabrina: Warren's circled the adjusted-earnings base and written "doesn't tie, source it," and I know why before I check, because I just moved the base by pulling pricing out. "Doesn't tie" is a number not matching where it comes from. The adjusted-earnings bridge builds up off the projected base, and I just changed the base, so the bridge is starting from a stale number. Back into the model, take the current base off the summary tab now that pricing's out, bring it into the bridge, and re-walk the bridge from reported at the bottom up through each add-back to confirm it still lands right at the top. Then one level further, because the model line pulls from the revenue schedule, so I go to the schedule and confirm it still agrees after the pricing change. It does. The bridge ties to the model, the model ties to the schedule, all three walked, not assumed.
+
+[Another of Warren's marks is on the customer paragraph, a wording change over the top of the framing already built.]
+
+Sabrina: Warren's rewritten a line in the customer-concentration paragraph, the one framed off the executed contract earlier this week. His wording isn't a structural change, he wants the sentence about the contract term to read harder, more like a fact and less like reassurance. I keep the paragraph as it's built, the relationship length and the term as the moat, and I take Warren's exact words for the one sentence, because when the MD hands you the precise words he wants in a sentence a buyer will read, those are the words.
+
+[She works into a section Warren has bracketed with "this buries the lede, move it."]
+
+Sabrina: Then a straight MD-level re-order, which is bigger than a rewrite. He's bracketed the part of the business description that explains how the retail relationships actually work and written that it's buried, pull it up. He's right that a buyer wants it earlier, but a re-order is never just moving text, it's the numbering, the contents page, and every cross-reference that pointed at the old spot. I move the passage up, resequence the numbering around it, update the contents page, and then hunt the references: I search for the ones that name that passage by its old position, find two pointing at where it used to sit, and fix both. A book that cross-references a page that isn't there anymore is exactly what Priya catches cold in the morning, and this version is going to the client, so it can't have a broken reference in it.
+
+[It is past ten. Most of the marks are turned. A new mark lands from Warren.]
+
+Sabrina: It's past ten, I'm nearly down the markup, and a new comment comes in from Warren, because he's had another look. He wants the risk section's customer-concentration factor to point explicitly back to the framing up front, so the risk section and the summary tell the same story instead of the risk section re-raising the worry the summary already settled. It's real work: I go to the risk factor, rewrite it so it names the exposure and then points to how the front of the book already frames it, the term and the relationship, so a buyer reading the risk section doesn't hit a worry the summary already answered. One more mark, landed at ten, turned at ten.
+
+[She closes the markup and starts the two-pass close, heavier tonight than on a normal turn.]
+
+Sabrina: Now the close, and tonight it's heavier than a normal turn, because this is the version the client sees and there were a lot of marks, so a missed one isn't just a nit, it's the book going to Rick with a mark not turned. First pass, back to the top, down every one of Warren's marks against the draft with the markup open beside it, one at a time. The exec-summary re-cut, confirmed. The pricing pulled out of the base, confirmed in the words and confirmed in the model number that flowed from it. The doesn't-tie base, re-walked. The customer wording in Warren's exact words. The re-order and its two references. The ten o'clock risk-section mark. Each one confirmed against its mark, not from memory. Second pass, I close the markup and read the book front to back as a document, because the re-order and the pricing change moved things and the seams where sections join don't automatically still work. Two transitions need a rewrite so the new order reads like it was always the order, and one sentence that pointed forward at the growth ranking now points at a ranking that's changed, so it comes out.
+
+[The clock is past one. She writes the note that goes up with the file.]
+
+Sabrina: Last thing, the note up, and tonight it carries more than the usual "here's what changed," because there were so many marks. I write Danny and Priya exactly what moved: Warren's re-cut of the open, the pricing pulled out of the base per his mark and flagged in the margin at that spot, the base re-tied through the model and schedule after pricing came out, his exact wording on the customer sentence, the business-description re-order with its references chased, and the ten o'clock risk-section mark. The bigger moves I name specifically, so that whoever reads it next sees them on the first read instead of finding them after the client already has the book. Everything's turned. The book's clean, and it's the version that goes to the client in the morning.`,
+    commentary: `This is the clearance turn, and it's the last one before the client sees the book, so every one of Warren's marks has to turn tonight. His marks are fewer than Danny's were but they're bigger, blunt, each one pulling to a whole section instead of a line, and there are a lot of them. I work down his markup and turn every one of them, and this one doesn't end when I decide it's done. It ends when the book's clean and Warren's marks are all turned, whatever time that is.
+
+The book's cleared Warren, which means it's the version that goes to Rick tomorrow, and the note up names what moved so it reads clean first thing. I'll check with Danny that nothing else is landing before I go, because even at this hour you don't just leave, and then it's the car home. Tomorrow the book's in front of the client.
+
+---`,
+    after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: artifact14Html } },
   },
 }

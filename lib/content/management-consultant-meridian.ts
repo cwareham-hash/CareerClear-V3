@@ -1,37 +1,58 @@
 import type { TimeBlockContent } from '../simulation'
+import { meridianArtifact01Html }       from './artifacts/meridian-artifact-01-interviewguide'
+import { meridianArtifact02Html }       from './artifacts/meridian-artifact-02-themetracker'
+import { meridianArtifact03Html }       from './artifacts/meridian-artifact-03-themesummary'
+import { meridianArtifact04Html }       from './artifacts/meridian-artifact-04-skeletondeck'
+import { meridianArtifact05Html }       from './artifacts/meridian-artifact-05-rawnotes'
+import { meridianArtifact06Html }       from './artifacts/meridian-artifact-06-cleannotes'
+import { meridianArtifact07Html }       from './artifacts/meridian-artifact-07-gapsfirstdraft'
+import { meridianArtifact08MasterHtml } from './artifacts/meridian-artifact-08-gapsmarkup-master'
+import { meridianArtifact08DitlHtml }   from './artifacts/meridian-artifact-08-gapsmarkup-ditl'
+import { meridianArtifact09Html }       from './artifacts/meridian-artifact-09-gapsrevised'
+import { meridianArtifact10Html }       from './artifacts/meridian-artifact-10-smdeckreview'
+import { meridianArtifact11Html }       from './artifacts/meridian-artifact-11-engagementeconomics'
 
-// Management Consulting — Project Meridian (Meridian Park investor-portal
+// Management Consulting - Project Meridian (Meridian Park investor-portal
 // assessment, week 3 of a six-week engagement). Per-project content.
 //
-// V4 INTEGRATION: every field of every block re-transcribed from the V4 sources.
-// Nothing carries over from the prior (V3) integration. The block STRUCTURE
-// (20-block full week, 6-block Day-in-the-Life, 4-reading Orientation, the times,
-// titles, and connector schedule) lives in lib/simulation.ts and is unchanged.
+// V5 INTEGRATION: every field of every Full-Simulation and Day-in-the-Life block
+// re-transcribed from the V5 sources. The four Orientation readings are unchanged
+// (the V5 handoff carries no orientation changes). The block STRUCTURE (20-block
+// full week, 6-block Day-in-the-Life, 4-reading Orientation, the times, titles, and
+// connector schedule) lives in lib/simulation.ts and is unchanged; every block id
+// is frozen, because live Supabase user progress references it.
+//
+// The eleven Markdown `artifact:` work products the V4 integration carried are
+// superseded: all fifteen work products now arrive as self-contained HTML modules
+// in lib/content/artifacts/, placed at their inline artifact markers.
 //
 // Sources (transcribed verbatim; prose not paraphrased or trimmed):
-//   Meridian_Park_Full_Simulation_Master_V4.md   (full week, blocks 1–20)
-//   Meridian_Park_Day_in_the_Life_V4.md           (the standalone six-block DITL layer)
-//   Meridian_Park_Orientation_V3.md               (four briefing readings)
+//   Meridian_Park_Full_Simulation_Master_V5.md   (full week, blocks 1-20, 11 tokens)
+//   Meridian_Park_Day_in_the_Life_V5.md          (the six-block DITL layer, 4 tokens)
+//   MERIDIAN_ARTIFACT_CODING_HANDOFF_V1.md       (the 15 token rows and their markers)
+//   MERIDIAN_ARTIFACT_MANIFEST.md                (artifact types; onenote renders document)
+//   Meridian_Park_Orientation_V3.md              (four briefing readings, unchanged)
 //
 // Field mapping per block (see BlockContent.tsx for how each renders):
-//   before        ← "Setting the Scene"  (neutral 3rd person; block 8 also carries
-//                   its optional-second-interview navigation note)
-//   simulatedWork ← the scene: interview/meeting dialogue OR, for individual-work
-//                   blocks, the named working section(s) ("Sharpening the guide",
-//                   "Coding the interviews", …). "" where the block has no scene
-//                   (the dinner). Rendered as briefing prose for the learning block
-//                   and the four Orientation readings (the briefing flag in
-//                   lib/simulation.ts).
-//   commentary    ← "Over-the-shoulder, Carly"  (multiple beats joined in source order)
-//   artifact      ← "Artifact:" / "Work product"  (markdown; multiple artifacts concatenated)
-//   after         ← intentionally BLANK for every block
+//   before        <- "Setting the Scene", up to its first horizontal rule
+//   simulatedWork <- the scene: interview/meeting dialogue and, for individual-work
+//                    blocks, the named working sections ("Sharpening the guide",
+//                    "Coding the interviews", ...), joined in source order with the
+//                    section headings stripped. "" where the block has no scene (the
+//                    dinner). Rendered as briefing prose for the learning block and
+//                    the four Orientation readings (the briefing flag in
+//                    lib/simulation.ts).
+//   commentary    <- every "Over-the-shoulder, Carly" section, joined in source order
+//   after         <- intentionally BLANK for every block
 //
-// Transforms applied to the screenplay scene: V4 speaker labels **Name:** → Name:
-// and *italic* stage directions → [bracketed], so BlockContent's screenplay parser
-// reads them; interview beat headers (#### 1. …) are stripped so each interview
-// renders as one continuous conversation.
+// Transforms applied to the screenplay scene: V5 speaker labels **Name:** -> Name:
+// and *italic* stage directions -> [bracketed], so BlockContent's screenplay parser
+// reads them; interview beat headers (#### 1. ...) are stripped so each interview
+// renders as one continuous conversation. Artifact tokens sit exactly where the
+// sources place them.
 
 export const managementConsultantMeridianContent: Record<string, TimeBlockContent> = {
+  // -- Orientation (four readings, unchanged from the V4 integration) ---------
   'management-consultant-meridian-orientation-b1': {
     before: ``,
     simulatedWork: `Meridian Park is an alternatives manager. It invests money on behalf of large institutions and runs that money in private markets, meaning investments that are not bought and sold on public stock exchanges. Its two main products are private credit, privately negotiated loans to companies, and infrastructure, the long-lived physical assets like utilities and transport that generate steady cash flows over decades.
@@ -85,6 +106,8 @@ A few terms will come up often. They are worth knowing now so the conversations 
     commentary: ``,
     after: ``,
   },
+
+  // ── Full Simulation (20 blocks, Monday to Friday) ─────────────────────────
   'management-consultant-meridian-full-d1-b1': {
     before: `The team gathers in a team meeting room at the firm's New York office, its home base for the engagement, for the weekly kickoff. David, the Senior Manager who sits above Marcus, joins to do a pulse check at the halfway mark: what the interviews so far are surfacing, which working hypotheses the team is now testing, and what has to get done this week. Marcus, the Manager, runs the day-to-day. Carly has sat in on a string of the investor interviews and owns the synthesis and the first deck pages.`,
     simulatedWork: `David: Morning, both. Let's keep this to the half hour, I'm due on another call at the top of the hour. We're at the halfway mark, so before we get into this week I want to see where we stand, and I want to walk out with a clean read on what each of you is landing by Friday. Marcus, bring me up to speed on the interviews. Are we tracking to get through the full interview list with room to spare before the readout, and what are they telling us so far?
@@ -201,55 +224,14 @@ The fork is where I spend the most time, it's the whole hypothesis. When the por
 
 Then I trim to the clock, it's thirty minutes. The benchmark question stays, but phrased neutrally, where do your other managers sit, not where do your better managers sit, so I'm not planting a comparison that might not exist. The questions that don't test the split get shorter, not cut, in my back pocket to skip live rather than gone.
 
-Last, the tailoring note at the bottom, since this week's slate isn't uniform. Two corporate pensions and an endowment lean document, so those get marked for the board-ready probes. Two insurers lean data, so those get the feed and look-through probes, with a reminder to expect a wider score spread, their downstream is a regulator, not a board. A sovereign wealth allocator and a large family office are the first of either type on the slate, and I genuinely don't know which way they'll go, so the note says, for those, open on usage, let them set the frame, narrow later.`,
+Last, the tailoring note at the bottom, since this week's slate isn't uniform. Two corporate pensions and an endowment lean document, so those get marked for the board-ready probes. Two insurers lean data, so those get the feed and look-through probes, with a reminder to expect a wider score spread, their downstream is a regulator, not a board. A sovereign wealth allocator and a large family office are the first of either type on the slate, and I genuinely don't know which way they'll go, so the note says, for those, open on usage, let them set the frame, narrow later.
+
+{{artifact:1}}`,
     commentary: `We've got a couple of hypotheses now, so the guide I'm sharpening this morning has one job: test them, not fish. Most of the base questions stay. What I'm adding are the sharper probes that force the difference between an investor who wants a finished document and one who wants raw data, because that distinction is the through-line of the whole story. The pull is always to ask everything while I've got them on the call, so I'm reprioritizing toward the questions that actually test the hypotheses and giving less time to the ones that don't, rather than dropping anything good.
 
 That's the guide done, and it only really gets tested tomorrow, in the room, not here at my desk. A guide that reads well and quietly leads the witness is worse than a rough one that just lets the investor talk, so the version that matters is the one I'll adjust between calls once I see where it drags. For now it's ready. The rest of today turns from gathering to shaping, the tracker and then the first pass at the deck, but the guide's part is finished until it meets a live investor tomorrow morning.`,
     after: ``,
-    artifact: `### Artifact: Interview guide (week 3 fieldwork)
-
-**Meridian Park Investor Platform Assessment, investor discussion guide**
-Semi-structured. Roughly 30 minutes per call.
-
-**Working hypothesis this guide tests:** the portal delivers accurate data but leaves the last mile, the finished output the investor actually needs, to the investor, and the shape of that last mile differs by investor type (document-led versus data-led).
-
-**1. Framing and permission (about 3 minutes)**
-- Thank them, and acknowledge the busy season (quarter-end or statutory filing).
-- Scope: an outside read on how the portal works for the investors who use it.
-- Confidentiality: nothing attributed individually; everything synthesized into themes and recommendations for Meridian.
-- Time check and hard stop.
-
-**2. Warm-up, the person then the institution (about 5 minutes)**
-- Their role, tenure, and what they oversee. Confirm the title even if known.
-- The institution and what they are investing toward.
-- How long with Meridian, and in what product or allocation.
-
-**3. Core, portal usage and where it falls short (about 20 minutes)**
-- How and how often do they use the portal? When is it tested hardest (the reporting cycle)?
-- Where does it work well? (Credit the accurate data; it earns trust for the rest.)
-- Where does it create work? Open broad, then narrow to specifics.
-- Probe each gap, and pair each with the quantification follow-up:
-  - Consolidated capital activity: can they pull a period's calls and distributions in one clean view, or do they assemble it? Who does the assembly? (Quantify: how much analyst time per quarter?)
-  - Document search and retrieval: can they self-serve a specific past statement or notice, or go back to a person? (Quantify: how often, and how long to get it?)
-  - Onboarding and subscription: how does the paperwork go on a new fund? Does anything carry across? (Quantify: how many funds, how many times re-submitted?)
-  - Notifications: how do they find out a call or document has posted? Has a late notice ever cost them? What would actually help?
-- When the portal falls short, what is the finished thing they actually needed?
-  - If document-led (pension, endowment, foundation): is the missing piece a board-ready or committee-ready report?
-  - If data-led (insurer): is the missing piece structured data or a feed into their own systems for statutory, regulatory-capital, or asset-liability work? Probe look-through detail on holdings for capital charges.
-
-**4. Benchmark (about 5 minutes)**
-- One to ten, where does Meridian land? Where do their other managers sit?
-- If there are managers you think are doing better, what are they doing that Meridian is not?
-
-**5. Wrap (about 3 minutes)**
-- Anything we should have asked? Anything on their mind?
-- Note that Meridian is actively working to improve, that their feedback is valued and taken seriously, and thank them for their time.
-- Thanks.
-
-**How to tailor the guide to each investor on this week's slate:**
-- Two corporate pensions and one endowment: lean on the board-ready and committee-ready probes.
-- Two insurers (one life, one property and casualty): lean on the data-feed and look-through probes; expect a wider score spread, since the downstream work is regulatory.
-- One sovereign wealth allocator and one large family office: these are the first of either type on the slate, so they may take things in a different direction than the pensions and insurers have; open on usage and let them set the frame before narrowing.`,
+    artifactsHtml: { 1: { type: 'document', html: meridianArtifact01Html } },
   },
   'management-consultant-meridian-full-d1-b4': {
     before: `With the guide done, Carly turns to the running theme tracker: the master sheet where every completed interview gets coded into themes and the soft, felt complaints start becoming numbers the team can defend. This is where qualitative material becomes a finding. The artifact is the tracker as it stands at the week-3 midpoint, with twelve of the thirty interviews completed and coded.`,
@@ -265,50 +247,16 @@ Onboarding is the one coding call I have to think about. It's raised by about ha
 
 Then, across the whole matrix, the rows turn into the count, which is the part that earns the hour. One clunky-portal comment is an anecdote, the same complaint in most of the rows is a finding, and a finding with a number under it is harder to wave away. So I total each gap and work out the score spread, an average for Meridian against an average for the best other manager, carrying the quantified pain through wherever I harvested it. The spread says it on its own, the gap between the two averages isn't accuracy, everyone credits that, it's the last mile, the step from accurate data to the finished thing.
 
-The last thing I'm careful about is not overselling the thin columns. The data-feed and look-through gap only shows up for the insurers so far, a small slice of what we've done, so I band it as high for insurers rather than high across the board. It matters to the ones it matters to, sharply, but three of twelve isn't the whole book, and if I let a loud few set the impact band, the roadmap tips toward a build that serves almost nobody. The grid's job is to keep me honest about how widespread each thing actually is, not just how loud it was in the room.`,
+The last thing I'm careful about is not overselling the thin columns. The data-feed and look-through gap only shows up for the insurers so far, a small slice of what we've done, so I band it as high for insurers rather than high across the board. It matters to the ones it matters to, sharply, but three of twelve isn't the whole book, and if I let a loud few set the impact band, the roadmap tips toward a build that serves almost nobody. The grid's job is to keep me honest about how widespread each thing actually is, not just how loud it was in the room.
+
+{{artifact:1}}
+
+{{artifact:2}}`,
     commentary: `So this hour is mostly me reading through the completed interviews, tagging each one against the themes, and pulling out every number we managed to get. The reason I work it this way: a single quote is just an anecdote, and one CIO finding the reporting clunky doesn't survive a room with the client's leadership in it. Eight of the twelve investors we've spoken to so far raise the consolidated-reporting gap, and the ones who put a number on it lose one to two analyst-days a quarter to manual assembly. It's the same complaint again and again, and once it's counted it stops being an anecdote and becomes a finding. Where someone gave us a time estimate or a score, it goes in a cell. Where they only gave us a feeling, I flag it, so we can see the data point is still missing.
 
 That's the tracker current and the count pulled, which is what turns a stack of separate conversations into something a deck can lean on. Two things carry out of this hour. The first is the open question I flagged, whether onboarding belongs with the reporting-cycle gaps or stands on its own, and that isn't mine to settle alone, so it goes to the team on Wednesday. The second is the count itself, the raised-by numbers and the score spread, because that's the evidence I'll set underneath the titles when I build the skeleton after lunch. Up to now the story's been a hypothesis. After this hour it's a hypothesis with a tally behind it, and this afternoon I find out whether the tally actually holds a storyline or just a pile of gaps. Either way the numbers travel with me into that build, because a title I can't put a count under is a title Marcus will make me cut.`,
     after: ``,
-    artifact: `### Artifact 1: Theme tracker, interview coding matrix
-
-The master synthesis sheet consolidates what the team has heard across all the interviews in one place. Rows are interviews; columns are the recurring gaps. Y marks whether the gap was raised. Scores are the investor's own one-to-ten rating of Meridian and of their best other manager. Dates are the interview date. (CR = no consolidated capital-activity report; DS = poor document search/retrieval; OB = onboarding/subscription re-papering; NT = no event notifications; DF = data feed/export and look-through detail.)
-
-| Interviewee | Date | Investor type | MP score | Best other | CR | DS | OB | NT | DF | Last-mile shape |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Margaret | Feb 14 | Corporate pension | 6 | 8 | Y | Y | Y | | | Board-ready document |
-| Theo | Feb 15 | University endowment | 7 | 8 | | | | Y | | Committee-ready document |
-| Priya | Feb 17 | Property and casualty insurer | 5 | 9 | Y | | | Y | Y | System-ready data |
-| Walter | Feb 18 | Sovereign wealth fund | 6 | 8 | Y | Y | Y | Y | | IC-ready document |
-| Nadia | Feb 19 | Family office | 8 | 8 | | | | | | Few complaints; wants on-demand access |
-| Hugh | Feb 20 | Public pension | 5 | 8 | Y | Y | Y | Y | | Board-ready document |
-| Coleen | Feb 21 | Foundation | 6 | 7 | Y | Y | Y | | | Committee-ready document |
-| Gordon | Feb 24 | Corporate pension | 6 | 8 | Y | | Y | Y | | Board-ready document |
-| Imani | Feb 24 | Life insurer | 5 | 9 | Y | | | | Y | System-ready data |
-| Sayid | Feb 25 | Health insurer | 6 | 8 | | Y | | Y | Y | System-ready data |
-| Beatrice | Feb 25 | Public pension | 7 | 8 | Y | Y | Y | Y | | Board-ready document |
-| Frank | Feb 26 | University endowment | 6 | 8 | | Y | | | | Committee-ready document |
-
-### Artifact 2: Theme summary and light quantification
-
-Generated from the coding in Artifact 1.
-
-Read across the matrix. Of twelve interviews completed to date (of thirty planned):
-
-| Theme / gap | Raised by | Quantified pain (where harvested) | Impact band |
-|---|---|---|---|
-| Last mile (umbrella) | 11 of 12 (92%) | Dominant pattern: accurate data, finished output left to the investor | High |
-| No consolidated capital-activity report | 8 of 12 (67%) | 1 to 2 analyst-days per quarter on manual assembly (harvested from those who quantified) | High |
-| Poor document search / retrieval | 7 of 12 (58%) | Hours to about a day per retrieval, routed through the relationship manager | Medium-high |
-| No event notifications | 7 of 12 (58%) | Compressed funding windows; a few near-misses, nothing escalated to a board | Medium |
-| Onboarding / subscription re-papering | 6 of 12 (50%) | Same materials re-submitted up to 4 times for multi-fund investors | Medium |
-| Data feed / export and look-through (data-led only) | 3 of 12 (25%) | About 2 staff for the better part of a week per quarterly filing; thin look-through for capital charges | High for insurers |
-
-**Score spread:** average Meridian score 6.1; average best other manager 8.1. The gap is concentrated in the last mile, not in data accuracy.
-
-**Open question for Wednesday's problem-solving session:** onboarding re-papering is real (6 of 12) but felt by a different team (operations, not the CIO) and at a different moment (the front end, not the reporting cycle). Does it sit under the last-mile umbrella, or does it stand as its own theme? Flag for the team to resolve before the storyline locks.
-
-**Tracker note:** the wider interview set is coded in lighter detail. The column taxonomy is a working layout for this engagement, not a single industry standard.`,
+    artifactsHtml: { 1: { type: 'excel', html: meridianArtifact02Html }, 2: { type: 'excel', html: meridianArtifact03Html } },
   },
   'management-consultant-meridian-full-d1-b5': {
     before: `After lunch, Carly builds the skeleton of the recommendation deck before touching a single finished slide. The work is the storyline: the order of the argument and the action-title lead-ins, with placeholders where the evidence will go. The artifact is the skeleton deck.`,
@@ -326,44 +274,12 @@ Section four, the recommendations, and here I do almost nothing on purpose. Marc
 
 The appendix is where everything that doesn't fit an executive's time goes, the back third, the per-interview detail, the full tracker, the methodology and the count, the score table. The wishlist lives there too, everything every investor asked for, so nobody thinks we lost it. Sections three and four are the refined cut of that wishlist, not the wishlist itself, and keeping the two visibly separate is half of not letting the deck read like a list of everything anyone wanted.
 
-Only then does the executive summary get its rough shape, the answer on one page, now there's an argument to summarize. Then the test I trust, the titles alone, top to bottom, sections one through three, whether they hold as a paragraph. They do. Section four doesn't yet, which is right, the placeholders stay empty until the gaps lock. That's the version that goes to Marcus, titles that argue and a section that's honestly unfinished, the logic's cheapest to fix while it's still just sentences on a page.`,
+Only then does the executive summary get its rough shape, the answer on one page, now there's an argument to summarize. Then the test I trust, the titles alone, top to bottom, sections one through three, whether they hold as a paragraph. They do. Section four doesn't yet, which is right, the placeholders stay empty until the gaps lock. That's the version that goes to Marcus, titles that argue and a section that's honestly unfinished, the logic's cheapest to fix while it's still just sentences on a page.
+
+{{artifact:1}}`,
     commentary: `There's a discipline here that took me a while to trust: settle the argument before anything starts looking like a slide. Open the charting tools too early and I'll fall in love with a pretty chart and bend the story to fit it. So the titles come first, full sentences in order, and the test is whether they hold together as a paragraph on their own. If they do, the argument holds. If they don't, no amount of formatting later will save it. This is also the version Marcus actually wants to react to on Wednesday, because the logic's cheapest to change while it's still just titles on a page.`,
     after: ``,
-    artifact: `### Artifact 3: Skeleton deck, recommendation storyline (working, week 3)
-
-A skeleton deck is the outline of the recommendation deck: the section headings and the action-title lead-ins in order, with placeholders where the evidence will go, and no finished slides yet. The test is the storyline test: read the action titles alone, top to bottom, and they should form the argument on their own.
-
-This deck follows a gap analysis. It walks the current state, the desired future state, the gaps between them, and the prioritized recommendations to close those gaps, with the executive summary written last and placed first. Each numbered section below is a group of slides, not a single slide; the numbered titles under it are the individual slide titles.
-
-**Section 0. Executive summary (one page, written last, placed first)**
-- Title placeholder: [the answer on one page: Meridian's investors value the relationship and trust the portal's data, but the portal stops at accurate data and leaves investors to build the finished output by hand; closing that gap does not require a rebuild, but a prioritized, fundable set of improvements sequenced over a roadmap]
-
-**Section 1. Current state (how the portal serves investors today)**
-- 1.1 Slide title: "Meridian's investors value the relationship, and the portal's data is accurate and complete" [evidence: accuracy credited even by the lower scorers; representative unattributed quotes]
-- 1.2 Slide title: "Investors lean on the portal most heavily at the reporting cycle, exactly when the stakes are highest" [evidence: usage pattern across interviews]
-- 1.3 Slide title: "Today the portal stops at accurate data and leaves investors to assemble the finished output themselves" [evidence: the last-mile pattern and the anchor quotes]
-
-**Section 2. Desired future state (what a best-in-class portal delivers)**
-- 2.1 Slide title: "Investors already get consolidated, exportable, notified data from their best managers; the bar has moved and Meridian sits behind it" [evidence: best other manager benchmark of 8 to 9 against Meridian's 6]
-- 2.2 Slide title: "The target state delivers the finished output each investor type needs: board-ready documents for document-led investors, system-ready data for data-led investors" [evidence: the two finish lines]
-
-**Section 3. The gaps (the difference between current and future state)**
-- 3.1 Slide title: "A small number of recurring gaps drive most of the manual work investors describe" [evidence: the gap counts and percentages from the tracker, shown as a simple bar; detail table in the appendix]
-- 3.2 Slide title: "The gaps take a different shape by investor type: pensions need documents, insurers need data" [evidence: the document-led versus data-led split]
-- 3.3 Slide title: "For data-led investors the same gap costs more, because the downstream is a regulatory filing, not a board slide" [evidence: insurer look-through and data-feed pain; the wider score spread]
-- 3.4 Slide title: "Underneath the gaps is one root cause: the platform has no memory and does not reach out, so every interaction starts from scratch" [evidence: onboarding re-papering and passive notifications]
-
-**Section 4. Recommendations and roadmap (prioritized, fundable)**
-- 4.1 Slide title: "Closing the gaps does not require rebuilding the platform; it requires sequencing a few high-leverage improvements" [evidence: the funding posture]
-- 4.2 Slide title placeholder: [Phase 1, quick wins, pending Laura's read on what is realistic to build: consolidated capital-activity report, real document search, event notifications]
-- 4.3 Slide title placeholder: [Phase 2: reusable onboarding profile, data export and feed for data-led investors]
-- 4.4 Slide title placeholder: [Phase 3, heavier lifts: look-through holdings data, deeper system integrations]
-- 4.5 Slide title placeholder: [the recommended sequence, each improvement tied to the gap it closes and the effort it takes; this is the page Diane funds from, built with the client's input on what is realistic]
-
-**Appendix (parked, roughly the 30 percent that does not fit an executive's time)**
-- Per-interview detail; the full theme tracker; methodology and interview count; the score table; the per-gap detail.
-
-**Note:** the client wishlist, everything investors asked for, is captured in the tracker and the appendix; Sections 3 and 4 are the refinement of that wishlist into the prioritized gaps and the fundable recommendation. The Section 4 phase titles stay placeholders until the problem-solving session firms the gaps and Laura's team gives a read on what is realistic to build. Sections 1 to 3 lock first; the recommendation is only as honest as what can actually be built behind it.`,
+    artifactsHtml: { 1: { type: 'powerpoint', html: meridianArtifact04Html } },
   },
   'management-consultant-meridian-full-d2-b1': {
     before: `Carly and her manager Marcus are joining a scheduled video call, from their consulting firm's New York office, with Ellen, the Chief Investment Officer of a public pension fund that invests in one of Meridian Park's private credit funds. The team is partway through a round of interviews with Meridian's investors, gathering candid feedback on the investor platform to find where it falls short. Ellen is one of those investors. Marcus will lead the conversation; Carly is here to take notes and listen for what matters.`,
@@ -534,7 +450,9 @@ Marcus: It is, and that's exactly why we're talking to people like you. This is 
 Ellen: Of course. Happy to help. Good luck with it.
 
 [The call ends a few minutes shy of the hour.]`,
-    commentary: `That was a good one. Ellen was candid, which you can't always count on, and I've got a couple of pages of notes I want to tighten up before any of it blurs. Right now I can still hear exactly how she said things, which thing she rated a six, why the better manager came out ahead, the one or two offhand comments that I think actually matter more than she let on. A few days from now that detail is gone, and "the portal is clunky" is all that's left.
+    commentary: `[(after Ellen drops off)]
+
+That was a good one. Ellen was candid, which you can't always count on, and I've got a couple of pages of notes I want to tighten up before any of it blurs. Right now I can still hear exactly how she said things, which thing she rated a six, why the better manager came out ahead, the one or two offhand comments that I think actually matter more than she let on. A few days from now that detail is gone, and "the portal is clunky" is all that's left.
 
 Fortunately we don't have another interview right after this, so I've got the time to clean these up while they're fresh. That doesn't always happen, so when it does, I take it.
 
@@ -543,153 +461,21 @@ My cleaned-up notes are an important artifact, and they get added to our ongoing
   },
   'management-consultant-meridian-full-d2-b2': {
     before: `After the Ellen call, Carly stays at her desk in the firm's New York office to work the interview notes into shape before the next interview. What comes out is a pair of artifacts, shown back to back: first the raw notes Carly typed live during the call, then the cleaned, structured write-up she rewrites them into, the same conversation moved from private shorthand into a document that carries on its own.`,
-    simulatedWork: `The raw block above is what a live call leaves behind, and the write-up below isn't a clean retype of it, it's a run of small judgments about what mattered. I'm starting with the headline, one line for the whole interview: the relationship's good, the data's accurate, the pain is the last mile. Everything else in the write-up sits under that, the hard facts up top in a small fields table, the findings below, ordered by how much they matter rather than the order they came up.
+    simulatedWork: `{{artifact:1}}
+
+The raw block above is what a live call leaves behind, and the write-up below isn't a clean retype of it, it's a run of small judgments about what mattered. I'm starting with the headline, one line for the whole interview: the relationship's good, the data's accurate, the pain is the last mile. Everything else in the write-up sits under that, the hard facts up top in a small fields table, the findings below, ordered by how much they matter rather than the order they came up.
 
 One number stops me. In the raw the assembly time is the better part of a couple of days, and for a second I can't tell whether she meant a week or a quarter. The run of the conversation settles it, the figure came right after Marcus asked her to put a number on it per quarter, so per quarter. It goes into the finding as her own rough estimate, not a hard figure, since it was a guess under a little pressure, not something we measured.
 
-The gaps are what I'm really building toward, they're what the tracker takes. Three of them, the consolidated report, document search, and notifications, are the same reporting-cycle problem and sit together cleanly. Onboarding I'm less sure about, it's real and Ellen was pointed about it, but it's the front end of the relationship, not the reporting cycle, and a different team feels it. That one I don't settle at my desk, I code it and flag it for the group, a question rather than a call I make alone.`,
+The gaps are what I'm really building toward, they're what the tracker takes. Three of them, the consolidated report, document search, and notifications, are the same reporting-cycle problem and sit together cleanly. Onboarding I'm less sure about, it's real and Ellen was pointed about it, but it's the front end of the relationship, not the reporting cycle, and a different team feels it. That one I don't settle at my desk, I code it and flag it for the group, a question rather than a call I make alone.
+
+{{artifact:2}}`,
     commentary: `Next it goes into the running theme tracker, where the interview stops being one person's story and becomes part of the count the deck will stand on, one more row in a matrix that's finally getting big enough to say something on its own. Two things are worth watching as the interviews continue: whether the last-mile split really breaks document-led versus data-led the way it's starting to, and whether other investors feel the onboarding re-papering as sharply as Ellen does. I'll flag both for the team so the next block of calls can probe them.`,
     after: ``,
-    artifact: `### Artifact 4: Raw live notes (as typed during the call)
-
-\`\`\`
-ELLEN - CIO public pension - MP private credit
-
-she's GLAD MP looking at portal - "there's room for improvement"
-  (candid, good sign)
-conf reminder given. ok w/ it
-
-ROLE: CIO ~9 yrs at fund, last 4 in seat. runs whole inv program, all asset classes.
-public pension, retirement assets for state employees. ~$12B total
-w/ MP ~6 yrs. they run a slice of our PC alloc. grown since start BUT "won't get into
-  specifics" - bigger part of book than it was
-USAGE: varies. month-end + qtr-end = HEAVY. pulls statements, perf, cap activity for
-  period -> board reporting. between = ad hoc, team needs a doc / IR q comes in.
-  few x / wk normally, lots around rptg cycle
-  team = small (handful of analysts + her). during a close ALL of them in portal at some pt
-    (perf, cap activity, chasing a doc an auditor wants). ~dozen small retrievals, same compressed
-    window (board calendar doesn't move) -> the portal being a step slow gets x'd across the whole team
-  *** "that's when it costs me the most"
-
-GAP 1 - cap activity reporting ***
-nothing comes out in 1 step. qtr cap activity = calls + distribs across period.
-CANT pull a single clean rpt. opens statements 1 by 1, stitches in own spreadsheet
-  -> number she needs for board
-who rebuilds? -> TEAM. "unnecessary amount of time", "incredibly manual"
-data IS all there. getting it OUT in board shape = the painful part.
-  "for what we pay in fees, that's a little hard to swallow"
-*** QUOTE "I'm paying for a finished product and getting raw ingredients"
-$ FOLLOW UP (Marcus asked to quantify) -> analyst time? "better part of a couple of
-  days" just on the assembly, per qtr, before anyone looks at the numbers
-  *** "the thinking is the job. the assembly shouldn't be"
-  MECHANICS of assembly: someone w/ ~dozen stmts open, copies figures into own spreadsheet,
-    checked line by line (a transposed # in a board rpt = not small), reconciled back vs stmts.
-    careful + fully mechanical = worst combo (high stakes, no thinking). consolidated view would kill the step
-  BOARD USE: number -> inv committee of the board (oversees program). meets quarterly, PC = 1 line on long agenda.
-    wants clean consolidated view, absorb in ~couple min. NOT the dozen stmts, NOT the spreadsheet.
-    assembly must be invisible by design -> "look effortless in that room... a lot of effort nobody sees"
-    board-ready = specific: 1 page, own template, same layout every qtr (committee compares, doesn't relearn).
-    team also re-forces the number into a format the portal has never produced. every qtr
-
-GAP 2 - doc search / retrieval
-auditors ask for a specific qtrly stmt from 2 yrs ago, or a particular notice ->
-  can rarely just find it. "search doesn't work the way you'd expect"
-ends up EMAILING RM at MP to send it over
-RM responsive, ~within a day. BUT "a day, for something I should get in 30 sec myself"
-  -> "makes the whole platform feel a step behind"
-  search matches on wrong things -> query pulls up everything or nothing. no reliable filter by fund / period / doc type
-  AUDITOR angle: ext auditors ~1x/yr, ask for specific stmts + notices going back yrs. she must produce.
-    can't self-serve -> emails RM, waits, WHILE auditor sits there. "makes us look slower than we are"
-    own work she can manage (knows roughly where things live); under audit NO workaround - needs the exact doc
-
-GAP 3 - onboarding / subscription paperwork (front end)
-sore spot - more her OPS team than her directly, but she hears about it
-every new fund = start paperwork FROM SCRATCH. same entity info, same signatories,
-  same supporting docs. none of it carries across funds
-in 4 MP funds now. "by the fourth one... sending the same formation docs + signatory
-  list again is a little absurd. they have all of it"
-other mgrs? better ones come back mostly pre-filled, only ask what's CHANGED (new
-  signatory, updated address). "treating us as an existing relationship, not a brand
-  new one every time"
-ops team: rekeys entity details + re-collects signatures MP already has on file. "small indignity, wears on people"
-  head of ops raised it w/ her after last fund -> why it's on her radar. "not the biggest thing but maybe the most needless"
-better-mgr fix = just keeping the file: hold what they collected, present back to confirm not re-enter.
-  not sophisticated -> "the fix is that mundane and still isn't there" -> reads as priority, not difficulty
-
-GAP 4 - notifications / how she finds out
-portal doesn't tell her anything. RM emails when a call is coming - she appreciates it
-  BUT means leaning on an email, not the system
-if email late / she's travelling -> first time seeing call notice can be late in the
-  funding window
-ever cost? nothing she'd "put in front of my board" but a couple times had to move
-  faster than she'd like. "shouldn't come down to whether I caught an email"
-what would help? -> alert tied to the ACTUAL EVENT, not someone remembering. moment a
-  call is issued -> notif w/ amount + due date, sits top of dashboard til acted on.
-  good platforms do exactly this
-"move faster" cost: call funded by a date, cash from somewhere (sale/transfer/approvals, a day or two).
-  comfortable runway = routine; late notice = scramble, "a scramble is where mistakes live". nothing broken yet.
-  managing the risk w/ her attention not a system, "attention is the thing I have least of during a close"
-today's workaround: she + assistant keep own calendar of expected calls (from mgr signals); someone logs into
-  each portal on a rhythm to see what appeared. "manual net under a system that should catch this itself".
-  works bc diligent -> "shouldn't depend on us being diligent". hole in the net = a call sitting there nobody flagged
-
-SCORE *** MP = 6 / 10. best other mgr = 8 (maybe a touch higher)
-why 6: data accurate + all there (doesn't take that for granted) but stops there
-best mgr does: at qtr-end the reporting is basically ALREADY BUILT - consolidated stmt,
-  full cap activity in 1 place, ~hand straight to board. reviewing not assembling.
-  + search "just works"
-  *** "the bar has moved, they're sitting where some others were ~2 yrs ago"
-=> LAST MILE theme: accurate data -> board-ready, without her doing the work
-(aside) compares notes w/ a few peer CIOs at similar systems, informal. not MP by name.
-  general shape: who's modernized reporting vs not. "where a mgr sits on tech, not just returns" gets noticed now.
-  a few yrs ago nobody compared notes on a portal. [soft color - prob drop in clean]
-
-MY Q (Carly): raised it w/ MP directly? -> yes, more than once, to RM. always gracious,
-  take the point, then nothing changes. NOT unwillingness -> "bigger than the person
-  I'm talking to. it's the platform itself." RM can't just go fix it
-
-WRAP: none of it a dealbreaker, investment relationship is good (what matters most).
-  but on the platform: same set of frustrations for a while. glad they're looking at it
-\`\`\`
-
-### Artifact 5: Cleaned, structured notes
-
-**Interview write-up: Ellen**
-
-| Field | Detail |
-|---|---|
-| Interviewee | Ellen, Chief Investment Officer |
-| Organization | Public pension system (~$12B total assets; retirement assets for state employees) |
-| Meridian product | Private credit allocation (Meridian runs a slice; ~6-year relationship; investor in 4 Meridian funds) |
-| Date | Tuesday, week 3 of 6 |
-| Interviewers | Marcus (Manager, lead), Carly (Consultant, notes) |
-| Format | 30-minute video call |
-
-**Headline.** The investment relationship is good and the portal data is accurate; the pain is the last mile. The Meridian Investor Portal stops at accurate data and leaves the assembly to the investor. Ellen scores Meridian a 6 out of 10 against a best-other-manager 8, and the gap is consistently about getting from accurate data to a finished, board-ready output without her team doing that step by hand.
-
-**Context.** Ellen is CIO of about nine years at the fund (four in the seat), responsible for the whole investment program. The fund has invested with Meridian about six years across a slice of its private credit allocation. She declined to detail how the allocation has grown. Portal use is heaviest at month-end and quarter-end (statements, performance, capital activity for board reporting) and ad hoc in between. During a close her small team (a handful of analysts) is all in the portal at once, and many small retrievals land in the same compressed window set by the board calendar.
-
-**Findings by theme.**
-
-1. **No consolidated capital-activity report.** Ellen cannot pull a single clean view of a quarter's calls and distributions. She opens statements one at a time and her team stitches them together in a spreadsheet to reach the board-ready number. The data is all present; the assembly is the burden. The spreadsheet her team maintains is checked line by line and reconciled back against the statements, high-stakes but purely mechanical work that a consolidated view would eliminate. The assembled figure goes to the board's investment committee, which reviews private markets as one line on a quarterly agenda and wants a single consolidated view it can absorb in minutes, in the consistent one-page format it has seen every quarter; the manual assembly has to stay invisible to that room, which is what makes the missing consolidated report grate. Her words: *"I'm paying for a finished product and getting raw ingredients,"* and *"the thinking is the job. The assembly shouldn't be."*
-   - *Quantification:* the better part of a couple of analyst-days per quarter spent on assembly alone, before anyone analyzes the numbers (Ellen's own rough estimate when asked).
-
-2. **Poor document search and retrieval.** Search does not reliably surface a specific past statement or notice (e.g., an auditor request for a quarterly statement from two years ago). Ellen routinely emails her relationship manager to retrieve documents instead. The relationship manager is responsive (usually within a day), but her point stands: *"a day, for something I should be able to get in thirty seconds myself."* It *"makes the whole platform feel a step behind."* Search matches on the wrong things, returning everything or nothing with no reliable filter by fund, period, or document type. The sharpest version is the annual external audit, when auditors request exact statements and notices going back years on someone else's clock; not being able to self-serve there makes the fund look slower than it is.
-
-3. **Onboarding / subscription re-papering each new fund.** Each new Meridian fund starts the paperwork from scratch: the same entity information, authorized signatories, and supporting documentation, none of it carrying across. Ellen is in four Meridian funds and still re-submits the same materials. Felt mostly by her operations team. Better managers return mostly pre-filled paperwork and only ask her to confirm what has changed (a new signatory, an updated address), which she reads as being treated as an existing relationship rather than a new one each time. Her head of operations raised the re-papering with her directly after the last fund, which is how it reached her; she frames it as not the biggest gap but perhaps the most needless. She reads the better managers' fix as unsophisticated, simply keeping her file and presenting it back to confirm, which makes Meridian's omission look like a question of priority rather than difficulty.
-
-4. **Passive portal, no event notifications.** The portal does not alert her when a capital call or document posts. She leans on her relationship manager's emails, so a late email or travel can mean seeing a call notice late in the funding window. Nothing she would escalate to her board, but a couple of times she has had to move faster than she would like. She wants notifications tied to the actual event (the moment a call is issued), with amount and due date, surfaced on the dashboard until acted on. A late notice compresses the funding routine (sourcing cash by a fixed date) into a scramble; nothing has broken, but she manages the risk with her own attention rather than a system. Today she and her assistant keep their own calendar of expected calls and log into each portal on a rhythm to catch what has posted, a manual net under a system that should be catching it itself, holding only because they are diligent.
-
-**Score and benchmark.** Meridian 6/10; best other manager 8/10 (possibly a touch higher). The 6 credits accurate, complete data; the gap to the 8 is the finished output. The best manager delivers a consolidated statement at quarter-end that is close to board-ready (reviewing, not assembling) and search that simply works. Ellen: *"the bar has moved, and they're sitting where some of the others were maybe two years ago."*
-
-**Cross-cutting theme (candidate).** The "last mile": the portal delivers accurate data but leaves the investor to turn it into the finished thing they actually need. Strong candidate to anchor a deck section; watch for the same pattern in other interviews (shape of the last mile likely differs by investor type).
-
-**Did she raise it with Meridian?** Yes, more than once, to her relationship manager. Always received graciously, but nothing changes. Her read: it is bigger than any one contact, it is the platform itself, which a relationship manager cannot fix.`,
+    artifactsHtml: { 1: { type: 'document', html: meridianArtifact05Html }, 2: { type: 'document', html: meridianArtifact06Html } },
   },
   'management-consultant-meridian-full-d2-b3': {
-    before: `Navigation note: this is an optional second interview. You can sit in on it, or skip ahead to the rest of the day. It is here because this investor is a different type of institution, so it shows a different side of the same problem.
-
-Later the same morning, from the same New York office, Carly and Marcus join a scheduled video call with Raymond, the Chief Investment Officer of a life insurance company that holds an infrastructure allocation with Meridian Park. Meridian's investors are institutions spread across the country, so the interviews run over video. Marcus will lead the conversation; Carly is here to take notes and listen for what matters.`,
+    before: `Later the same morning, from the same New York office, Carly and Marcus join a scheduled video call with Raymond, the Chief Investment Officer of a life insurance company that holds an infrastructure allocation with Meridian Park. Meridian's investors are institutions spread across the country, so the interviews run over video. Marcus will lead the conversation; Carly is here to take notes and listen for what matters.`,
     simulatedWork: `[Marcus and Carly are on the call. Raymond joins a moment later.]
 
 Marcus: Raymond, hi, thanks for making the time. We're a few weeks past quarter-end, so I imagine you're in the thick of the statutory filing right now, I appreciate you fitting us in. I'm Marcus, and this is my colleague Carly.
@@ -833,7 +619,9 @@ Raymond: Partial is useful. If they gave me the position-level data in any struc
 Marcus: That's exactly the kind of thing we're here to take back. It goes straight into what we bring to Meridian. Thank you for being so candid, and for the time, I know the filing has you busy.
 
 Raymond: Of course. Send it back to them straight, that's all I'd ask. Good luck with it.`,
-    commentary: `No gap this time. Ellen's notes I got to clean while she was fresh; Raymond's are going straight onto the pile, because there's another call in a few minutes, then a thirty-minute lunch I'm eating at my desk, then one more right after. So by early afternoon I'll be three interviews deep with none of them written up, working from shorthand and memory, and I'll have to reconstruct the detail tonight, which is the tax you pay on a stacked interview day. So the discipline shifts: no clean-up gap means I lean harder on the double-starred flags in my shorthand, the quotes and the numbers, and trust that the connective tissue will come back tonight if the anchors are solid. Raymond's a useful one to have gotten, though. He's the clean opposite of Ellen: she wants a finished document at the end, he wants raw data he can load, and it's the same platform failing them from two different directions. That's the split we're testing, and so far it's holding.`,
+    commentary: `[(after Raymond drops off)]
+
+No gap this time. Ellen's notes I got to clean while she was fresh; Raymond's are going straight onto the pile, because there's another call in a few minutes, then a thirty-minute lunch I'm eating at my desk, then one more right after. So by early afternoon I'll be three interviews deep with none of them written up, working from shorthand and memory, and I'll have to reconstruct the detail tonight, which is the tax you pay on a stacked interview day. So the discipline shifts: no clean-up gap means I lean harder on the double-starred flags in my shorthand, the quotes and the numbers, and trust that the connective tissue will come back tonight if the anchors are solid. Raymond's a useful one to have gotten, though. He's the clean opposite of Ellen: she wants a finished document at the end, he wants raw data he can load, and it's the same platform failing them from two different directions. That's the split we're testing, and so far it's holding.`,
     after: ``,
   },
   'management-consultant-meridian-full-d3-b1': {
@@ -920,9 +708,9 @@ Marcus: Right. We're in the weeds. Pull up. [his phone buzzes on the table; he g
 
 [While Marcus answers the message, Carly turns back to the tracker on the wall and scans down the insurer rows.]
 
-Marcus: [putting the phone face down] Okay. Now the insurer split, because that's the one I'm least settled on. The data-led investors, the insurers, the ones who want raw data into their own systems rather than a finished document. I want to make sure we're not over-rotating on them, because so far they're a small part of the sample. We've got, what, five of them out of the twenty?
+Marcus: [putting the phone face down] Okay. Now the insurer split, because that's the one I'm least settled on. The data-led investors, the insurers, the ones who want raw data into their own systems rather than a finished document. I want to make sure we're not over-rotating on them, because so far they're a small part of the sample. We've got, what, five of them out of the eighteen?
 
-Carly: Five so far, and the spread's real. Raymond rates Meridian a five out of ten and his best other manager a nine, a much wider gap than the document-led investors give us. But I'd be careful claiming insurers are the bigger population. I read them as the smaller slice with the sharper pain, because their downstream lands in a regulatory filing, not a board meeting. One thing we should do is ask Meridian for their own rough split of investors by segment. If insurers are, say, one in ten of their book, we need to know that before we let a loud five out of twenty in our sample pull the roadmap toward a data-feed build that serves very few of them.
+Carly: Five so far, and the spread's real. Raymond rates Meridian a five out of ten and his best other manager a nine, a much wider gap than the document-led investors give us. But I'd be careful claiming insurers are the bigger population. I read them as the smaller slice with the sharper pain, because their downstream lands in a regulatory filing, not a board meeting. One thing we should do is ask Meridian for their own rough split of investors by segment. If insurers are, say, one in ten of their book, we need to know that before we let a loud five out of eighteen in our sample pull the roadmap toward a data-feed build that serves very few of them.
 
 Marcus: Say more on why the pain reads sharper, because I want to be sure it's the downstream and not just that Raymond's a blunt guy who scores low.
 
@@ -966,53 +754,14 @@ Now the title. I'm leading with the symmetry, pensions need board-ready document
 
 Page 3.3 is the hard one. It has to carry the gaps themselves, four of them, how many investors raised each, what they do about it today, and the quantified pain, and every column is pulling weight. It's a heavy grid and a senior would flip past it, but cutting a column means dropping evidence I fought for, so it stays dense for now. Then a snag: one gap's count doesn't match the tracker, a stale number I'd carried from memory. That becomes a rule on the spot, numbers come off the tracker, never out of my head. Onboarding goes down as the separate no-memory theme rather than a fourth reporting gap, and the data-feed gap gets its own page, its pain a different order that a general grid would flatten. The middle column takes concrete verbs, not deals with it but opens statements one at a time and assembles them in a spreadsheet.
 
-Then the titles test, each one on its own. 3.1 holds, 3.2 holds, 3.3 doesn't, and I can see it doesn't. What it wants is a clean lead slide with the counts as a bar and the table demoted behind it, but that's real minutes I don't have before the block ends, and Marcus asked for a draft he can react to, not a finished section. So 3.3 stays overloaded on purpose, with a note that it may need to come apart. What's here at the end is a genuine first draft, real titles, real evidence, two exhibits sketched, one page I already know is soft, which is about as far as a first pass goes.`,
+Then the titles test, each one on its own. 3.1 holds, 3.2 holds, 3.3 doesn't, and I can see it doesn't. What it wants is a clean lead slide with the counts as a bar and the table demoted behind it, but that's real minutes I don't have before the block ends, and Marcus asked for a draft he can react to, not a finished section. So 3.3 stays overloaded on purpose, with a note that it may need to come apart. What's here at the end is a genuine first draft, real titles, real evidence, two exhibits sketched, one page I already know is soft, which is about as far as a first pass goes.
+
+{{artifact:1}}`,
     commentary: `The point of this block is to take what Marcus and I just agreed and get it onto real slides while the logic's still fresh. I draft, Marcus marks it up, and it tightens over the next few weeks before it's anywhere near the client. What I owe him is a genuine first pass he can react to, not a polished section, because the fastest way to waste his review is to hand him something so finished I've stopped being able to change it.
 
 I've one more call at three, and after that it's heads-down. I'll keep drafting and cleaning these pages the rest of the afternoon, get them as organized and easy to read as I can with the exhibits sketched in, and send them to Marcus tonight. That timing is deliberate, not just diligence. He asked to mark them up first thing tomorrow, and I've learned that first thing for Marcus is early, he's the kind of person who might be in the deck at half seven with a coffee. If it isn't in his inbox tonight, he's blocked the moment he sits down, and the worst version of my job is him having to email me at ten asking where the draft is. A lot of being good in this seat is invisible: it's making the next person's step easy and never being the thing anyone's waiting on. Part of that, specifically, is building the draft so Marcus can move through it fast and mark it up straight on the page, because the quicker he can react the more passes we get, and the section only gets good by cycling through a few of them. So the goal for the rest of today is simple, and it isn't perfection. It's in his inbox by end of day, clean enough that he can start marking it up cold, and clear enough that his time goes to sharpening the argument rather than decoding my shorthand.`,
     after: ``,
-    artifact: `### Artifact 6: Gaps section, first-draft slides
-
-**Page 3.1**
-
-**Action title:** The Meridian portal delivers accurate data but stops short of the finished output investors need, leaving them to build the last mile by hand
-
-Body:
-- Across the 20 investor interviews completed to date, nearly all credit the portal's data as accurate and complete, and nearly all describe doing manual work to turn that data into what they actually use.
-- The pain is not accuracy. It is the gap between accurate data and a usable end product.
-- Select quotes:
-  - "I'm paying for a finished product and getting raw ingredients."
-  - "It gives me a PDF I have to take apart before any of the real work starts."
-- So what: the opportunity is the last mile, not the data layer. This reframes the problem from fix the data to finish the job.
-- [Exhibit placeholder: simple two-step visual, accurate data, then the gap, then finished output]
-
-**Page 3.2**
-
-**Action title:** The last mile takes a different shape by investor type: pensions need board-ready documents, insurers need system-ready data
-
-Body:
-- Document-led investors (pensions, endowments, foundations): the missing last step is a consolidated, presentation-ready report they can take to a board or investment committee.
-  - Anchor example: a pension CIO rebuilds a quarter's capital activity by hand because there is no consolidated capital-activity report. About 1 to 2 analyst-days per quarter on assembly alone, before anyone analyzes the numbers.
-- Data-led investors (insurers): the missing last step is structured data delivered into their own systems for statutory accounting, regulatory capital, and asset-liability work. A PDF is of little use.
-  - Anchor example: a life insurer reclassifies and re-keys every position so it maps to statutory reporting. About 2 staff for the better part of a week each quarterly filing.
-- So what: one structural problem, two finish lines. The roadmap has to serve both without rebuilding the platform.
-- [Exhibit placeholder: two-column compare, document-led versus data-led]
-
-**Page 3.3**
-
-**Action title:** Four recurring gaps drive most of the manual work, and they cluster by how often investors hit them
-
-Body:
-
-| Gap | Raised by | What investors do today | Quantified pain |
-|---|---|---|---|
-| No consolidated capital-activity report | 14 of 20 (70%) | Open statements one at a time, assemble in own spreadsheet | 1 to 2 analyst-days per quarter |
-| Poor document search / retrieval | 12 of 20 (60%) | Email the relationship manager to retrieve | Hours to about a day per request |
-| No event notifications | 11 of 20 (55%) | Rely on the relationship manager's emails; risk seeing call notices late | Compressed funding windows; near-misses |
-| Onboarding re-papering (carried as the separate no-memory theme) | 10 of 20 (50%) | Re-submit the same entity info and signatories each new fund | Re-papered up to 4 times for multi-fund investors |
-
-- So what: these are discrete, addressable fixes, not a platform rebuild. That is what makes a phased roadmap possible.
-- [Note on page: the data feed and look-through gap for data-led investors is carried on its own page given the wider score spread.]`,
+    artifactsHtml: { 1: { type: 'powerpoint', html: meridianArtifact07Html } },
   },
   'management-consultant-meridian-full-d4-b1': {
     before: `Thursday morning, in a small team meeting room in the firm's New York office. Marcus has Carly's gaps section open on the screen and walks her through his edits. A meaningful share of it gets restructured, which on a first draft is the norm rather than a verdict on the work. The artifact is one of Carly's pages with Marcus's markup.`,
@@ -1100,29 +849,12 @@ Marcus: Before we prep for the checkpoint this afternoon. When we walk Diane thr
 
 Carly: Right by this afternoon. Pretty can wait.
 
-Marcus: And none of this is because the draft was weak. A first cut that needs this much shaping is just a first cut. The thinking underneath it is right, which is the part I can't fix for you. The structure I can.`,
+Marcus: And none of this is because the draft was weak. A first cut that needs this much shaping is just a first cut. The thinking underneath it is right, which is the part I can't fix for you. The structure I can.
+
+{{artifact:1}}`,
     commentary: `This is the midweek shaping Marcus told David he'd do on Monday, and getting the section in front of him now, rough, instead of polishing it alone for three days, is the whole reason I sent a draft this early. It has to be right before any of it goes near Diane at Thursday's checkpoint or lands in front of David for his Friday read of the titles. The instinct when a first draft comes back marked up is to take it as a grade on the thinking. I've learned not to. A first cut is a first cut, and the notes are structural, which means they're an hour of work, not a verdict. So that's the next hour: the revise, then straight back into his hands.`,
     after: ``,
-    artifact: `### Artifact 7: Marked-up slide, the gaps page with Marcus's comments
-
-This is the same gaps page from yesterday's draft, page 3.3, the one Marcus just walked through on the screen, now with his review comments attached inline so the specific changes are visible.
-
-**Action title:** Four recurring gaps drive most of the manual work, and they cluster by how often investors hit them
-> [C1, Marcus] Title is two ideas. Cut everything after the comma. One idea: the gaps drive the manual work. New title candidate: "A small number of recurring gaps drive most of the manual work investors describe."
-
-Body table:
-
-| Gap | Raised by | What investors do today | Quantified pain |
-|---|---|---|---|
-| No consolidated capital-activity report | 14 of 20 | Open statements one at a time, assemble in own spreadsheet | 1 to 2 analyst-days per quarter |
-| ... | ... | ... | ... |
-
-> [C2, Marcus] 14 of 20 what? Investors interviewed to date. Put the base on every number, and make each slide stand on its own.
-> [C3, Marcus] This whole table is the appendix. The page itself should show the counts as a simple bar and make ONE point. The detail moves behind it.
-> [C4, Marcus] Good content, wrong container. Split it: lead page is the point, the evidence table is appendix A3.
-
-So what: these are discrete, addressable fixes, not a platform rebuild.
-> [C5, Marcus] Keep this line, it is the so-what. But it belongs up on the lead page, not buried under the table.`,
+    artifactsHtml: { 1: { type: 'powerpoint', html: meridianArtifact08MasterHtml } },
   },
   'management-consultant-meridian-full-d4-b2': {
     before: `Carly works Marcus's edits into a cleaner version of the gaps section, one point per page with the detail moved behind it. The artifact is the revised section.`,
@@ -1134,42 +866,14 @@ Then the bases, every number gets its denominator right on the exhibit, not four
 
 The by-type page needs its title reworked, the one I'd been a little pleased with. My draft led with the symmetry, documents for one type, data for the other, because it read nicely. Marcus's point was that a title's job is the so-what, not the music, so I flip it to lead with the cost: because the downstream work differs, the same gap costs a pension a board report and an insurer a regulatory filing. The parallel's still in the body, but the title lands the stakes first now. It stings a little that he was right.
 
-The last part is what I leave out. No fix leaks into this section, every instinct wants to follow a gap with the thing that closes it, but that comes later, this section just proves the gap and stops. One more pass down the three titles, top to bottom, and this time they hold as a paragraph on their own. That's the version that goes back to Marcus and then across town.`,
+The last part is what I leave out. No fix leaks into this section, every instinct wants to follow a gap with the thing that closes it, but that comes later, this section just proves the gap and stops. One more pass down the three titles, top to bottom, and this time they hold as a paragraph on their own. That's the version that goes back to Marcus and then across town.
+
+{{artifact:1}}`,
     commentary: `This is the block right after the review, on purpose. Marcus's notes are still warm, I can still hear what he meant by each one, and the revise is always fastest while that's true. I've got his marked-up page in front of me and a short list of exactly what changes: split the dense page, put the base on every number, sharpen the by-type title, keep the fix out. None of it is a rethink. It's structure, which he told me is the hour of work, not the verdict. And there's a clock on it, because whatever I land here is the spine of what Diane sees at the checkpoint this afternoon, so clean matters more than clever.
 
 That's the section clean, and out of my hands for the moment. It goes back to Marcus, and more to the point it's the spine of what we walk Diane through at two o'clock. I don't know yet which parts she'll push on, and that's fine, that's what the checkpoint is for. After lunch we head across town, and for the first time this week the work stops being a document I'm building alone and turns into something a client reacts to in a room. I'd rather it be right and plain for that than pretty and fragile.`,
     after: ``,
-    artifact: `### Artifact 8: Revised gaps section
-
-**Page 3.2 (revised, with the sharpened title)**
-
-**Action title:** Because the downstream work differs, the same gap costs a pension a board report and an insurer a regulatory filing
-
-Body: (unchanged) document-led investors need a consolidated, presentation-ready report; data-led investors need structured data into their own systems. Anchor examples and quantification as drafted.
-
-**Page 3.3 (revised, now a clean lead page)**
-
-**Action title:** A small number of recurring gaps drive most of the manual work investors describe
-
-Body:
-- Four gaps account for the majority of the manual effort cited across interviews.
-- [Exhibit: simple bar, share of the 20 investors interviewed to date raising each gap]
-  - No consolidated capital-activity report: 14 of 20 (70%)
-  - Poor document search / retrieval: 12 of 20 (60%)
-  - No event notifications: 11 of 20 (55%)
-  - Onboarding re-papering (carried as the separate no-memory theme): 10 of 20 (50%)
-- So what: each gap is a discrete, addressable fix rather than a platform rebuild, which is what makes a phased roadmap possible.
-
-**New appendix page A3**
-
-**Title:** Appendix: per-gap detail and quantified pain
-
-| Gap | Raised by | What investors do today | Quantified pain |
-|---|---|---|---|
-| No consolidated capital-activity report | 14 of 20 (70%) | Open statements one at a time, assemble in own spreadsheet | 1 to 2 analyst-days per quarter |
-| Poor document search / retrieval | 12 of 20 (60%) | Email the relationship manager to retrieve | Hours to about a day per request |
-| No event notifications | 11 of 20 (55%) | Rely on the relationship manager's emails; risk seeing call notices late | Compressed funding windows; near-misses |
-| Onboarding re-papering | 10 of 20 (50%) | Re-submit the same entity info and signatories each new fund | Re-papered up to 4 times for multi-fund investors |`,
+    artifactsHtml: { 1: { type: 'powerpoint', html: meridianArtifact09Html } },
   },
   'management-consultant-meridian-full-d4-b3': {
     before: `Early afternoon, back at Carly's desk in the New York office. Marcus stops by before the two of them head across town. Every week he has a standing one-on-one checkpoint with the client at Meridian's office, and until now it has been just him and the Meridian stakeholders. This week he is bringing Carly. This short check-in is where he tells her what the meeting is, what he wants out of it, and what her role in the room is.`,
@@ -1235,7 +939,7 @@ Marcus: That's it. And we'll debrief straight afterward, so if you see something
     before: `Marcus, Carly, and David take an Uber across town to Meridian's office for the mid-engagement checkpoint, the week's one in-person client meeting. Traffic makes the short hop slow, and they get up to a large conference room on Meridian's floor with a few minutes to spare. This is a status meeting, not the final readout: the team shares where the themes are landing and the initial direction, gathers the client's reaction, and keeps everyone aligned so nothing in the week-six readout comes as a surprise. From the consulting team: David, the Senior Manager and the senior face of the relationship, and Marcus, who runs the engagement day-to-day and drives today's conversation. Carly is here for the first time, brought in to see the client side of the work up close. From Meridian: Diane, the Global Head of Client Solutions who sponsored the work and owns the platform strategy and its funding; Gregory, the Head of Investor Relations, whose team operates the portal day-to-day; and Laura, the Head of Technology, who owns the build.`,
     simulatedWork: `Marcus: Diane, Gregory, Laura, thank you all for making the time. I know this is a busy stretch and the calendars are full, so I appreciate it. Before we start, you all know David, and I've also brought Carly with me today. She's been in most of the investor interviews and she's the one building the synthesis behind everything I'm about to show you, so if you ever want the evidence straight from the source, she can give it to you. As for today, I want to be clear about what this is and isn't. This is a checkpoint, not the readout. We're three weeks in, right at the halfway mark, and the whole point of sitting down now is to show you where the themes are landing while there's still time to steer them, hear your reactions, and make sure that when we get to the week-six readout, nothing in it is a surprise to anyone in this room. So please push back as we go.
 
-David: And Diane, before Marcus dives in, thank you for making the time on your side. I wanted to be here in person for this one, because the halfway mark is where these engagements are actually made or lost, and I'd rather hear your reactions directly than have Marcus catch me up later. 
+David: And Diane, before Marcus dives in, thank you for making the time on your side. I wanted to be here in person for this one, because the halfway mark is where these engagements are actually made or lost, and I'd rather hear your reactions directly than have Marcus catch me up later.
 
 Diane: I'm glad you did, David. It's been a while. And I'll say the same thing to all of you that I say to my own teams. I'd rather hear it rough and early than polished and late. A surprise in week six helps no one. So where are you landing?
 
@@ -1436,7 +1140,7 @@ And underneath the soccer stories and Gregory's travel plans, David and Marcus n
     after: ``,
   },
   'management-consultant-meridian-full-d5-b1': {
-    before: `Friday morning, back in the firm's New York office for the team's office day. This is the review David asked for at Monday's kickoff, when he said he wanted to read the storyline himself once it was drafted, and it is why Marcus and Carly spent the last two days getting the gaps section into shape. David has it in front of him now, revised through Marcus's review and updated after the client checkpoint, and he read it closely before walking in. His review is a different altitude from Marcus's: less about whether a page is clean, more about whether the argument survives the room it is built for, the one with Diane and her leadership in it.`,
+    before: `Friday morning, back in the firm's New York office for the team's office day. This is the review David asked for at Monday's kickoff, when he said he wanted to read the storyline himself once it was drafted, and it is why Marcus and Carly spent the last two days getting the gaps section into shape. David has it in front of him now, revised through Marcus's review and updated after the client checkpoint, and he read it closely the night before, leaving his comments in the file as he went. The artifact is that marked-up copy. His review is a different altitude from Marcus's: less about whether a page is clean, more about whether the argument survives the room it is built for, the one with Diane and her leadership in it.`,
     simulatedWork: `David: I read it last night the way Diane's boss will read it. Titles only, front to back, ninety seconds. Want to know what I got?
 
 Carly: Please.
@@ -1457,7 +1161,7 @@ David: Different jobs. Marcus makes each page correct, that's his altitude. I'm 
 
 Carly: I'll start doing that before I hand you anything.
 
-David: Do, and you'll need me less, which is the point. Now, let me try to break it, because that's my job, and it's a lot cheaper for me to break it here than for Diane's leadership to break it in the readout. That's the whole point of this review. Everything I catch this morning is something that doesn't cost us anything in a room where it would. I've got a few things. Let's take them worst-first.
+David: Do, and you'll need me less, which is the point. Now, let me try to break it, because that's my job, and it's a lot cheaper for me to break it here than for Diane's leadership to break it in the readout. That's the whole point of this review. Everything I catch this morning is something that doesn't cost us anything in a room where it would. I've got a few things, and they're already on the pages as comments, so you'll have all of it after this. Let's take them worst-first.
 
 David: Biggest one, the funding story. You assert two things in your titles, without a rebuild, and in phases. Good words, both. But Diane's going to carry this deck to people who control a budget, and people who control a budget don't fund adjectives. Where on these pages does it become obvious that phase one is small and cheap and phase three is the big bet? Right now I can see the gaps beautifully. I cannot see the money.
 
@@ -1519,9 +1223,12 @@ Carly: That's the same thing Marcus said after the checkpoint, from the other si
 
 David: Then it's doubly true, and worth building the whole back half of this engagement around. Good. Then here's the whole review in a sentence, so it's portable: tighten the money, arm Diane for the cynical question, warm the credit so it disarms, hold the one-idea discipline as you build, and make the front match the middle. Do those and this is a deck I'd be comfortable putting in front of Diane's leadership.
 
-David: And genuinely, well done. This is in strong shape for week three, and I don't say that to be kind. I read a lot of week-three decks that are still a pile of observations looking for a point. This one's already an argument. That's the hard part done. Now go make it undeniable while it's fresh.`,
+David: And genuinely, well done. This is in strong shape for week three, and I don't say that to be kind. I read a lot of week-three decks that are still a pile of observations looking for a point. This one's already an argument. That's the hard part done. Now go make it undeniable while it's fresh.
+
+{{artifact:1}}`,
     commentary: `That's the last real gate on the section before it becomes the spine of the readout deck. Next week the notes from this morning turn into pages, and then the exec summary gets built backward from the recommendation rather than bolted on at the end. None of that is new thinking anymore, it's execution, which carries its own kind of pressure. The hard part, the argument, holds. The job from here is making it undeniable before week six.`,
     after: ``,
+    artifactsHtml: { 1: { type: 'powerpoint', html: meridianArtifact10Html } },
   },
   'management-consultant-meridian-full-d5-b2': {
     before: `Friday late morning. Marcus hands Carly something most first-years never touch: the engagement's economics. The work is the budget tracker, hours logged against the plan by staff level, against the fixed fee, and what it says about whether the engagement is on track to hit its margin. The artifact is the tracker.`,
@@ -1539,42 +1246,14 @@ The bottom names three levers, leverage the mix I just saw, utilization keeping 
 
 There's a recovery question in it. Two percent over at halfway isn't a hole you sprint out of, it's one you close by not adding to it, a few hours saved across the back half by not reopening things that are done, drafting the exec summary once off David's blessed structure instead of three times, letting Laura's read set the sequencing so I'm not rebuilding the recommendation later. And half of it isn't mine to spend, the most expensive hours here are David's, so protecting the margin partly means not pulling him into what Marcus or I can carry.
 
-The tracker isn't a scoreboard I'm losing, it's the first time the business behind the work has been legible to me.`,
+The tracker isn't a scoreboard I'm losing, it's the first time the business behind the work has been legible to me.
+
+{{artifact:1}}`,
     commentary: `Marcus just handed me the engagement's hours tracker, which isn't a thing most first-years get to open. The work is interviews and decks, but the business is hours. We're on a fixed fee, which means the firm priced this engagement assuming a certain number of hours at each level, and every hour over that plan comes straight out of the margin. So what I'm looking at is honest bookkeeping: planned hours against actual, by week and by level. Marcus framed it as, you don't get to care about margin only once you're a partner. And he has a point. If I'm the one burning hours redoing a section three times, I should at least be the one who can see it in the numbers.
 
 Seeing it laid out like that is a little sobering, in a useful way. The takeaway isn't to work scared, and it isn't that two percent over is a problem, because it isn't. It's that the budget isn't infinite, the expensive move is redoing settled work, and the most useful thing I can do over the next three weeks is get things closer to right the first time and stop reopening sections that are already done. That's a different discipline than doing good work. It's doing good work once. And honestly, Marcus handing me this wasn't a warning. It was a kind of promotion, trusting me to see the business the way he has to, so that when I make the small calls next week, which section to reopen, whose hours to spend on what, I make them with the margin in view and not just the deck.`,
     after: ``,
-    artifact: `### Artifact 9: Engagement budget and margin tracker
-
-This is a working view of the tracker the firm keeps in Excel, exported from its internal financials system, showing hours logged against the plan and what that does to the fee.
-
-As of end of week 3 of 6. Fixed-fee engagement.
-
-**Table 1, hours by staff level, plan against actual**
-
-| Level | Planned hours (6 weeks) | Actual to date (weeks 1 to 3) | Plan to date | Variance |
-|---|---|---|---|---|
-| Senior Manager (David) | 90 | 44 | 45 | 1 under (on plan) |
-| Manager (Marcus) | 300 | 158 | 150 | 8 over |
-| Consultant (Carly) | 480 | 250 | 240 | 10 over |
-| Total | 870 | 452 | 435 | 17 over |
-
-**Table 2, margin read**
-
-Bill rates by level: Senior Manager $550/hour, Manager $350/hour, Consultant $250/hour.
-
-| Line | Value | Note |
-|---|---|---|
-| Fixed fee | about $274,500 | 90 SM hours plus 300 Manager hours plus 480 Consultant hours, priced at the rates above |
-| Blended bill rate | about $316 per hour | the fee divided by the 870 planned hours; leverage across levels is what makes it work |
-| Hours used to date | 452 of 870 (52 percent) | against 50 percent of the timeline elapsed |
-| Projected hours at close | about 885 | overage is front-loaded in the rebuilt section; weeks 4 to 6 held to plan |
-| Projected variance | about 15 hours over, roughly 2 percent | small, watch it, do not panic |
-| Effect on margin | about 15 hours at the blended rate is roughly $4,700 of effort beyond the fee, a little under 2 percent | manage across weeks 4 to 6 |
-
-**So what (the read):**
-- The engagement is marginally over plan, about 2 percent, driven by the consultant and manager lines. Most of that overage is the deck section that got restructured. Normal, and recoverable.
-- Three levers protect the margin. Leverage: keep the right junior-to-senior mix, and do not pull David in for work Marcus can do, because his hours are the most expensive. Utilization: keep billable hours productive. Realization: deliver inside the priced hours, and do not let the scope creep.`,
+    artifactsHtml: { 1: { type: 'excel', html: meridianArtifact11Html } },
   },
   'management-consultant-meridian-full-d5-b3': {
     before: `Friday after lunch, a standing slot for internal development, the kind of skill-building that fills a consultant's office day. This week's session is a primer on the domain this kind of engagement runs through: private-markets investing, and how the institutional investors on the other end of a manager's portal actually consume the reporting they receive.`,
@@ -1648,13 +1327,15 @@ Marcus: Exactly. Good work this week. Genuinely. Go home.`,
     commentary: `Three weeks in, and for the first time the thing actually feels like a case we're making instead of a pile of interviews. That's the week the work turns, when here's what we heard becomes here's what they should do about it. Up to now it's all been gathering and shaping, the interviews, the tracker, the skeleton, everything pointed at a story we couldn't quite commit to yet because the evidence was still moving under it. Week four it stops moving. The last interviews close the counts, Laura's read tells us what's buildable, and the roadmap stops being a placeholder and becomes the recommendation Diane actually funds from. That's the part I'm looking forward to, the shift from describing the problem to committing to an answer, which is the part that either holds up in front of her leadership or doesn't. And the money lens Marcus left me with is the thing I'll carry into every page of it, because a gap without a fundable fix behind it is just a complaint with a chart. For now, though, it's Friday, and Marcus saying go home twice is the closest thing to a hard stop this job offers. I'll take it. The deck will still be there Monday, and so, apparently, will the whale.`,
     after: ``,
   },
+
+  // ── Day in the Life (six blocks, one representative day) ──────────────────
   'management-consultant-meridian-dil-d1-b1': {
     before: `The engagement is an outside read for Meridian Park, an alternatives manager, on how well its investor portal actually serves the institutions that use it, and today is the Monday that frames the week. The team gathers in a meeting room at the firm's New York office, its home base for the work. David, the Senior Manager above Marcus and the senior face of the relationship, joins to do a pulse check at the halfway mark and point the work ahead: what the investor interviews are surfacing, which working hypotheses the team is now testing, and what has to move from raw interviews toward a finished argument. Marcus, the Manager, runs the day-to-day. Carly, the first-year consultant, has sat in on a string of the investor interviews and owns the synthesis and the first deck pages. This is the room where the day's work gets pointed.`,
     simulatedWork: `David: Morning, both. Let's keep this to the half hour, I'm due on another call at the top of the hour. We're at the halfway mark, so before we get into the day I want to see where we stand, and I want to walk out with a clean read on what each of you is driving toward. Marcus, bring me up to speed on the interviews. Are we tracking to get through the full interview list with room to spare before the readout, and what are they telling us so far?
 
 Marcus: We're about halfway through, with more coming today, which puts us where we need to be to start locking themes. On track to finish the full list well before the readout. The headline's more consistent than I expected at this stage. Meridian's investors like the firm, the investment relationship's good, and they trust the data on the portal. The frustration's almost entirely about what the portal doesn't do once that data is in front of them.
 
-David: Define what it doesn't do. 
+David: Define what it doesn't do.
 
 Marcus: The portal stops at providing accurate data and leaves the last step to the investor. The pension CIOs we've already spoken to describe it the same way. They can pull a quarter's capital activity, but not in one consolidated report, so their teams rebuild it by hand to get a number they can put in front of a board. They're paying for a finished product and assembling it themselves.
 
@@ -1887,7 +1568,9 @@ Marcus: It is, and that's exactly why we're talking to people like you. This is 
 Ellen: Of course. Happy to help. Good luck with it.
 
 [The call ends a few minutes shy of the hour.]`,
-    commentary: `That was a good one. Ellen was candid, which you can't always count on, and I've got a couple of pages of notes I want to tighten up before any of it blurs. Right now I can still hear exactly how she said things, which thing she rated a six, why the better manager came out ahead, the one or two offhand comments that I think actually matter more than she let on. A few days from now that detail is gone, and "the portal is clunky" is all that's left.
+    commentary: `[(after Ellen drops off)]
+
+That was a good one. Ellen was candid, which you can't always count on, and I've got a couple of pages of notes I want to tighten up before any of it blurs. Right now I can still hear exactly how she said things, which thing she rated a six, why the better manager came out ahead, the one or two offhand comments that I think actually matter more than she let on. A few days from now that detail is gone, and "the portal is clunky" is all that's left.
 
 Fortunately we don't have another interview right after this, so I've got the time to clean these up while they're fresh. That doesn't always happen, so when it does, I take it.
 
@@ -1896,148 +1579,18 @@ My cleaned-up notes are an important artifact, and they get added to our ongoing
   },
   'management-consultant-meridian-dil-d1-b3': {
     before: `After the Ellen call, Carly stays at her desk to work the interview notes into shape while Ellen's voice is still fresh. What comes out is a pair of artifacts, shown back to back: first the raw notes Carly typed live during the call, then the cleaned, structured write-up she rewrites them into, the same conversation moved from private shorthand into a document that carries on its own.`,
-    simulatedWork: `The raw block above is what a live call leaves behind, and the write-up below isn't a clean retype of it, it's a run of small judgments about what mattered. I'm starting with the headline, one line for the whole interview: the relationship's good, the data's accurate, the pain is the last mile. Everything else in the write-up sits under that, the hard facts up top in a small fields table, the findings below, ordered by how much they matter rather than the order they came up.
+    simulatedWork: `{{artifact:1}}
+
+The raw block above is what a live call leaves behind, and the write-up below isn't a clean retype of it, it's a run of small judgments about what mattered. I'm starting with the headline, one line for the whole interview: the relationship's good, the data's accurate, the pain is the last mile. Everything else in the write-up sits under that, the hard facts up top in a small fields table, the findings below, ordered by how much they matter rather than the order they came up.
 
 One number stops me. In the raw the assembly time is the better part of a couple of days, and for a second I can't tell whether she meant a week or a quarter. The run of the conversation settles it, the figure came right after Marcus asked her to put a number on it per quarter, so per quarter. It goes into the finding as her own rough estimate, not a hard figure, since it was a guess under a little pressure, not something we measured.
 
-The gaps are what I'm really building toward, they're what the tracker takes. Three of them, the consolidated report, document search, and notifications, are the same reporting-cycle problem and sit together cleanly. Onboarding I'm less sure about, it's real and Ellen was pointed about it, but it's the front end of the relationship, not the reporting cycle, and a different team feels it. That one I don't settle at my desk, I code it and flag it for the group, a question rather than a call I make alone.`,
+The gaps are what I'm really building toward, they're what the tracker takes. Three of them, the consolidated report, document search, and notifications, are the same reporting-cycle problem and sit together cleanly. Onboarding I'm less sure about, it's real and Ellen was pointed about it, but it's the front end of the relationship, not the reporting cycle, and a different team feels it. That one I don't settle at my desk, I code it and flag it for the group, a question rather than a call I make alone.
+
+{{artifact:2}}`,
     commentary: `Next it goes into the running theme tracker, where the interview stops being one person's story and becomes part of the count the deck will stand on, one more row in a matrix that's finally getting big enough to say something on its own. Two things are worth watching as the interviews continue: whether the last-mile split really breaks document-led versus data-led the way it's starting to, and whether other investors feel the onboarding re-papering as sharply as Ellen does. I'll flag both for the team so the calls still ahead can probe them.`,
     after: ``,
-    artifact: `### Artifact 1: Raw live notes (as typed during the call)
-
-\`\`\`
-ELLEN - CIO public pension - MP private credit
-
-she's GLAD MP looking at portal - "there's room for improvement"
-  (candid, good sign)
-conf reminder given. ok w/ it
-
-ROLE: CIO ~9 yrs at fund, last 4 in seat. runs whole inv program, all asset classes.
-public pension, retirement assets for state employees. ~$12B total
-w/ MP ~6 yrs. they run a slice of our PC alloc. grown since start BUT "won't get into
-  specifics" - bigger part of book than it was
-USAGE: varies. month-end + qtr-end = HEAVY. pulls statements, perf, cap activity for
-  period -> board reporting. between = ad hoc, team needs a doc / IR q comes in.
-  few x / wk normally, lots around rptg cycle
-  team = small (handful of analysts + her). during a close ALL of them in portal at some pt
-    (perf, cap activity, chasing a doc an auditor wants). ~dozen small retrievals, same compressed
-    window (board calendar doesn't move) -> the portal being a step slow gets x'd across the whole team
-  *** "that's when it costs me the most"
-
-GAP 1 - cap activity reporting ***
-nothing comes out in 1 step. qtr cap activity = calls + distribs across period.
-CANT pull a single clean rpt. opens statements 1 by 1, stitches in own spreadsheet
-  -> number she needs for board
-who rebuilds? -> TEAM. "unnecessary amount of time", "incredibly manual"
-data IS all there. getting it OUT in board shape = the painful part.
-  "for what we pay in fees, that's a little hard to swallow"
-*** QUOTE "I'm paying for a finished product and getting raw ingredients"
-$ FOLLOW UP (Marcus asked to quantify) -> analyst time? "better part of a couple of
-  days" just on the assembly, per qtr, before anyone looks at the numbers
-  *** "the thinking is the job. the assembly shouldn't be"
-  MECHANICS of assembly: someone w/ ~dozen stmts open, copies figures into own spreadsheet,
-    checked line by line (a transposed # in a board rpt = not small), reconciled back vs stmts.
-    careful + fully mechanical = worst combo (high stakes, no thinking). consolidated view would kill the step
-  BOARD USE: number -> inv committee of the board (oversees program). meets quarterly, PC = 1 line on long agenda.
-    wants clean consolidated view, absorb in ~couple min. NOT the dozen stmts, NOT the spreadsheet.
-    assembly must be invisible by design -> "look effortless in that room... a lot of effort nobody sees"
-    board-ready = specific: 1 page, own template, same layout every qtr (committee compares, doesn't relearn).
-    team also re-forces the number into a format the portal has never produced. every qtr
-
-GAP 2 - doc search / retrieval
-auditors ask for a specific qtrly stmt from 2 yrs ago, or a particular notice ->
-  can rarely just find it. "search doesn't work the way you'd expect"
-ends up EMAILING RM at MP to send it over
-RM responsive, ~within a day. BUT "a day, for something I should get in 30 sec myself"
-  -> "makes the whole platform feel a step behind"
-  search matches on wrong things -> query pulls up everything or nothing. no reliable filter by fund / period / doc type
-  AUDITOR angle: ext auditors ~1x/yr, ask for specific stmts + notices going back yrs. she must produce.
-    can't self-serve -> emails RM, waits, WHILE auditor sits there. "makes us look slower than we are"
-    own work she can manage (knows roughly where things live); under audit NO workaround - needs the exact doc
-
-GAP 3 - onboarding / subscription paperwork (front end)
-sore spot - more her OPS team than her directly, but she hears about it
-every new fund = start paperwork FROM SCRATCH. same entity info, same signatories,
-  same supporting docs. none of it carries across funds
-in 4 MP funds now. "by the fourth one... sending the same formation docs + signatory
-  list again is a little absurd. they have all of it"
-other mgrs? better ones come back mostly pre-filled, only ask what's CHANGED (new
-  signatory, updated address). "treating us as an existing relationship, not a brand
-  new one every time"
-ops team: rekeys entity details + re-collects signatures MP already has on file. "small indignity, wears on people"
-  head of ops raised it w/ her after last fund -> why it's on her radar. "not the biggest thing but maybe the most needless"
-better-mgr fix = just keeping the file: hold what they collected, present back to confirm not re-enter.
-  not sophisticated -> "the fix is that mundane and still isn't there" -> reads as priority, not difficulty
-
-GAP 4 - notifications / how she finds out
-portal doesn't tell her anything. RM emails when a call is coming - she appreciates it
-  BUT means leaning on an email, not the system
-if email late / she's travelling -> first time seeing call notice can be late in the
-  funding window
-ever cost? nothing she'd "put in front of my board" but a couple times had to move
-  faster than she'd like. "shouldn't come down to whether I caught an email"
-what would help? -> alert tied to the ACTUAL EVENT, not someone remembering. moment a
-  call is issued -> notif w/ amount + due date, sits top of dashboard til acted on.
-  good platforms do exactly this
-"move faster" cost: call funded by a date, cash from somewhere (sale/transfer/approvals, a day or two).
-  comfortable runway = routine; late notice = scramble, "a scramble is where mistakes live". nothing broken yet.
-  managing the risk w/ her attention not a system, "attention is the thing I have least of during a close"
-today's workaround: she + assistant keep own calendar of expected calls (from mgr signals); someone logs into
-  each portal on a rhythm to see what appeared. "manual net under a system that should catch this itself".
-  works bc diligent -> "shouldn't depend on us being diligent". hole in the net = a call sitting there nobody flagged
-
-SCORE *** MP = 6 / 10. best other mgr = 8 (maybe a touch higher)
-why 6: data accurate + all there (doesn't take that for granted) but stops there
-best mgr does: at qtr-end the reporting is basically ALREADY BUILT - consolidated stmt,
-  full cap activity in 1 place, ~hand straight to board. reviewing not assembling.
-  + search "just works"
-  *** "the bar has moved, they're sitting where some others were ~2 yrs ago"
-=> LAST MILE theme: accurate data -> board-ready, without her doing the work
-(aside) compares notes w/ a few peer CIOs at similar systems, informal. not MP by name.
-  general shape: who's modernized reporting vs not. "where a mgr sits on tech, not just returns" gets noticed now.
-  a few yrs ago nobody compared notes on a portal. [soft color - prob drop in clean]
-
-MY Q (Carly): raised it w/ MP directly? -> yes, more than once, to RM. always gracious,
-  take the point, then nothing changes. NOT unwillingness -> "bigger than the person
-  I'm talking to. it's the platform itself." RM can't just go fix it
-
-WRAP: none of it a dealbreaker, investment relationship is good (what matters most).
-  but on the platform: same set of frustrations for a while. glad they're looking at it
-\`\`\`
-
-### Artifact 2: Cleaned, structured notes
-
-**Interview write-up: Ellen**
-
-| Field | Detail |
-|---|---|
-| Interviewee | Ellen, Chief Investment Officer |
-| Organization | Public pension system (~$12B total assets; retirement assets for state employees) |
-| Meridian product | Private credit allocation (Meridian runs a slice; ~6-year relationship; investor in 4 Meridian funds) |
-| Date | Tuesday, week 3 of 6 |
-| Interviewers | Marcus (Manager, lead), Carly (Consultant, notes) |
-| Format | 30-minute video call |
-
-**Headline.** The investment relationship is good and the portal data is accurate; the pain is the last mile. The Meridian Investor Portal stops at accurate data and leaves the assembly to the investor. Ellen scores Meridian a 6 out of 10 against a best-other-manager 8, and the gap is consistently about getting from accurate data to a finished, board-ready output without her team doing that step by hand.
-
-**Context.** Ellen is CIO of about nine years at the fund (four in the seat), responsible for the whole investment program. The fund has invested with Meridian about six years across a slice of its private credit allocation. She declined to detail how the allocation has grown. Portal use is heaviest at month-end and quarter-end (statements, performance, capital activity for board reporting) and ad hoc in between. During a close her small team (a handful of analysts) is all in the portal at once, and many small retrievals land in the same compressed window set by the board calendar.
-
-**Findings by theme.**
-
-1. **No consolidated capital-activity report.** Ellen cannot pull a single clean view of a quarter's calls and distributions. She opens statements one at a time and her team stitches them together in a spreadsheet to reach the board-ready number. The data is all present; the assembly is the burden. The spreadsheet her team maintains is checked line by line and reconciled back against the statements, high-stakes but purely mechanical work that a consolidated view would eliminate. The assembled figure goes to the board's investment committee, which reviews private markets as one line on a quarterly agenda and wants a single consolidated view it can absorb in minutes, in the consistent one-page format it has seen every quarter; the manual assembly has to stay invisible to that room, which is what makes the missing consolidated report grate. Her words: *"I'm paying for a finished product and getting raw ingredients,"* and *"the thinking is the job. The assembly shouldn't be."*
-   - *Quantification:* the better part of a couple of analyst-days per quarter spent on assembly alone, before anyone analyzes the numbers (Ellen's own rough estimate when asked).
-
-2. **Poor document search and retrieval.** Search does not reliably surface a specific past statement or notice (e.g., an auditor request for a quarterly statement from two years ago). Ellen routinely emails her relationship manager to retrieve documents instead. The relationship manager is responsive (usually within a day), but her point stands: *"a day, for something I should be able to get in thirty seconds myself."* It *"makes the whole platform feel a step behind."* Search matches on the wrong things, returning everything or nothing with no reliable filter by fund, period, or document type. The sharpest version is the annual external audit, when auditors request exact statements and notices going back years on someone else's clock; not being able to self-serve there makes the fund look slower than it is.
-
-3. **Onboarding / subscription re-papering each new fund.** Each new Meridian fund starts the paperwork from scratch: the same entity information, authorized signatories, and supporting documentation, none of it carrying across. Ellen is in four Meridian funds and still re-submits the same materials. Felt mostly by her operations team. Better managers return mostly pre-filled paperwork and only ask her to confirm what has changed (a new signatory, an updated address), which she reads as being treated as an existing relationship rather than a new one each time. Her head of operations raised the re-papering with her directly after the last fund, which is how it reached her; she frames it as not the biggest gap but perhaps the most needless. She reads the better managers' fix as unsophisticated, simply keeping her file and presenting it back to confirm, which makes Meridian's omission look like a question of priority rather than difficulty.
-
-4. **Passive portal, no event notifications.** The portal does not alert her when a capital call or document posts. She leans on her relationship manager's emails, so a late email or travel can mean seeing a call notice late in the funding window. Nothing she would escalate to her board, but a couple of times she has had to move faster than she would like. She wants notifications tied to the actual event (the moment a call is issued), with amount and due date, surfaced on the dashboard until acted on. A late notice compresses the funding routine (sourcing cash by a fixed date) into a scramble; nothing has broken, but she manages the risk with her own attention rather than a system. Today she and her assistant keep their own calendar of expected calls and log into each portal on a rhythm to catch what has posted, a manual net under a system that should be catching it itself, holding only because they are diligent.
-
-**Score and benchmark.** Meridian 6/10; best other manager 8/10 (possibly a touch higher). The 6 credits accurate, complete data; the gap to the 8 is the finished output. The best manager delivers a consolidated statement at quarter-end that is close to board-ready (reviewing, not assembling) and search that simply works. Ellen: *"the bar has moved, and they're sitting where some of the others were maybe two years ago."*
-
-**Cross-cutting theme (candidate).** The "last mile": the portal delivers accurate data but leaves the investor to turn it into the finished thing they actually need. Strong candidate to anchor a deck section; watch for the same pattern in other interviews (shape of the last mile likely differs by investor type).
-
-**Did she raise it with Meridian?** Yes, more than once, to her relationship manager. Always received graciously, but nothing changes. Her read: it is bigger than any one contact, it is the platform itself, which a relationship manager cannot fix.`,
+    artifactsHtml: { 1: { type: 'document', html: meridianArtifact05Html }, 2: { type: 'document', html: meridianArtifact06Html } },
   },
   'management-consultant-meridian-dil-d1-b4': {
     before: `With the morning's interview done and its notes cleaned up, Marcus and Carly sit down in a small breakout room, four chairs and a TV mounted on the wall, for the team's problem-solving session: the working meeting where the team compares what it is hearing, attacks its own logic, and tightens the themes into something the deck can stand on. Two artifacts drive the hour, the theme tracker and the skeleton deck, and Carly has both open on her laptop to put up on the screen.`,
@@ -2123,9 +1676,9 @@ Marcus: Right. We're in the weeds. Pull up. [his phone buzzes on the table; he g
 
 [While Marcus answers the message, Carly turns back to the tracker on the wall and scans down the insurer rows.]
 
-Marcus: [putting the phone face down] Okay. Now the insurer split, because that's the one I'm least settled on. The data-led investors, the insurers, the ones who want raw data into their own systems rather than a finished document. I want to make sure we're not over-rotating on them, because so far they're a small part of the sample. We've got, what, five of them out of the twenty?
+Marcus: [putting the phone face down] Okay. Now the insurer split, because that's the one I'm least settled on. The data-led investors, the insurers, the ones who want raw data into their own systems rather than a finished document. I want to make sure we're not over-rotating on them, because so far they're a small part of the sample. We've got, what, five of them out of the eighteen?
 
-Carly: Five so far, and the spread's real. Raymond rates Meridian a five out of ten and his best other manager a nine, a much wider gap than the document-led investors give us. But I'd be careful claiming insurers are the bigger population. I read them as the smaller slice with the sharper pain, because their downstream lands in a regulatory filing, not a board meeting. One thing we should do is ask Meridian for their own rough split of investors by segment. If insurers are, say, one in ten of their book, we need to know that before we let a loud five out of twenty in our sample pull the roadmap toward a data-feed build that serves very few of them.
+Carly: Five so far, and the spread's real. Raymond rates Meridian a five out of ten and his best other manager a nine, a much wider gap than the document-led investors give us. But I'd be careful claiming insurers are the bigger population. I read them as the smaller slice with the sharper pain, because their downstream lands in a regulatory filing, not a board meeting. One thing we should do is ask Meridian for their own rough split of investors by segment. If insurers are, say, one in ten of their book, we need to know that before we let a loud five out of eighteen in our sample pull the roadmap toward a data-feed build that serves very few of them.
 
 Marcus: Say more on why the pain reads sharper, because I want to be sure it's the downstream and not just that Raymond's a blunt guy who scores low.
 
@@ -2169,53 +1722,14 @@ Now the title. I'm leading with the symmetry, pensions need board-ready document
 
 Page 3.3 is the hard one. It has to carry the gaps themselves, four of them, how many investors raised each, what they do about it today, and the quantified pain, and every column is pulling weight. It's a heavy grid and a senior would flip past it, but cutting a column means dropping evidence I fought for, so it stays dense for now. Then a snag: one gap's count doesn't match the tracker, a stale number I'd carried from memory. That becomes a rule on the spot, numbers come off the tracker, never out of my head. Onboarding goes down as the separate no-memory theme rather than a fourth reporting gap, and the data-feed gap gets its own page, its pain a different order that a general grid would flatten. The middle column takes concrete verbs, not deals with it but opens statements one at a time and assembles them in a spreadsheet.
 
-Then the titles test, each one on its own. 3.1 holds, 3.2 holds, 3.3 doesn't, and I can see it doesn't. What it wants is a clean lead slide with the counts as a bar and the table demoted behind it, but that's real minutes I don't have before the block ends, and Marcus asked for a draft he can react to, not a finished section. So 3.3 stays overloaded on purpose, with a note that it may need to come apart. What's here at the end is a genuine first draft, real titles, real evidence, two exhibits sketched, one page I already know is soft, which is about as far as a first pass goes.`,
+Then the titles test, each one on its own. 3.1 holds, 3.2 holds, 3.3 doesn't, and I can see it doesn't. What it wants is a clean lead slide with the counts as a bar and the table demoted behind it, but that's real minutes I don't have before the block ends, and Marcus asked for a draft he can react to, not a finished section. So 3.3 stays overloaded on purpose, with a note that it may need to come apart. What's here at the end is a genuine first draft, real titles, real evidence, two exhibits sketched, one page I already know is soft, which is about as far as a first pass goes.
+
+{{artifact:1}}`,
     commentary: `The point of this block is to take what Marcus and I just agreed and get it onto real slides while the logic's still fresh. I draft, Marcus marks it up, and it tightens over the next few weeks before it's anywhere near the client. What I owe him is a genuine first pass he can react to, not a polished section, because the fastest way to waste his review is to hand him something so finished I've stopped being able to change it.
 
 Now it's heads-down for the rest of the block. I'll keep drafting and cleaning these pages, get them as organized and easy to read as I can with the exhibits sketched in, and then take them to Marcus. That last part matters more than it sounds. A lot of being good in this seat is invisible: it's making the next person's step easy and never being the thing anyone's waiting on. Part of that, concretely, is building the draft so Marcus can move through it fast and drop his comments straight onto the page, because the quicker he can react the more passes we get, and the section only gets good by cycling through a few of them. So the goal for the rest of this block isn't perfection. It's clean enough that Marcus can start marking it up cold, and clear enough that his time goes to sharpening the argument rather than decoding my shorthand.`,
     after: ``,
-    artifact: `### Artifact: Gaps section, first-draft slides
-
-**Page 3.1**
-
-**Action title:** The Meridian portal delivers accurate data but stops short of the finished output investors need, leaving them to build the last mile by hand
-
-Body:
-- Across the 20 investor interviews completed to date, nearly all credit the portal's data as accurate and complete, and nearly all describe doing manual work to turn that data into what they actually use.
-- The pain is not accuracy. It is the gap between accurate data and a usable end product.
-- Select quotes:
-  - "I'm paying for a finished product and getting raw ingredients."
-  - "It gives me a PDF I have to take apart before any of the real work starts."
-- So what: the opportunity is the last mile, not the data layer. This reframes the problem from fix the data to finish the job.
-- [Exhibit placeholder: simple two-step visual, accurate data, then the gap, then finished output]
-
-**Page 3.2**
-
-**Action title:** The last mile takes a different shape by investor type: pensions need board-ready documents, insurers need system-ready data
-
-Body:
-- Document-led investors (pensions, endowments, foundations): the missing last step is a consolidated, presentation-ready report they can take to a board or investment committee.
-  - Anchor example: a pension CIO rebuilds a quarter's capital activity by hand because there is no consolidated capital-activity report. About 1 to 2 analyst-days per quarter on assembly alone, before anyone analyzes the numbers.
-- Data-led investors (insurers): the missing last step is structured data delivered into their own systems for statutory accounting, regulatory capital, and asset-liability work. A PDF is of little use.
-  - Anchor example: a life insurer reclassifies and re-keys every position so it maps to statutory reporting. About 2 staff for the better part of a week each quarterly filing.
-- So what: one structural problem, two finish lines. The roadmap has to serve both without rebuilding the platform.
-- [Exhibit placeholder: two-column compare, document-led versus data-led]
-
-**Page 3.3**
-
-**Action title:** Four recurring gaps drive most of the manual work, and they cluster by how often investors hit them
-
-Body:
-
-| Gap | Raised by | What investors do today | Quantified pain |
-|---|---|---|---|
-| No consolidated capital-activity report | 14 of 20 (70%) | Open statements one at a time, assemble in own spreadsheet | 1 to 2 analyst-days per quarter |
-| Poor document search / retrieval | 12 of 20 (60%) | Email the relationship manager to retrieve | Hours to about a day per request |
-| No event notifications | 11 of 20 (55%) | Rely on the relationship manager's emails; risk seeing call notices late | Compressed funding windows; near-misses |
-| Onboarding re-papering (carried as the separate no-memory theme) | 10 of 20 (50%) | Re-submit the same entity info and signatories each new fund | Re-papered up to 4 times for multi-fund investors |
-
-- So what: these are discrete, addressable fixes, not a platform rebuild. That is what makes a phased roadmap possible.
-- [Note on page: the data feed and look-through gap for data-led investors is carried on its own page given the wider score spread.]`,
+    artifactsHtml: { 1: { type: 'powerpoint', html: meridianArtifact07Html } },
   },
   'management-consultant-meridian-dil-d1-b6': {
     before: `With the section drafted, Carly takes it straight to Marcus. He has her gaps section open on the screen and walks her through his edits. A meaningful share of it gets restructured, which on a first draft is the norm rather than a verdict on the work. The artifact is one of Carly's pages with Marcus's markup. This is the last stop of the day, where the page she built an hour ago gets pressure-tested before it goes anywhere near David.`,
@@ -2255,11 +1769,11 @@ Marcus: That's the one. Say most of the manual work, not all of it, we don't wan
 
 Carly: Four bars, one color, ordered, base on the exhibit. That's cleaner than the table anyway.
 
-Marcus: It usually is. Next thing. Your counts. 14 of 20. Twenty what?
+Marcus: It usually is. Next thing. Your counts. 13 of 18. Eighteen what?
 
 Carly: Investors interviewed to date.
 
-Marcus: Then say it on the page, every time. 14 of 20 investors interviewed to date. The minute a number floats without its base, someone in that room asks, and if we're explaining our own denominator live, we've lost a little credibility for no reason. Put the base on every exhibit, and build every slide to stand on its own. You can't assume anyone in that room read the page before it, so each one has to make sense by itself.
+Marcus: Then say it on the page, every time. 13 of 18 investors interviewed to date. The minute a number floats without its base, someone in that room asks, and if we're explaining our own denominator live, we've lost a little credibility for no reason. Put the base on every exhibit, and build every slide to stand on its own. You can't assume anyone in that room read the page before it, so each one has to make sense by itself.
 
 Carly: Got it. Base on every number, and every slide stands alone.
 
@@ -2295,30 +1809,15 @@ Marcus: Last thing. Nowhere in here do you hint at the fix, and that's correct, 
 
 Carly: Okay. So I split page three into a clean lead page with the detail behind it, put the base on every count, rework the by-type title so it leads with the so-what, keep the quotes unattributed, and keep any hint of the fix out of this section.
 
-Marcus: That's a good list. And none of this is because the draft was weak. A first cut that needs this much shaping is just a first cut. The thinking underneath it is right, which is the part I can't fix for you. The structure I can.`,
+Marcus: That's a good list. And none of this is because the draft was weak. A first cut that needs this much shaping is just a first cut. The thinking underneath it is right, which is the part I can't fix for you. The structure I can.
+
+{{artifact:1}}`,
     commentary: `Getting the section in front of Marcus rough, instead of polishing it alone for days, is the whole reason I brought him a draft this early. The instinct when a first draft comes back this marked up is to take it as a grade on the thinking. I've learned not to. A first cut is a first cut, and the notes are structural, which means they're an hour of work, not a verdict. The page he reworked the hardest was the one where I'd crammed four ideas onto a slide because I didn't want to waste the space, and the thing I hold onto is what he said at the end: the thinking was right, the structure wasn't. Structure I can fix in an hour.
+
+[(closing the day)]
 
 That's the loop, start to end. This morning Ellen told us she's paying for a finished product and getting raw ingredients. By this afternoon that exact frustration is sitting in a deck page, coded, counted, argued over with Marcus, and pointed at something Meridian can actually fund. I've walked you through it as one clean day. The real version is messier and more interrupted than this, more calls stacked up, more half-built pages waiting on a number. But the line through it is exactly what you just watched: a real person's problem this morning, on its way to a page David will read, by the end of the day.`,
     after: ``,
-    artifact: `### Artifact: Marked-up page (page 3.3, with Marcus's comments)
-
-This is the gaps page Marcus just walked through on the screen, page 3.3 from the draft built earlier today, now with his review comments attached inline so the specific changes are visible.
-
-**Action title:** Four recurring gaps drive most of the manual work, and they cluster by how often investors hit them
-> [C1, Marcus] Title is two ideas. Cut everything after the comma. One idea: the gaps drive the manual work. New title candidate: "A small number of recurring gaps drive most of the manual work investors describe."
-
-Body table:
-
-| Gap | Raised by | What investors do today | Quantified pain |
-|---|---|---|---|
-| No consolidated capital-activity report | 14 of 20 | Open statements one at a time, assemble in own spreadsheet | 1 to 2 analyst-days per quarter |
-| ... | ... | ... | ... |
-
-> [C2, Marcus] 14 of 20 what? Investors interviewed to date. Put the base on every number, and make each slide stand on its own.
-> [C3, Marcus] This whole table is the appendix. The page itself should show the counts as a simple bar and make ONE point. The detail moves behind it.
-> [C4, Marcus] Good content, wrong container. Split it: lead page is the point, the evidence table is appendix A3.
-
-So what: these are discrete, addressable fixes, not a platform rebuild.
-> [C5, Marcus] Keep this line, it is the so-what. But it belongs up on the lead page, not buried under the table.`,
+    artifactsHtml: { 1: { type: 'powerpoint', html: meridianArtifact08DitlHtml } },
   },
 }
