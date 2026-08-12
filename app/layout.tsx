@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import { JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth'
+import PostHogProvider from '@/components/PostHogProvider'
 import Navbar from '@/components/Navbar'
 import AuthModal from '@/components/AuthModal'
 import SiteFooter from '@/components/landing/SiteFooter'
@@ -50,15 +51,19 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} ${jetbrains.variable}`}
     >
       <body className="font-sans bg-cream text-dark antialiased">
-        <AuthProvider>
-          {/* Sticky nav renders above all page content (§7.3) */}
-          <Navbar />
-          <main>{children}</main>
-          {/* Shared footer, rendered once here so it appears on every page */}
-          <SiteFooter />
-          {/* Single global auth modal, opened from navbar or simulation gate */}
-          <AuthModal />
-        </AuthProvider>
+        {/* Analytics wraps everything so pageviews cover every route, and so
+            auth events fired from AuthProvider have PostHog available. */}
+        <PostHogProvider>
+          <AuthProvider>
+            {/* Sticky nav renders above all page content (§7.3) */}
+            <Navbar />
+            <main>{children}</main>
+            {/* Shared footer, rendered once here so it appears on every page */}
+            <SiteFooter />
+            {/* Single global auth modal, opened from navbar or simulation gate */}
+            <AuthModal />
+          </AuthProvider>
+        </PostHogProvider>
       </body>
     </html>
   )
