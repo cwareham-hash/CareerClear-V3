@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Heart } from 'lucide-react'
 import type { Career } from '@/lib/careers'
+import { trackCareerCardClicked } from '@/lib/analytics'
 
 interface CareerCardProps {
   career: Career
@@ -28,7 +29,7 @@ interface CareerCardProps {
  * Hover: shadow-card-hover + translateY(-2px), 200ms ease
  */
 export default function CareerCard({ career, isFavorite, onToggleFavorite, isSimulated }: CareerCardProps) {
-  const { slug, emoji, title, industry, description, skills, hasSimulation } = career
+  const { id, slug, emoji, title, industry, description, skills, hasSimulation } = career
 
   return (
     <article
@@ -138,9 +139,13 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
             )}
           </div>
 
-          {/* Explore link (§5.2.2, §7.6.1) */}
+          {/* Explore link (§5.2.2, §7.6.1) — the card's only navigation, so this
+              is where the click is reported. This component is shared with the
+              questionnaire results page; PostHog's $current_url tells the two
+              surfaces apart. */}
           <Link
             href={`/careers/${slug}`}
+            onClick={() => trackCareerCardClicked(id, hasSimulation)}
             className="font-sans text-[13px] font-semibold text-teal
               hover:text-teal-light transition-colors duration-150 shrink-0
               rounded focus-visible:outline-none focus-visible:ring-2"

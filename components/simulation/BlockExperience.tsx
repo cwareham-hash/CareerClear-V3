@@ -20,6 +20,17 @@ import {
   upsertProgress,
   type SimulationFeedback,
 } from '@/lib/userProgress'
+import {
+  trackTierStarted,
+  trackBlockOpened,
+  trackBlockCompleted,
+  trackBlockMarkedIncomplete,
+  trackTierCompleted,
+  trackSurveyShown,
+  trackSurveySubmitted,
+  trackSurveyDismissed,
+  type SimulationContext,
+} from '@/lib/analytics'
 import SimAccessGate from './SimAccessGate'
 import SimulationCalendar from './SimulationCalendar'
 import OrientationReadingList from './OrientationReadingList'
@@ -58,9 +69,15 @@ export default function BlockExperience({
   footer,
   connectors,
 }: Props) {
-  const { user, userName } = useAuth()
+  const { user, userName, betaAccess, isLoading: authLoading } = useAuth()
   const { isFavorite, upgradeToActively } = useFavorites()
   const career = CAREERS.find((c) => c.id === careerId)
+
+  // Identifying properties shared by every analytics event fired from here.
+  const analyticsCtx = useMemo<SimulationContext>(
+    () => ({ careerId, scenario, tier }),
+    [careerId, scenario, tier],
+  )
 
   // ── State ─────────────────────────────────────────────────────────────────
   const [completedIds, setCompletedIds]       = useState<Set<string>>(new Set())
@@ -70,6 +87,38 @@ export default function BlockExperience({
   const [isLoaded, setIsLoaded]               = useState(false)
 
   const prevCompletedCountRef = useRef(0)
+
+  // Which (scenario, tier) pairs have already reported tier_started during THIS
+  // page load. A ref, not state, so it never triggers a render — and because it
+  // lives for the component's lifetime, a soft navigation to another route
+  // remounts and legitimately starts fresh.
+  const startedTiersRef = useRef<Set<string>>(new Set())
+
+  // ── tier_started ──────────────────────────────────────────────────────────
+  // Fires once per tier the user actually reaches. Gated on access because this
+  // component mounts (and its effects run) even when SimAccessGate is showing the
+  // login or beta-waitlist card instead of the tier — firing there would count
+  // people who never saw the experience. Switching Day-in-the-Life → Full inside
+  // the project page is a genuine new tier entry and does fire again; re-renders
+  // and returning to a tier already entered this page load do not.
+  useEffect(() => {
+    if (authLoading || !user || !betaAccess) return
+    const key = `${scenario}:${tier}`
+    if (startedTiersRef.current.has(key)) return
+    startedTiersRef.current.add(key)
+    trackTierStarted(analyticsCtx)
+  }, [authLoading, user, betaAccess, scenario, tier, analyticsCtx])
+
+  // ── block_opened ──────────────────────────────────────────────────────────
+  // Keyed on the open block's id rather than on the click handlers, so it counts
+  // every block the panel/modal actually displays — whether the user got there by
+  // clicking the calendar, the reading list, or the panel's Next/Previous
+  // controls — exactly once per display.
+  useEffect(() => {
+    if (!openBlock) return
+    trackBlockOpened(analyticsCtx, openBlock.id, openBlock.activityType)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openBlock?.id])
 
   // Load completed block ids for this user. Orientation is signalled by the tier
   // (no longer by a null scenario) and reads that project's orientation rows; the
@@ -132,12 +181,15 @@ export default function BlockExperience({
       completedCount > prevCompletedCountRef.current &&
       completedCount === blocks.length
     ) {
-      const t = setTimeout(() => setShowRatingModal(true), 400)
+      const t = setTimeout(() => {
+        setShowRatingModal(true)
+        trackSurveyShown(analyticsCtx)
+      }, 400)
       prevCompletedCountRef.current = completedCount
       return () => clearTimeout(t)
     }
     prevCompletedCountRef.current = completedCount
-  }, [completedCount, blocks.length, tier])
+  }, [completedCount, blocks.length, tier, analyticsCtx])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   // Toggle a block complete/incomplete and persist the change to the shared
@@ -145,23 +197,39 @@ export default function BlockExperience({
   // all stay in sync (they read the same source).
   const handleToggleComplete = useCallback(
     (id: string, complete: boolean) => {
-      setCompletedIds((prev) => {
-        const next = new Set(prev)
-        if (complete) next.add(id)
-        else next.delete(id)
-        if (user) {
-          const completedForTier = blocks.filter((b) => next.has(b.id)).map((b) => b.id)
-          void upsertProgress({
-            userId:          user.id,
-            careerId,
-            scenario,
-            tier,
-            completedBlocks: completedForTier,
-            isCompleted:     blocks.length > 0 && completedForTier.length === blocks.length,
-          })
-        }
-        return next
-      })
+      // The next set is computed here rather than inside a setCompletedIds
+      // updater. React runs updater functions twice in development, which was
+      // firing the Supabase write twice (harmless for an upsert, but it would
+      // double every analytics event below). `completedIds` is a dependency of
+      // this callback, so reading it directly is just as current.
+      const next = new Set(completedIds)
+      if (complete) next.add(id)
+      else next.delete(id)
+      setCompletedIds(next)
+
+      if (user) {
+        const completedForTier = blocks.filter((b) => next.has(b.id)).map((b) => b.id)
+        const tierComplete = blocks.length > 0 && completedForTier.length === blocks.length
+        void upsertProgress({
+          userId:          user.id,
+          careerId,
+          scenario,
+          tier,
+          completedBlocks: completedForTier,
+          isCompleted:     tierComplete,
+        }).then((saved) => {
+          // The write is the source of truth: if Supabase rejected it, the user's
+          // progress did not change, so nothing is reported.
+          if (!saved) return
+          if (complete) {
+            trackBlockCompleted(analyticsCtx, id)
+            // Same condition that reveals the completion card.
+            if (tierComplete) trackTierCompleted(analyticsCtx, blocks.length)
+          } else {
+            trackBlockMarkedIncomplete(analyticsCtx, id)
+          }
+        })
+      }
       // Clean exit: marking the FINAL block of Orientation or Day-in-the-Life
       // complete closes the open panel/modal and lands the user on the overview,
       // where the completion card shows. (Full Simulation is left unchanged.)
@@ -171,7 +239,7 @@ export default function BlockExperience({
         if (completesTier) setOpenBlock(null)
       }
     },
-    [careerId, scenario, tier, user, blocks, completedIds],
+    [careerId, scenario, tier, user, blocks, completedIds, analyticsCtx],
   )
 
   const handleNextBlock = useCallback(() => {
@@ -188,15 +256,17 @@ export default function BlockExperience({
         void saveRating({ userId: user.id, careerId, scenario, rating, feedback, tier })
       }
       void upgradeToActively(careerId)
+      trackSurveySubmitted(analyticsCtx, rating)
       setShowRatingModal(false)
     },
-    [careerId, scenario, tier, user, upgradeToActively],
+    [careerId, scenario, tier, user, upgradeToActively, analyticsCtx],
   )
 
   const handleRatingDismiss = useCallback(() => {
     if (isFavorite(careerId)) upgradeToActively(careerId)
+    trackSurveyDismissed(analyticsCtx)
     setShowRatingModal(false)
-  }, [careerId, isFavorite, upgradeToActively])
+  }, [careerId, isFavorite, upgradeToActively, analyticsCtx])
 
   return (
     <SimAccessGate label={accessLabel}>

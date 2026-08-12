@@ -184,6 +184,10 @@ export async function getProgressByCareer(userId: string): Promise<Record<string
  * Upsert the completed-blocks list for one (user, simulation, tier). Stores the
  * blocks completed within this tier's depth; the union across tiers reconstructs
  * the full set on read.
+ *
+ * Returns true when the write succeeded, false when Supabase returned an error.
+ * Callers that must not act on a failed write (analytics, for one) check this;
+ * existing callers can keep ignoring the return value.
  */
 export async function upsertProgress(args: {
   userId:          string
@@ -192,7 +196,7 @@ export async function upsertProgress(args: {
   tier:            string
   completedBlocks: string[]
   isCompleted:     boolean
-}): Promise<void> {
+}): Promise<boolean> {
   const { userId, careerId, scenario, tier, completedBlocks, isCompleted } = args
   const nowIso = new Date().toISOString()
   const { error } = await supabase.from('user_progress').upsert(
@@ -209,4 +213,5 @@ export async function upsertProgress(args: {
     { onConflict: 'user_id,simulation_id,scenario,tier' },
   )
   if (error) console.error('[progress] upsertProgress failed:', error.message)
+  return !error
 }

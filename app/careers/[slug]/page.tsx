@@ -2,9 +2,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Play, ChevronRight, Hourglass } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Hourglass } from 'lucide-react'
 import { CAREERS } from '@/lib/careers'
 import { CAREER_DETAIL } from '@/lib/careerDetail'
+import SimulateCtaLink from '@/components/SimulateCtaLink'
 
 interface Props {
   params: { slug: string }
@@ -315,15 +316,7 @@ export default function CareerDetailPage({ params }: Props) {
                     see what a day-to-day actually looks like.
                   </p>
                 </div>
-                <Link
-                  href={`/careers/${career.slug}/simulate`}
-                  className="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-btn
-                    font-sans font-semibold text-[14px] text-white bg-teal hover:bg-teal-light
-                    transition-colors duration-150"
-                >
-                  <Play size={15} aria-hidden="true" />
-                  Start Simulation
-                </Link>
+                <SimulateCtaLink careerId={career.id} careerSlug={career.slug} />
               </div>
             </div>
           ) : (

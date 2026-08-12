@@ -87,6 +87,104 @@ export function captureEvent(
   posthog.capture(event, properties)
 }
 
+// ── Product events ────────────────────────────────────────────────────────────
+//
+// Every named event the product fires lives below, one function each, so this
+// file answers "what do we track?" on its own. Components import these helpers
+// rather than calling captureEvent with a raw string — that keeps event names
+// and property shapes from drifting apart across call sites.
+//
+// Every simulation event carries the same three identifying properties:
+//   career_id — e.g. 'management-consultant'
+//   scenario  — the project slug, e.g. 'meridian' | 'kestrel'
+//   tier      — 'orientation' | 'day-in-life' | 'full'
+// PostHog adds $current_url automatically, so no event needs to record where it
+// was fired from.
+
+/** The (career, project, tier) a simulation event happened in. */
+export interface SimulationContext {
+  careerId: string
+  scenario: string | null
+  tier:     string
+}
+
+/** Expand a context into the shared property names used by every sim event. */
+function simProps(ctx: SimulationContext): Record<string, unknown> {
+  return {
+    career_id: ctx.careerId,
+    scenario:  ctx.scenario,
+    tier:      ctx.tier,
+  }
+}
+
+// ── Exploration ───────────────────────────────────────────────────────────────
+
+/**
+ * A career card's "Explore →" link was clicked. The card component is shared, so
+ * this also fires from the questionnaire results page; $current_url separates the
+ * two surfaces.
+ */
+export function trackCareerCardClicked(careerId: string, hasSimulation: boolean): void {
+  captureEvent('career_card_clicked', {
+    career_id:       careerId,
+    has_simulation:  hasSimulation,
+  })
+}
+
+/** The "Start Simulation" CTA on a career detail page was clicked. */
+export function trackSimulateCtaClicked(careerId: string): void {
+  captureEvent('simulate_cta_clicked', { career_id: careerId })
+}
+
+// ── Simulation ────────────────────────────────────────────────────────────────
+
+/** The user entered a tier view. Deduped by the caller — once per tier entry. */
+export function trackTierStarted(ctx: SimulationContext): void {
+  captureEvent('tier_started', simProps(ctx))
+}
+
+/** A block's reading panel (desktop) or modal (mobile) displayed a block. */
+export function trackBlockOpened(
+  ctx: SimulationContext,
+  blockId: string,
+  activityType: string,
+): void {
+  captureEvent('block_opened', {
+    ...simProps(ctx),
+    block_id:      blockId,
+    activity_type: activityType,
+  })
+}
+
+/** A block was marked complete AND the progress write succeeded. */
+export function trackBlockCompleted(ctx: SimulationContext, blockId: string): void {
+  captureEvent('block_completed', { ...simProps(ctx), block_id: blockId })
+}
+
+/** A block was un-marked AND the progress write succeeded. */
+export function trackBlockMarkedIncomplete(ctx: SimulationContext, blockId: string): void {
+  captureEvent('block_marked_incomplete', { ...simProps(ctx), block_id: blockId })
+}
+
+/** The final block of a tier was completed — the completion-card condition. */
+export function trackTierCompleted(ctx: SimulationContext, blockCount: number): void {
+  captureEvent('tier_completed', { ...simProps(ctx), block_count: blockCount })
+}
+
+// ── Post-tier feedback survey (the rating modal) ───────────────────────────────
+
+export function trackSurveyShown(ctx: SimulationContext): void {
+  captureEvent('survey_shown', simProps(ctx))
+}
+
+export function trackSurveySubmitted(ctx: SimulationContext, score: number): void {
+  captureEvent('survey_submitted', { ...simProps(ctx), score })
+}
+
+export function trackSurveyDismissed(ctx: SimulationContext): void {
+  captureEvent('survey_dismissed', simProps(ctx))
+}
+
 /**
  * Clear the identity on logout so the next anonymous session isn't merged into
  * the person who just signed out (important on shared/library computers).
