@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, X, MailCheck } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { captureEvent } from '@/lib/analytics'
 
 /**
  * Single global auth modal. Rendered once in the root layout; opened from
@@ -42,6 +43,9 @@ export default function AuthModal() {
       setError('')
       setCheckEmail(false)
       setSubmitting(false)
+      // The account wall is a modal, not a route, so it has no URL of its own —
+      // this event is what makes "user hit the account wall" measurable.
+      captureEvent('auth_page_viewed', { mode: authModalMode })
     }
   }, [authModalOpen, authModalMode])
 
@@ -60,6 +64,8 @@ export default function AuthModal() {
     setMode(next)
     setError('')
     setPassword('')
+    // Toggling login ↔ signup inside the modal is a new view of the wall.
+    captureEvent('auth_page_viewed', { mode: next })
   }
 
   async function handleSubmit(e: FormEvent) {

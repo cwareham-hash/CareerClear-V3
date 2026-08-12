@@ -6,7 +6,7 @@
 - **Local dev:** `npm run dev` → http://localhost:3000. The `dev` and `prebuild` scripts intentionally run `rm -rf .next` first (permanent fix for a stale-cache bug that broke all CSS). Never remove that cleanup. If styling ever breaks in dev: `npm run clean`, then restart.
 - **Code layout:** `app/` (pages), `components/` (UI building blocks), `lib/` (data, logic, and per-career simulation content in `lib/content/`).
 - **Repo:** GitHub `cwareham-hash/CareerClear-V3`, main branch `main`.
-- **Deploy:** Connected to Vercel — **every push to `main` auto-deploys to production** at https://career-clear-v3-iy5k.vercel.app/. This makes the "never commit or push without explicit instruction" rule (Section 5) especially important: a push is a production deploy.
+- **Deploy:** Connected to Vercel — **every push to `main` auto-deploys to production** at https://careerclear-beta.vercel.app/ (`career-clear-v3.vercel.app` 307-redirects there; the older `career-clear-v3-iy5k.vercel.app` alias is DEAD, left over from deleted duplicate Vercel projects, and returns DEPLOYMENT_NOT_FOUND). This makes the "never commit or push without explicit instruction" rule (Section 5) especially important: a push is a production deploy.
 
 ## 2. What Career Clear is and why it exists
 

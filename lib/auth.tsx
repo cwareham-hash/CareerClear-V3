@@ -9,6 +9,7 @@ import React, {
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { identifyUser, captureEvent, resetAnalytics } from '@/lib/analytics'
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -94,6 +95,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // Keep analytics attached to the right person across page reloads. signIn /
+  // signUp identify at the moment they succeed, but a returning user with a
+  // stored session never calls either — without this they'd look anonymous.
+  // identifyUser() ignores repeat calls for the same id, so this is cheap.
+  useEffect(() => {
+    if (user) identifyUser(user.id, user.email)
+  }, [user])
+
   // Fetch the profile row whenever the logged-in user changes.
   // (Done in its own effect, NOT inside onAuthStateChange — running Supabase
   // queries inside that callback can deadlock the client.)
@@ -127,6 +136,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       })
       if (error) return { error: error.message, needsConfirmation: false }
+
+      // Analytics: stitch this browser to the new Supabase user id. Note that
+      // with "Confirm email" ON there is no session yet, but data.user still
+      // carries the id — so signup is attributable even before confirmation.
+      // (The password is never passed to analytics, here or anywhere.)
+      if (data.user) {
+        identifyUser(data.user.id, data.user.email)
+        captureEvent('signup_completed', {
+          needs_confirmation: !data.session,
+        })
+      }
+
       // With "Confirm email" ON, no session is returned until the user clicks
       // the email link — signal that so the UI can show a "check your inbox" state.
       return { error: null, needsConfirmation: !data.session }
@@ -136,14 +157,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(
     async ({ email, password }: { email: string; password: string }) => {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      return { error: error?.message ?? null }
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) return { error: error.message }
+
+      if (data.user) {
+        identifyUser(data.user.id, data.user.email)
+        captureEvent('login_completed')
+      }
+      return { error: null }
     },
     [],
   )
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut()
+    // Drop the identity so a following anonymous session isn't merged into the
+    // person who just left — matters on shared machines.
+    resetAnalytics()
   }, [])
 
   const openAuthModal = useCallback((mode: AuthModalMode = 'login') => {
