@@ -25,7 +25,7 @@ A historical note for context: the product spec document CareerClear_ProductSpec
 ## 3. Current product direction
 
 - We are replacing the four duration tiers (10 min / 30 min / 2 hr / 5 hr) with three experiential tiers: Orientation (10-15 min prose briefing), Day-in-the-Life (45-60 min compressed day with decision points), Full Simulation (3-5 hr multi-day arc with consequences).
-- Management Consulting is the only career track getting full simulation content right now. IB and Law simulations will be hidden behind a "coming soon" state; their exploration pages stay live. Once Consulting is validated, IB and Law get built using the identical structure. Do not build for multiple tracks simultaneously.
+- Two simulations are live: Management Consulting (Project Meridian) and Investment Banking (Project Kestrel, career slug `investment-banking-analyst`). Law and Product Manager simulations stay hidden behind a "coming soon" state; their exploration pages stay live. Further tracks get built using the identical structure. Do not build for multiple tracks simultaneously.
 - Scalability is a hard requirement: adding a future career track must be purely a content exercise (drop in a new content file), never a structural rebuild.
 - A Supabase backend (real auth + Postgres) is planned and will replace all localStorage persistence. Until it lands, do not build new features that deepen the localStorage dependency.
 - Simulation content files arrive pre-drafted from a separate planning workflow. Claude Code's job is integration, not content writing.
@@ -36,9 +36,10 @@ A historical note for context: the product spec document CareerClear_ProductSpec
 
 - **Design system source of truth:** `CareerClear_ProductSpec_v3.html` §7.5–7.6 (colors, typography, spacing, component specs). Key palette: navy #1a2744, teal #2a9d8f, cream #f8f6f1, gold #d4a017.
 - **One content file per career:** simulation content lives in `lib/content/<career>.ts`; the shared structure is defined in `lib/simulation.ts`. New careers must slot in by adding a content file only (see scalability rule in Section 3).
-- **Known gap:** the codebase still implements the old four duration tiers and has full content for all four careers; migrating to the three experiential tiers and the Consulting-only rollout is upcoming work, not done.
+- **Tier migration: done.** The three experiential tiers (`orientation`, `day-in-life`, `full`) are implemented and two simulations are live (Meridian, Kestrel). Law and Product Manager keep their legacy content but stay behind the "coming soon" state (`hasSimulation: false`).
 - **localStorage keys in use:** `cc_quiz_history` (quiz attempts), plus favorites and simulation progress/ratings — all slated for replacement by Supabase.
 - **Don't commit scratch files:** Playwright screenshots (`*.png` in root, `.playwright-mcp/`) are temporary artifacts, gitignored as of June 2026.
+- **Portal gotcha (clicks + exit animations):** React `onClick` does not fire on elements portaled to `document.body` in this app. Wire clicks as native listeners instead (`el.onclick` set from a callback ref). Also avoid `AnimatePresence` on portaled subtrees: exit animations fail there, so unmount immediately and animate only on enter. Working reference: `components/simulation/HtmlArtifact.tsx`.
 - **Supabase is live (Phase 2, June 2026):** real email/password auth + Postgres replace localStorage for auth, favorites, progress, and ratings. Client in `lib/supabase.ts`; schema in `supabase/schema.sql` (run manually in the SQL Editor). Quiz history (`cc_quiz_history`) still on localStorage. `tier` columns store the numeric duration as text pending the experiential-tier migration. Email confirmation is ON. Simulations require login **and** `profiles.beta_access = true` (granted manually); exploration stays public.
 
 ## 5. Workflow rules (standing — follow these every session)
