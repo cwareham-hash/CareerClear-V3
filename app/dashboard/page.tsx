@@ -19,7 +19,7 @@ import {
   LogIn,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
-import { getHistoryForUser, type QuizAttempt } from '@/lib/recommendations'
+import { getQuizHistory, type SavedQuizResult } from '@/lib/quizResults'
 import { CAREERS } from '@/lib/careers'
 import { CAREER_SIMS, getCareerTierBlocks, TIERS, type Tier } from '@/lib/simulation'
 import {
@@ -332,8 +332,28 @@ function FavoriteCareerCard({
 
 // ── Quiz Attempt Card ─────────────────────────────────────────────────────────
 
-function AttemptCard({ attempt, attemptNumber }: { attempt: QuizAttempt; attemptNumber: number }) {
+function AttemptCard({
+  attempt,
+  attemptNumber,
+  previous,
+}: {
+  attempt:       SavedQuizResult
+  attemptNumber: number
+  /** The chronologically previous attempt, if any — drives the change line. */
+  previous:      SavedQuizResult | null
+}) {
   const topResults = attempt.results.slice(0, 5)
+
+  // What changed since last time: the top match, and how its score moved.
+  const top = attempt.results[0]
+  const topCareer = top ? CAREERS.find((c) => c.id === top.careerId) : undefined
+  const priorPct = previous?.results.find((r) => r.careerId === top?.careerId)?.matchPct
+  const delta = top && priorPct !== undefined ? top.matchPct - priorPct : null
+  const priorTopCareer = previous?.results[0]
+    ? CAREERS.find((c) => c.id === previous.results[0].careerId)
+    : undefined
+  const topChanged =
+    !!previous && !!top && previous.results[0]?.careerId !== top.careerId
 
   return (
     <div className="bg-white rounded-card border border-border shadow-card overflow-hidden">
@@ -346,8 +366,31 @@ function AttemptCard({ attempt, attemptNumber }: { attempt: QuizAttempt; attempt
             Attempt #{attemptNumber}
           </span>
         </div>
-        <span className="font-sans text-[13px] text-muted">{formatDate(attempt.completedAt)}</span>
+        <span className="font-sans text-[13px] text-muted">{formatDate(attempt.takenAt)}</span>
       </div>
+
+      {/* Change since the previous attempt — only once there is one to compare to */}
+      {previous && topCareer && (
+        <div className="px-5 pt-3">
+          <p className="font-sans text-[12px] text-muted">
+            Top match:{' '}
+            <span className="text-dark font-medium">
+              <span aria-hidden="true">{topCareer.emoji}</span> {topCareer.title}
+            </span>
+            {topChanged && priorTopCareer ? (
+              <>
+                {' — up from '}
+                <span aria-hidden="true">{priorTopCareer.emoji}</span> {priorTopCareer.title}
+                {` in attempt #${attemptNumber - 1}`}
+              </>
+            ) : delta !== null ? (
+              delta === 0
+                ? ` — unchanged at ${top.matchPct}% since attempt #${attemptNumber - 1}`
+                : ` — ${delta > 0 ? '+' : ''}${delta} pts vs attempt #${attemptNumber - 1}`
+            ) : null}
+          </p>
+        </div>
+      )}
 
       <div className="px-5 py-4">
         <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-3">
@@ -416,36 +459,33 @@ export default function DashboardPage() {
   const { user, userName, isLoading: authLoading, openAuthModal } = useAuth()
   const { favorites } = useFavorites()
 
-  const [history, setHistory]           = useState<QuizAttempt[]>([])
+  const [history, setHistory]           = useState<SavedQuizResult[]>([])
   const [roleProgress, setRoleProgress] = useState<RoleProgress[]>([])
   const [rolesRated, setRolesRated]     = useState(0)
   const [latestRatingByCareer, setLatestRatingByCareer] =
     useState<Record<string, SimulationRating>>({})
   const [dataLoading, setDataLoading]   = useState(true)
 
-  // Quiz history still lives in localStorage (keyed by name), newest first.
-  useEffect(() => {
-    if (userName) setHistory([...getHistoryForUser(userName)].reverse())
-    else setHistory([])
-  }, [userName])
-
-  // Load simulation progress + ratings from Supabase.
+  // Load simulation progress, ratings, and quiz history from Supabase.
   useEffect(() => {
     if (!user) {
       setRoleProgress([])
       setRolesRated(0)
       setLatestRatingByCareer({})
+      setHistory([])
       setDataLoading(false)
       return
     }
     let active = true
     setDataLoading(true)
     ;(async () => {
-      const [progressMap, allRatings] = await Promise.all([
+      const [progressMap, allRatings, quizHistory] = await Promise.all([
         getProgressByCareer(user.id),
         getAllRatings(user.id),
+        getQuizHistory(user.id),   // already newest-first
       ])
       if (!active) return
+      setHistory(quizHistory)
 
       // Group ratings by career; allRatings is newest-first so the first seen
       // per career is the latest.
@@ -818,42 +858,22 @@ export default function DashboardPage() {
           />
 
           {history.length === 0 ? (
-            <div className="bg-white rounded-card border border-border shadow-card py-12 text-center">
-              <div
-                className="w-12 h-12 rounded-card flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: 'var(--color-tag-bg)' }}
-              >
-                <Sparkles size={20} style={{ color: 'var(--color-teal)' }} />
-              </div>
-              <p className="font-sans font-semibold text-[15px] text-dark mb-1">
-                No quiz results yet
-              </p>
-              <p className="font-sans text-[13px] text-muted mb-5 max-w-xs mx-auto">
-                Take the Career Match Quiz to discover which roles suit you best.
-              </p>
-              <Link
-                href="/questionnaire"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
-                  font-sans font-semibold text-[14px] text-white transition-colors duration-150"
-                style={{ backgroundColor: 'var(--color-teal)' }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal-light)')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal)')
-                }
-              >
-                <Sparkles size={14} aria-hidden="true" />
-                Take the Career Quiz
+            <p className="font-sans text-[13px] text-muted">
+              No saved quiz results yet.{' '}
+              <Link href="/questionnaire" className="text-teal hover:text-teal-light transition-colors">
+                Take the Career Match Quiz →
               </Link>
-            </div>
+            </p>
           ) : (
             <div className="flex flex-col gap-4">
+              {/* Newest first; each card compares itself to the attempt below it,
+                  so the progression across attempts is visible on the page. */}
               {history.map((attempt, i) => (
                 <AttemptCard
                   key={attempt.id}
                   attempt={attempt}
                   attemptNumber={history.length - i}
+                  previous={history[i + 1] ?? null}
                 />
               ))}
 

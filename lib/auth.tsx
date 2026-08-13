@@ -10,6 +10,14 @@ import React, {
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { identifyUser, captureEvent, resetAnalytics } from '@/lib/analytics'
+import { claimLocalQuizResults } from '@/lib/quizResults'
+
+// Copy any quiz attempts taken on this browser into the account that just
+// signed in or signed up. Fire-and-forget and fully swallowed: claiming is a
+// nice-to-have and must never block or break authentication.
+function claimQuizResultsQuietly(userId: string): void {
+  void claimLocalQuizResults(userId).catch(() => {})
+}
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -146,6 +154,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         captureEvent('signup_completed', {
           needs_confirmation: !data.session,
         })
+        // With confirmation ON there is no session yet, so RLS refuses the
+        // insert and nothing is claimed — the attempts stay pending and get
+        // picked up at the user's first real login instead.
+        claimQuizResultsQuietly(data.user.id)
       }
 
       // With "Confirm email" ON, no session is returned until the user clicks
@@ -163,6 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.user) {
         identifyUser(data.user.id, data.user.email)
         captureEvent('login_completed')
+        claimQuizResultsQuietly(data.user.id)
       }
       return { error: null }
     },
