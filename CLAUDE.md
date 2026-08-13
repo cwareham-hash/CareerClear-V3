@@ -40,6 +40,7 @@ A historical note for context: the product spec document CareerClear_ProductSpec
 - **localStorage keys in use:** `cc_quiz_history` (quiz attempts), plus favorites and simulation progress/ratings — all slated for replacement by Supabase.
 - **Don't commit scratch files:** Playwright screenshots (`*.png` in root, `.playwright-mcp/`) are temporary artifacts, gitignored as of June 2026.
 - **Portal gotcha (clicks + exit animations):** React `onClick` does not fire on elements portaled to `document.body` in this app. Wire clicks as native listeners instead (`el.onclick` set from a callback ref). Also avoid `AnimatePresence` on portaled subtrees: exit animations fail there, so unmount immediately and animate only on enter. Working reference: `components/simulation/HtmlArtifact.tsx`.
+- **Local password gate:** Local dev sits behind a shared-password beta gate (`middleware.ts`, `SITE_PASSWORD` in `.env.local`); browser-based verification needs that password to get past it.
 - **Supabase is live (Phase 2, June 2026):** real email/password auth + Postgres replace localStorage for auth, favorites, progress, and ratings. Client in `lib/supabase.ts`; schema in `supabase/schema.sql` (run manually in the SQL Editor). Quiz history (`cc_quiz_history`) still on localStorage. `tier` columns store the numeric duration as text pending the experiential-tier migration. Email confirmation is ON. Simulations require login **and** `profiles.beta_access = true` (granted manually); exploration stays public.
 
 ## 5. Workflow rules (standing — follow these every session)

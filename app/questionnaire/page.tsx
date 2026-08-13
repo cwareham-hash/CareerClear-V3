@@ -28,6 +28,7 @@ import {
   saveAttempt,
   type CareerResult,
 } from '@/lib/recommendations'
+import { saveQuizResult } from '@/lib/quizResults'
 import { CAREERS } from '@/lib/careers'
 import CareerCard from '@/components/CareerCard'
 import { useFavorites } from '@/lib/useFavorites'
@@ -74,7 +75,7 @@ function matchLabel(pct: number): string {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function QuestionnairePage() {
-  const { userName } = useAuth()
+  const { user, userName } = useAuth()
   const { isFavorite, toggle } = useFavorites()
 
   const [phase, setPhase] = useState<Phase>('intro')
@@ -113,16 +114,25 @@ export default function QuestionnairePage() {
     if (isLastQuestion) {
       const computed = computeRecommendations(answers)
       setResults(computed)
-      if (userName) {
-        saveAttempt(userName, answers, computed)
+
+      // Always record the attempt locally — including for anonymous visitors, so
+      // the attempt still exists to be claimed if they sign up or log in later.
+      // (Keyed off `user`, not `userName`: the display name is null while the
+      // profile loads and for accounts with no full_name.)
+      const attempt = saveAttempt(userName ?? '', answers, computed)
+      if (user) {
+        // Fire-and-forget: the results screen never waits on the network, and a
+        // failed write leaves the attempt unclaimed so a later login retries it.
+        void saveQuizResult(user.id, answers, computed, attempt.completedAt, attempt.id)
       }
+
       setPhase('results')
       return
     }
 
     setDirection(1)
     setCurrentIndex((i) => i + 1)
-  }, [selectedValue, isLastQuestion, answers, userName])
+  }, [selectedValue, isLastQuestion, answers, user, userName])
 
   const retake = useCallback(() => {
     setAnswers({})
