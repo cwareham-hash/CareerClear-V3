@@ -14,12 +14,11 @@ import { CAREERS } from '@/lib/careers'
 import { useAuth } from '@/lib/auth'
 import { useFavorites } from '@/lib/useFavorites'
 import {
-  saveRating,
   getCompletedBlockIds,
   getOrientationCompletedBlockIds,
   upsertProgress,
-  type SimulationFeedback,
 } from '@/lib/userProgress'
+import { saveVerdict } from '@/lib/roleVerdicts'
 import {
   trackTierStarted,
   trackBlockOpened,
@@ -251,9 +250,20 @@ export default function BlockExperience({
   }, [openBlockIndex, blocks])
 
   const handleRatingSubmit = useCallback(
-    (rating: number, feedback: SimulationFeedback) => {
+    (rating: number, liked: string, disliked: string) => {
       if (user) {
-        void saveRating({ userId: user.id, careerId, scenario, rating, feedback, tier })
+        // Writes to role_verdicts only. The old `ratings` table is no longer
+        // written to from here; its historical rows stay where they are.
+        void saveVerdict(
+          user.id,
+          careerId,
+          scenario,
+          tier,
+          rating,
+          liked,
+          disliked,
+          new Date().toISOString(),
+        )
       }
       void upgradeToActively(careerId)
       trackSurveySubmitted(analyticsCtx, rating)

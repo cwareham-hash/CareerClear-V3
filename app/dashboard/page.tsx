@@ -22,11 +22,8 @@ import { useAuth } from '@/lib/auth'
 import { getQuizHistory, type SavedQuizResult } from '@/lib/quizResults'
 import { CAREERS } from '@/lib/careers'
 import { CAREER_SIMS, getCareerTierBlocks, TIERS, type Tier } from '@/lib/simulation'
-import {
-  getProgressByCareer,
-  getAllRatings,
-  type SimulationRating,
-} from '@/lib/userProgress'
+import { getProgressByCareer } from '@/lib/userProgress'
+import { getVerdicts, verdictKey, type RoleVerdict } from '@/lib/roleVerdicts'
 import { useFavorites } from '@/lib/useFavorites'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -59,12 +56,14 @@ interface TierProgress {
   completedCount: number
   totalCount:     number        // authored activities in this tier (scoped per project)
   isCompleted:    boolean
+  /** Most recent role_verdicts score for this exact tier, or null if never rated.
+   *  Always null for Orientation — that tier never asks for a rating. */
+  verdictScore:   number | null
 }
 
 interface RoleProgress {
   careerId: string
   tiers:    TierProgress[]      // only tiers with completedCount >= 1 (started)
-  ratings:  SimulationRating[]
 }
 
 // ── Stat Card ─────────────────────────────────────────────────────────────────
@@ -120,8 +119,6 @@ function RatingBadge({ rating }: { rating: number }) {
 // ── Progress Row ──────────────────────────────────────────────────────────────
 
 function ProgressRow({ role }: { role: RoleProgress }) {
-  const [expanded, setExpanded] = useState(false)
-
   const sim    = CAREER_SIMS.find((c) => c.careerId === role.careerId)
   const career = CAREERS.find((c) => c.id === role.careerId)
   if (!sim || !career) return null
@@ -162,6 +159,23 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                 >
                   {tier.isCompleted ? '✓ Completed' : 'In Progress'}
                 </span>
+                {/* Most recent role verdict for this tier — shown only while the
+                    tier is currently complete. Rewinding a block hides it again
+                    (the verdict row itself is never deleted). Orientation is
+                    never rated, so it never has one. */}
+                {tier.isCompleted && tier.verdictScore !== null && (
+                  <span className="inline-flex items-center gap-1 shrink-0 font-sans text-[11px] text-muted">
+                    My Rating:
+                    <Star
+                      size={9}
+                      aria-hidden="true"
+                      style={{ color: 'var(--color-gold)' }}
+                      fill="var(--color-gold)"
+                      strokeWidth={0}
+                    />
+                    {tier.verdictScore}/10
+                  </span>
+                )}
                 <span className="flex-1" />
                 <Link
                   href={
@@ -204,73 +218,6 @@ function ProgressRow({ role }: { role: RoleProgress }) {
         })}
       </div>
 
-      {/* Feedback toggle */}
-      {role.ratings.length > 0 && (
-        <div className="px-5 pb-4">
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            className="inline-flex items-center gap-1 font-sans text-[13px] font-medium
-              transition-colors duration-150"
-            style={{ color: 'var(--color-teal)' }}
-          >
-            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            {expanded ? 'Hide feedback' : `View feedback (${role.ratings.length})`}
-          </button>
-        </div>
-      )}
-
-      {/* Expanded feedback */}
-      {expanded && role.ratings.length > 0 && (
-        <div className="border-t border-border px-5 py-5 flex flex-col gap-5 bg-cream">
-          {role.ratings.map((r, i) => (
-            <div key={r.id} className={i > 0 ? 'border-t border-border pt-5' : ''}>
-              <div className="flex items-center gap-2 mb-3">
-                <RatingBadge rating={r.rating} />
-                <span className="font-sans text-[12px] text-muted">
-                  {formatDate(r.completedAt)} · {tierLabel(r.tier)}
-                </span>
-              </div>
-              <div className="flex flex-col gap-3">
-                {r.feedback.liked && (
-                  <div>
-                    <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-1">
-                      What I liked
-                    </p>
-                    <p className="font-sans text-[13px] text-dark leading-relaxed">{r.feedback.liked}</p>
-                  </div>
-                )}
-                {r.feedback.disliked && (
-                  <div>
-                    <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-1">
-                      What I didn&apos;t like
-                    </p>
-                    <p className="font-sans text-[13px] text-dark leading-relaxed">{r.feedback.disliked}</p>
-                  </div>
-                )}
-                {r.feedback.questions && (
-                  <div>
-                    <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-1">
-                      Questions I still have
-                    </p>
-                    <p className="font-sans text-[13px] text-dark leading-relaxed">{r.feedback.questions}</p>
-                  </div>
-                )}
-                {r.feedback.comparison && (
-                  <div>
-                    <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-1">
-                      How it compares
-                    </p>
-                    <p className="font-sans text-[13px] text-dark leading-relaxed">{r.feedback.comparison}</p>
-                  </div>
-                )}
-                {!r.feedback.liked && !r.feedback.disliked && !r.feedback.questions && !r.feedback.comparison && (
-                  <p className="font-sans text-[13px] text-muted italic">No written feedback added.</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
@@ -280,11 +227,11 @@ function ProgressRow({ role }: { role: RoleProgress }) {
 function FavoriteCareerCard({
   careerId,
   pursuing,
-  latestRating,
+  latestVerdict,
 }: {
-  careerId:     string
-  pursuing:     boolean
-  latestRating: SimulationRating | null
+  careerId:      string
+  pursuing:      boolean
+  latestVerdict: RoleVerdict | null
 }) {
   const career = CAREERS.find((c) => c.id === careerId)
   if (!career) return null
@@ -295,7 +242,7 @@ function FavoriteCareerCard({
         <span className="text-[28px] leading-none select-none" aria-hidden="true">
           {career.emoji}
         </span>
-        {latestRating && <RatingBadge rating={latestRating.rating} />}
+        {latestVerdict && <RatingBadge rating={latestVerdict.score} />}
       </div>
 
       <div>
@@ -326,6 +273,70 @@ function FavoriteCareerCard({
           </Link>
         )}
       </div>
+    </div>
+  )
+}
+
+// ── Verdict Card (My Ratings section) ─────────────────────────────────────────
+
+function VerdictCard({ verdict }: { verdict: RoleVerdict }) {
+  const career = CAREERS.find((c) => c.id === verdict.careerId)
+
+  return (
+    <div className="bg-white rounded-card border border-border shadow-card overflow-hidden">
+      <div
+        className="px-5 py-4 flex items-center gap-3 flex-wrap"
+        style={{ borderTop: '3px solid var(--color-teal)' }}
+      >
+        <span className="text-[24px] leading-none select-none shrink-0" aria-hidden="true">
+          {career?.emoji ?? '💼'}
+        </span>
+        <h3 className="font-sans font-bold text-[15px] text-dark">
+          {career?.title ?? verdict.careerId}
+        </h3>
+        <span
+          className="px-2.5 py-0.5 rounded-pill font-sans text-[11px] font-semibold text-white shrink-0"
+          style={{ backgroundColor: 'var(--color-navy)' }}
+        >
+          {tierLabel(verdict.tier)}
+        </span>
+        <span className="inline-flex items-center gap-1 shrink-0 font-sans text-[11px] text-muted">
+          My Rating:
+          <Star
+            size={9}
+            aria-hidden="true"
+            style={{ color: 'var(--color-gold)' }}
+            fill="var(--color-gold)"
+            strokeWidth={0}
+          />
+          {verdict.score}/10
+        </span>
+        <span className="flex-1" />
+        <span className="font-sans text-[13px] text-muted shrink-0">
+          {formatDate(verdict.takenAt)}
+        </span>
+      </div>
+
+      {(verdict.liked || verdict.disliked) && (
+        <div className="px-5 pb-4 pt-1 flex flex-col gap-3 border-t border-border">
+          {verdict.liked && (
+            <div className="pt-3">
+              <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-1">
+                What I liked
+              </p>
+              <p className="font-sans text-[13px] text-dark leading-relaxed">{verdict.liked}</p>
+            </div>
+          )}
+          {verdict.disliked && (
+            <div>
+              <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-1">
+                What I didn&apos;t like
+              </p>
+              <p className="font-sans text-[13px] text-dark leading-relaxed">{verdict.disliked}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -462,8 +473,11 @@ export default function DashboardPage() {
   const [history, setHistory]           = useState<SavedQuizResult[]>([])
   const [roleProgress, setRoleProgress] = useState<RoleProgress[]>([])
   const [rolesRated, setRolesRated]     = useState(0)
-  const [latestRatingByCareer, setLatestRatingByCareer] =
-    useState<Record<string, SimulationRating>>({})
+  const [verdicts, setVerdicts]         = useState<RoleVerdict[]>([])
+  // Deliberately not persisted: every dashboard load starts collapsed.
+  const [showPreviousAttempts, setShowPreviousAttempts] = useState(false)
+  const [latestVerdictByCareer, setLatestVerdictByCareer] =
+    useState<Record<string, RoleVerdict>>({})
   const [dataLoading, setDataLoading]   = useState(true)
 
   // Load simulation progress, ratings, and quiz history from Supabase.
@@ -471,7 +485,8 @@ export default function DashboardPage() {
     if (!user) {
       setRoleProgress([])
       setRolesRated(0)
-      setLatestRatingByCareer({})
+      setVerdicts([])
+      setLatestVerdictByCareer({})
       setHistory([])
       setDataLoading(false)
       return
@@ -479,21 +494,28 @@ export default function DashboardPage() {
     let active = true
     setDataLoading(true)
     ;(async () => {
-      const [progressMap, allRatings, quizHistory] = await Promise.all([
+      const [progressMap, quizHistory, verdictRows] = await Promise.all([
         getProgressByCareer(user.id),
-        getAllRatings(user.id),
         getQuizHistory(user.id),   // already newest-first
+        getVerdicts(user.id),      // already newest-first
       ])
       if (!active) return
       setHistory(quizHistory)
+      setVerdicts(verdictRows)
 
-      // Group ratings by career; allRatings is newest-first so the first seen
-      // per career is the latest.
-      const ratingsByCareer: Record<string, SimulationRating[]> = {}
-      const latestByCareer:  Record<string, SimulationRating>   = {}
-      for (const r of allRatings) {
-        ;(ratingsByCareer[r.careerId] ??= []).push(r)
-        if (!latestByCareer[r.careerId]) latestByCareer[r.careerId] = r
+      // Latest score per (career, scenario, tier). getVerdicts is newest-first,
+      // so the first entry seen for a key is the most recent one.
+      const latestScoreByTier: Record<string, number> = {}
+      for (const v of verdictRows) {
+        const key = verdictKey(v.careerId, v.scenario, v.tier)
+        if (latestScoreByTier[key] === undefined) latestScoreByTier[key] = v.score
+      }
+
+      // Latest verdict per career, for the Saved Careers star badge.
+      // getVerdicts is newest-first, so the first seen per career is the latest.
+      const latestByCareer: Record<string, RoleVerdict> = {}
+      for (const v of verdictRows) {
+        if (!latestByCareer[v.careerId]) latestByCareer[v.careerId] = v
       }
 
       const data: RoleProgress[] = CAREER_SIMS.flatMap((cs) => {
@@ -520,6 +542,7 @@ export default function DashboardPage() {
               completedCount,
               totalCount:     blocks.length,
               isCompleted:    blocks.length > 0 && completedCount >= blocks.length,
+              verdictScore:   null,   // Orientation is never rated
             })
           }
         }
@@ -541,6 +564,7 @@ export default function DashboardPage() {
               completedCount,
               totalCount:     blocks.length,
               isCompleted:    blocks.length > 0 && completedCount >= blocks.length,
+              verdictScore:   latestScoreByTier[verdictKey(cs.careerId, sc.slug, value)] ?? null,
             })
           }
         }
@@ -549,13 +573,13 @@ export default function DashboardPage() {
         return [{
           careerId: cs.careerId,
           tiers,
-          ratings:  ratingsByCareer[cs.careerId] ?? [],
         }]
       })
 
       setRoleProgress(data)
-      setRolesRated(new Set(allRatings.map((r) => r.careerId)).size)
-      setLatestRatingByCareer(latestByCareer)
+      // "Roles Rated" = distinct careers with at least one verdict.
+      setRolesRated(new Set(verdictRows.map((v) => v.careerId)).size)
+      setLatestVerdictByCareer(latestByCareer)
       setDataLoading(false)
     })()
     return () => { active = false }
@@ -748,7 +772,41 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {/* ── 4. Saved Careers ───────────────────────────────────────────── */}
+        {/* ── 4. My Ratings ──────────────────────────────────────────────── */}
+        <section className="mb-12">
+          <SectionHeader
+            icon={Star}
+            title="My Ratings"
+            subtitle="Your ratings of careers you've tried"
+          />
+
+          {verdicts.length === 0 ? (
+            <p className="font-sans text-[13px] text-muted">
+              No ratings yet — finish a Day in the Life or Full Simulation to rate it.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {/* Newest first; the full list lives on /my-ratings. */}
+              {verdicts.slice(0, 3).map((v) => (
+                <VerdictCard key={v.id} verdict={v} />
+              ))}
+
+              {verdicts.length > 3 && (
+                <div className="flex justify-center pt-1">
+                  <Link
+                    href="/my-ratings"
+                    className="inline-flex items-center gap-1 font-sans text-[13px] font-semibold
+                      text-teal hover:text-teal-light transition-colors duration-150"
+                  >
+                    View all ratings →
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* ── 5. Saved Careers ───────────────────────────────────────────── */}
         <section className="mb-12">
           <SectionHeader
             icon={Heart}
@@ -810,7 +868,7 @@ export default function DashboardPage() {
                         key={careerId}
                         careerId={careerId}
                         pursuing={true}
-                        latestRating={latestRatingByCareer[careerId] ?? null}
+                        latestVerdict={latestVerdictByCareer[careerId] ?? null}
                       />
                     ))}
                   </div>
@@ -838,7 +896,7 @@ export default function DashboardPage() {
                         key={careerId}
                         careerId={careerId}
                         pursuing={false}
-                        latestRating={null}
+                        latestVerdict={null}
                       />
                     ))}
                   </div>
@@ -866,9 +924,12 @@ export default function DashboardPage() {
             </p>
           ) : (
             <div className="flex flex-col gap-4">
-              {/* Newest first; each card compares itself to the attempt below it,
-                  so the progression across attempts is visible on the page. */}
-              {history.map((attempt, i) => (
+              {/* Only the most recent attempt is shown by default. Older ones sit
+                  behind a toggle that resets to collapsed on every load — the
+                  latest result is the answer; the rest is history. Each card
+                  compares itself to the attempt below it, so the progression is
+                  still visible once expanded. */}
+              {(showPreviousAttempts ? history : history.slice(0, 1)).map((attempt, i) => (
                 <AttemptCard
                   key={attempt.id}
                   attempt={attempt}
@@ -876,6 +937,22 @@ export default function DashboardPage() {
                   previous={history[i + 1] ?? null}
                 />
               ))}
+
+              {history.length > 1 && (
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setShowPreviousAttempts((v) => !v)}
+                    className="inline-flex items-center gap-1 font-sans text-[13px] font-medium
+                      transition-colors duration-150"
+                    style={{ color: 'var(--color-teal)' }}
+                  >
+                    {showPreviousAttempts ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    {showPreviousAttempts
+                      ? 'Hide previous attempts'
+                      : `Show previous attempts (${history.length - 1})`}
+                  </button>
+                </div>
+              )}
 
               {/* Retake button at bottom of section */}
               <div className="flex justify-center pt-2">
