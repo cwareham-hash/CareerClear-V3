@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import type { Tier } from '@/lib/simulation'
-import type { SimulationFeedback } from '@/lib/userProgress'
 
 interface Props {
   show:        boolean
@@ -13,7 +12,7 @@ interface Props {
   careerEmoji: string
   tier:        Tier
   userName:    string | null
-  onSubmit:    (rating: number, feedback: SimulationFeedback) => void
+  onSubmit:    (rating: number, liked: string, disliked: string) => void
   onDismiss:   () => void
 }
 
@@ -21,13 +20,6 @@ const ANCHOR_LABELS: Record<number, string> = {
   1:  'Not for me',
   5:  'Still exploring',
   10: 'Perfect fit',
-}
-
-const EMPTY_FEEDBACK: SimulationFeedback = {
-  liked:      '',
-  disliked:   '',
-  questions:  '',
-  comparison: '',
 }
 
 // ── Inner modal content (shared by desktop + mobile) ──────────────────────────
@@ -40,16 +32,13 @@ function ModalContent({
 }: {
   careerTitle:    string
   careerEmoji:    string
-  onSubmit:       (rating: number, feedback: SimulationFeedback) => void
+  onSubmit:       (rating: number, liked: string, disliked: string) => void
   onDismiss:      () => void
 }) {
   const [rating, setRating]           = useState<number | null>(null)
-  const [feedback, setFeedback]       = useState<SimulationFeedback>(EMPTY_FEEDBACK)
+  const [liked, setLiked]             = useState('')
+  const [disliked, setDisliked]       = useState('')
   const [hoveredRating, setHoveredRating] = useState<number | null>(null)
-
-  function handleChange(field: keyof SimulationFeedback, value: string) {
-    setFeedback((prev) => ({ ...prev, [field]: value }))
-  }
 
   return (
     <>
@@ -121,34 +110,32 @@ function ModalContent({
         {/* Divider */}
         <div className="border-t border-border" />
 
-        {/* Optional text feedback */}
+        {/* Optional text feedback — the score is the only required answer, so
+            both fields are labelled optional rather than merely placeheld. */}
         <div className="flex flex-col gap-4">
-          <p className="font-sans text-[12px] font-semibold text-muted uppercase tracking-wide -mb-1">
-            Optional feedback
-          </p>
-
           {([
-            ['liked',      'What I liked about this role'],
-            ['disliked',   "What I didn't like about this role"],
-            ['questions',  'Questions I still have'],
-            ['comparison', 'How this compares to other roles I\'ve explored'],
-          ] as [keyof SimulationFeedback, string][]).map(([field, label]) => (
-            <div key={field}>
-              <label className="block font-sans text-[13px] font-medium text-dark mb-1.5">
-                {label}
-              </label>
-              <textarea
-                value={feedback[field]}
-                onChange={(e) => handleChange(field, e.target.value)}
-                rows={2}
-                placeholder="Optional..."
-                className="w-full px-3 py-2 rounded-btn border border-border bg-white
-                  font-sans text-[13px] text-dark placeholder:text-muted
-                  outline-none focus:border-teal focus:ring-2 focus:ring-teal/20
-                  transition-colors duration-150 resize-none"
-              />
-            </div>
-          ))}
+            ['What did you like?',      liked,    setLiked,    'liked'],
+            ["What didn't you like?",   disliked, setDisliked, 'disliked'],
+          ] as [string, string, (v: string) => void, string][]).map(
+            ([label, value, setValue, field]) => (
+              <div key={field}>
+                <label className="block font-sans text-[13px] font-medium text-dark mb-1.5">
+                  {label}{' '}
+                  <span className="font-normal text-muted">(optional)</span>
+                </label>
+                <textarea
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  rows={2}
+                  placeholder="Optional..."
+                  className="w-full px-3 py-2 rounded-btn border border-border bg-white
+                    font-sans text-[13px] text-dark placeholder:text-muted
+                    outline-none focus:border-teal focus:ring-2 focus:ring-teal/20
+                    transition-colors duration-150 resize-none"
+                />
+              </div>
+            ),
+          )}
         </div>
       </div>
 
@@ -161,7 +148,7 @@ function ModalContent({
           Skip for now
         </button>
         <button
-          onClick={() => rating !== null && onSubmit(rating, feedback)}
+          onClick={() => rating !== null && onSubmit(rating, liked, disliked)}
           disabled={rating === null}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
             font-sans font-semibold text-[14px] text-white transition-colors duration-150

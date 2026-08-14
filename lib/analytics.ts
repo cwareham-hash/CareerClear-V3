@@ -181,6 +181,13 @@ export function trackQuizNudgeDismissed(): void {
   captureEvent('quiz_nudge_dismissed')
 }
 
+// ── My Ratings ────────────────────────────────────────────────────────────────
+
+/** The My Ratings page was opened. Fired once per mount. */
+export function trackMyRatingsViewed(): void {
+  captureEvent('my_ratings_viewed')
+}
+
 // ── Simulation ────────────────────────────────────────────────────────────────
 
 /** The user entered a tier view. Deduped by the caller — once per tier entry. */

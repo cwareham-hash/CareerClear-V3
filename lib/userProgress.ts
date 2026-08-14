@@ -21,47 +21,12 @@ export interface SimulationFeedback {
   comparison: string
 }
 
-export interface SimulationRating {
-  id:          string
-  careerId:    string
-  scenario:    string | null   // null for Orientation (career-level); slug for DIL/Full
-  rating:      number          // 1–10
-  feedback:    SimulationFeedback
-  tier:        Tier
-  completedAt: string          // ISO 8601 (created_at)
-}
-
-// ── Ratings ─────────────────────────────────────────────────────────────────
-
-interface RatingRow {
-  id:                  string
-  simulation_id:       string
-  scenario:            string | null
-  tier:                string
-  score:               number
-  feedback_liked:      string | null
-  feedback_disliked:   string | null
-  feedback_questions:  string | null
-  feedback_comparison: string | null
-  created_at:          string
-}
-
-function mapRating(row: RatingRow): SimulationRating {
-  return {
-    id:          row.id,
-    careerId:    row.simulation_id,
-    scenario:    row.scenario,
-    rating:      row.score,
-    tier:        row.tier as Tier,
-    completedAt: row.created_at,
-    feedback: {
-      liked:      row.feedback_liked      ?? '',
-      disliked:   row.feedback_disliked   ?? '',
-      questions:  row.feedback_questions  ?? '',
-      comparison: row.feedback_comparison ?? '',
-    },
-  }
-}
+// ── Ratings (legacy) ────────────────────────────────────────────────────────
+//
+// SUPERSEDED by lib/roleVerdicts.ts. The post-tier modal writes to role_verdicts
+// now, and every screen reads from there — nothing in the app reads this table
+// any more. saveRating and the `ratings` table are left in place deliberately;
+// a later cleanup drops both once the historical rows are no longer wanted.
 
 export async function saveRating(args: {
   userId:   string
@@ -84,20 +49,6 @@ export async function saveRating(args: {
     feedback_comparison: feedback.comparison || null,
   })
   if (error) console.error('[ratings] saveRating failed:', error.message)
-}
-
-/** All of a user's ratings, newest first. */
-export async function getAllRatings(userId: string): Promise<SimulationRating[]> {
-  const { data, error } = await supabase
-    .from('ratings')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-  if (error) {
-    console.error('[ratings] getAllRatings failed:', error.message)
-    return []
-  }
-  return (data as RatingRow[]).map(mapRating)
 }
 
 // ── Progress ──────────────────────────────────────────────────────────────────
