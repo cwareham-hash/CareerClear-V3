@@ -136,6 +136,51 @@ export function trackSimulateCtaClicked(careerId: string): void {
   captureEvent('simulate_cta_clicked', { career_id: careerId })
 }
 
+// ── Career match quiz ─────────────────────────────────────────────────────────
+//
+// The quiz is open to anonymous visitors, so these fire with or without an
+// identified user. Clicks on the recommended career cards are already covered by
+// career_card_clicked above (the results grid reuses the shared CareerCard) —
+// nothing here duplicates that.
+
+/** The first question was shown, from either the intro CTA or Retake. */
+export function trackQuizStarted(): void {
+  captureEvent('quiz_started')
+}
+
+/**
+ * The user answered a question and advanced. Fired on advance rather than on
+ * selection, so changing an answer before continuing counts once. Going Back and
+ * advancing again re-fires for that question number — the answer was re-made.
+ */
+export function trackQuizQuestionAnswered(questionNumber: number): void {
+  captureEvent('quiz_question_answered', { question_number: questionNumber })
+}
+
+/**
+ * The quiz was completed and results rendered.
+ *   top_careers   — up to 5 best-matching career ids, best first
+ *   attempt_saved — whether the signed-in Supabase save was fired. False for
+ *                   anonymous visitors, whose attempt is saved locally and
+ *                   claimed if they sign up or log in later.
+ */
+export function trackQuizCompleted(topCareers: string[], attemptSaved: boolean): void {
+  captureEvent('quiz_completed', {
+    top_careers:   topCareers,
+    attempt_saved: attemptSaved,
+  })
+}
+
+/** The sign-in link in the post-quiz nudge was clicked. */
+export function trackQuizNudgeClicked(): void {
+  captureEvent('quiz_nudge_clicked')
+}
+
+/** The post-quiz nudge was dismissed with its X. */
+export function trackQuizNudgeDismissed(): void {
+  captureEvent('quiz_nudge_dismissed')
+}
+
 // ── Simulation ────────────────────────────────────────────────────────────────
 
 /** The user entered a tier view. Deduped by the caller — once per tier entry. */

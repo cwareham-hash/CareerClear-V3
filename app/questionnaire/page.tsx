@@ -11,7 +11,7 @@
 //   5. Match % colour tiers: ≥75 teal | ≥50 navy | <50 muted
 //   6. "Explore →" CTA on each result card links to the career detail page
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -20,6 +20,7 @@ import {
   Sparkles,
   RotateCcw,
   Trophy,
+  X,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { QUESTIONS, DIMENSION_LABELS } from '@/lib/questionnaire'
@@ -29,6 +30,13 @@ import {
   type CareerResult,
 } from '@/lib/recommendations'
 import { saveQuizResult } from '@/lib/quizResults'
+import {
+  trackQuizStarted,
+  trackQuizQuestionAnswered,
+  trackQuizCompleted,
+  trackQuizNudgeClicked,
+  trackQuizNudgeDismissed,
+} from '@/lib/analytics'
 import { CAREERS } from '@/lib/careers'
 import CareerCard from '@/components/CareerCard'
 import { useFavorites } from '@/lib/useFavorites'
@@ -36,6 +44,9 @@ import { useFavorites } from '@/lib/useFavorites'
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Phase = 'intro' | 'quiz' | 'results'
+
+/** Once dismissed, the post-quiz sign-in nudge never returns for this browser. */
+const NUDGE_DISMISSED_KEY = 'cc_quiz_nudge_dismissed'
 
 // ── Animation variants ─────────────────────────────────────────────────────────
 // direction: 1 = forward (slide from right), -1 = back (slide from left)
@@ -75,7 +86,7 @@ function matchLabel(pct: number): string {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function QuestionnairePage() {
-  const { user, userName } = useAuth()
+  const { user, userName, isLoading: authLoading, openAuthModal } = useAuth()
   const { isFavorite, toggle } = useFavorites()
 
   const [phase, setPhase] = useState<Phase>('intro')
@@ -83,6 +94,33 @@ export default function QuestionnairePage() {
   const [direction, setDirection] = useState(1)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [results, setResults] = useState<CareerResult[]>([])
+  const [nudgeDismissed, setNudgeDismissed] = useState(true)
+
+  // Read the dismissal flag after mount, never during render — localStorage does
+  // not exist on the server, and reading it inline would desync hydration.
+  // Starting at `true` means the nudge fades in once rather than flashing away.
+  useEffect(() => {
+    setNudgeDismissed(localStorage.getItem(NUDGE_DISMISSED_KEY) === 'true')
+  }, [])
+
+  const dismissNudge = useCallback(() => {
+    setNudgeDismissed(true)
+    try {
+      localStorage.setItem(NUDGE_DISMISSED_KEY, 'true')
+    } catch {
+      // Storage blocked (private mode) — the nudge simply returns next visit.
+    }
+    trackQuizNudgeDismissed()
+  }, [])
+
+  const openSignIn = useCallback(() => {
+    trackQuizNudgeClicked()
+    openAuthModal('login')
+  }, [openAuthModal])
+
+  // Signed-in visitors never see the nudge. `authLoading` keeps it from flashing
+  // for a returning user whose session is still resolving.
+  const showNudge = !authLoading && !user && !nudgeDismissed
 
   const question = QUESTIONS[currentIndex]
   const totalQuestions = QUESTIONS.length
@@ -93,6 +131,7 @@ export default function QuestionnairePage() {
 
   const startQuiz = useCallback(() => {
     setPhase('quiz')
+    trackQuizStarted()
   }, [])
 
   const selectAnswer = useCallback((questionId: string, value: string) => {
@@ -111,6 +150,10 @@ export default function QuestionnairePage() {
   const goNext = useCallback(() => {
     if (!selectedValue) return
 
+    // Fires for every question including the last — answering Q15 and seeing
+    // results are two separate things.
+    trackQuizQuestionAnswered(currentIndex + 1)
+
     if (isLastQuestion) {
       const computed = computeRecommendations(answers)
       setResults(computed)
@@ -126,19 +169,25 @@ export default function QuestionnairePage() {
         void saveQuizResult(user.id, answers, computed, attempt.completedAt, attempt.id)
       }
 
+      trackQuizCompleted(
+        computed.slice(0, 5).map((r) => r.careerId),
+        !!user,
+      )
+
       setPhase('results')
       return
     }
 
     setDirection(1)
     setCurrentIndex((i) => i + 1)
-  }, [selectedValue, isLastQuestion, answers, user, userName])
+  }, [selectedValue, isLastQuestion, answers, currentIndex, user, userName])
 
   const retake = useCallback(() => {
     setAnswers({})
     setCurrentIndex(0)
     setDirection(1)
     setPhase('quiz')
+    trackQuizStarted()
   }, [])
 
   // ── Keyboard: Enter to advance ───────────────────────────────────────────────
@@ -269,6 +318,32 @@ export default function QuestionnairePage() {
               <RotateCcw size={14} aria-hidden="true" />
               Retake Quiz
             </button>
+
+            {/* Sign-in nudge — anonymous visitors only, dismissible for good.
+                Deliberately a quiet line, not a card: the results are the point
+                of this screen, this is a footnote. */}
+            {showNudge && (
+              <div className="mt-5 flex items-center justify-center gap-2">
+                <p className="font-sans text-[13px] text-muted">
+                  <button
+                    onClick={openSignIn}
+                    className="font-medium text-teal hover:text-teal-light
+                      underline underline-offset-2 transition-colors duration-150"
+                  >
+                    Sign in or sign up
+                  </button>{' '}
+                  to save your quiz results
+                </p>
+                <button
+                  onClick={dismissNudge}
+                  aria-label="Dismiss"
+                  className="shrink-0 p-0.5 rounded text-muted hover:text-dark
+                    transition-colors duration-150"
+                >
+                  <X size={13} aria-hidden="true" />
+                </button>
+              </div>
+            )}
           </motion.div>
 
           {/* Career grid — all 10, sorted by match %.
