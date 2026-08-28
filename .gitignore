@@ -45,3 +45,6 @@ next-env.d.ts
 # local audit reports and pre-edit file backups (working notes, not shipped)
 /.audit/
 /.backups/
+
+# generated narration audio samples (local only, never committed)
+/audio-samples/

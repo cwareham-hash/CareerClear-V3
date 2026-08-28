@@ -417,6 +417,7 @@ export function ScriptSection({
 export function ArtifactSection({ content }: { content: string }) {
   return (
     <div
+      data-audio-artifact="work-product"
       className="rounded-[10px] p-4"
       style={{ backgroundColor: '#fbfaf8', border: '1px solid #e5e7eb' }}
     >
@@ -451,7 +452,7 @@ function ScriptLines({ content, asProse }: { content: string; asProse?: boolean 
 // (see panelMaxWidthFor); it is intentionally no longer shown in the caption.
 function InlineHtmlArtifact({ n, html }: { n: number; html: string }) {
   return (
-    <div className="w-full">
+    <div className="w-full" data-audio-artifact={n}>
       <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-2">
         Artifact {n}
       </p>

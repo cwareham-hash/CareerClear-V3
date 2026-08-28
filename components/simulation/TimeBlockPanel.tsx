@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, panelMaxWidthFor, type TimeBlock } from '@/lib/simulation'
 import { BlockBody } from './BlockContent'
+import BlockAudioPlayer from './BlockAudioPlayer'
 import { useDialog } from './useDialog'
 
 const TITLE_ID = 'timeblock-panel-title'
@@ -123,6 +124,9 @@ export default function TimeBlockPanel({
                   </button>
                 </div>
               </div>
+
+              {/* Narration bar — renders nothing for blocks without audio. */}
+              <BlockAudioPlayer blockId={block.id} scrollRef={scrollRef} />
 
               {/* Scrollable body. Prose stays capped to a comfortable line length;
                   for artifact blocks the panel is wider and only the artifact uses

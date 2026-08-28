@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock } from '@/lib/simulation'
 import { BlockBody } from './BlockContent'
+import BlockAudioPlayer from './BlockAudioPlayer'
 import { useDialog } from './useDialog'
 
 const TITLE_ID = 'timeblock-modal-title'
@@ -113,6 +114,9 @@ export default function TimeBlockModal({
                 </button>
               </div>
             </div>
+
+            {/* Narration bar — renders nothing for blocks without audio. */}
+            <BlockAudioPlayer blockId={block.id} scrollRef={scrollRef} />
 
             {/* Scrollable body — prose column capped to a comfortable line length */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5" style={{ backgroundColor: 'var(--color-cream)' }}>
