@@ -196,7 +196,7 @@ export default function TimeBlockPanel({
                     className="font-sans text-[13px] font-medium text-muted hover:text-dark
                       transition-colors duration-150"
                   >
-                    Back
+                    Close
                   </button>
                   <button
                     onClick={onNextBlock}

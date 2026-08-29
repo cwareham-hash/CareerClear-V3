@@ -17,14 +17,15 @@ function activityStyle(color: string): CSSProperties {
   return { borderLeftWidth: '4px', borderLeftStyle: 'solid', borderLeftColor: color, backgroundColor: `${color}1a` }
 }
 
-// Legend items — human-readable names mapped to activity types
+// Legend items — the SAME vocabulary the block badges use (ACTIVITY_LABELS),
+// so one word set names each activity type everywhere.
 const LEGEND_ITEMS: { label: string; type: keyof typeof ACTIVITY_COLORS }[] = [
-  { label: 'External Client Meeting', type: 'meeting' },
-  { label: 'Internal Team Meeting',   type: 'team' },
-  { label: 'Individual Work Block',   type: 'independent' },
-  { label: 'Learning',                type: 'learning' },
-  { label: 'Presentation',            type: 'presentation' },
-  { label: 'Social',                  type: 'social' },
+  { label: 'Meeting',      type: 'meeting' },
+  { label: 'Team Sync',    type: 'team' },
+  { label: 'Deep Work',    type: 'independent' },
+  { label: 'Learning',     type: 'learning' },
+  { label: 'Presentation', type: 'presentation' },
+  { label: 'Social',       type: 'social' },
 ]
 
 interface Props {

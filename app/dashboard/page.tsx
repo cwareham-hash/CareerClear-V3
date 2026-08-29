@@ -166,7 +166,7 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                     (the verdict row itself is never deleted). Orientation is
                     never rated, so it never has one. */}
                 {tier.isCompleted && tier.verdictScore !== null && (
-                  <span className="inline-flex items-center gap-1 shrink-0 font-sans text-[11px] text-muted">
+                  <span className="inline-flex items-center gap-1.5 shrink-0 font-sans text-[11px] text-muted">
                     My Rating:
                     <Star
                       size={9}
@@ -198,7 +198,9 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                   }
                 >
                   <Play size={10} aria-hidden="true" />
-                  {tier.isCompleted ? 'View Results' : 'Continue'}
+                  {/* "Revisit" (not "View Results"): the link reopens the tier's
+                      experience — there is no separate results panel to land on. */}
+                  {tier.isCompleted ? 'Revisit' : 'Continue'}
                 </Link>
               </div>
 
@@ -228,11 +230,13 @@ function ProgressRow({ role }: { role: RoleProgress }) {
 
 function FavoriteCareerCard({
   careerId,
-  pursuing,
+  simLabel,
   latestVerdict,
 }: {
   careerId:      string
-  pursuing:      boolean
+  /** Verb for the simulate link, aligned with actual progress:
+   *  "Simulate" (never started) · "Continue" (in progress) · "Revisit" (done). */
+  simLabel:      string
   latestVerdict: RoleVerdict | null
 }) {
   const career = CAREERS.find((c) => c.id === careerId)
@@ -271,7 +275,7 @@ function FavoriteCareerCard({
               text-muted hover:text-teal transition-colors duration-150"
           >
             <Play size={11} aria-hidden="true" />
-            {pursuing ? 'Retake' : 'Simulate'}
+            {simLabel}
           </Link>
         )}
       </div>
@@ -302,7 +306,7 @@ function VerdictCard({ verdict }: { verdict: RoleVerdict }) {
         >
           {tierLabel(verdict.tier)}
         </span>
-        <span className="inline-flex items-center gap-1 shrink-0 font-sans text-[11px] text-muted">
+        <span className="inline-flex items-center gap-1.5 shrink-0 font-sans text-[11px] text-muted">
           My Rating:
           <Star
             size={9}
@@ -377,9 +381,9 @@ function AttemptCard({
         <div className="flex items-center gap-3">
           <span className="font-sans font-semibold text-[14px] text-dark">
             Attempt #{attemptNumber}
+            <span className="font-normal text-muted"> · {formatDate(attempt.takenAt)}</span>
           </span>
         </div>
-        <span className="font-sans text-[13px] text-muted">{formatDate(attempt.takenAt)}</span>
       </div>
 
       {/* Change since the previous attempt — only once there is one to compare to */}
@@ -605,6 +609,15 @@ export default function DashboardPage() {
   const activePursuing = favorites.filter((f) => f.category === 'actively_pursuing')
   const savedToTry     = favorites.filter((f) => f.category === 'saved_to_try')
 
+  // Simulate-link verb for a favorite, aligned with actual tier progress:
+  // no progress → "Simulate"; any started-but-unfinished tier → "Continue";
+  // progress with every started tier complete → "Revisit".
+  function simLabelFor(careerId: string): string {
+    const role = roleProgress.find((r) => r.careerId === careerId)
+    if (!role || role.tiers.length === 0) return 'Simulate'
+    return role.tiers.some((t) => !t.isCompleted) ? 'Continue' : 'Revisit'
+  }
+
   // New user: nothing started yet
   const isNewUser = roleProgress.length === 0 && favorites.length === 0 && history.length === 0
 
@@ -677,13 +690,13 @@ export default function DashboardPage() {
           <StatCard
             icon={CheckCircle2}
             value={tiersCompleted}
-            label="Completed"
+            label="Tiers completed"
             color="var(--color-teal)"
           />
           <StatCard
             icon={Star}
             value={rolesRated}
-            label="Roles Rated"
+            label={rolesRated === 1 ? 'Role Rated' : 'Roles Rated'}
             color="var(--color-teal)"
           />
           <StatCard
@@ -879,7 +892,7 @@ export default function DashboardPage() {
                       <FavoriteCareerCard
                         key={careerId}
                         careerId={careerId}
-                        pursuing={true}
+                        simLabel={simLabelFor(careerId)}
                         latestVerdict={latestVerdictByCareer[careerId] ?? null}
                       />
                     ))}
@@ -907,7 +920,7 @@ export default function DashboardPage() {
                       <FavoriteCareerCard
                         key={careerId}
                         careerId={careerId}
-                        pursuing={false}
+                        simLabel={simLabelFor(careerId)}
                         latestVerdict={null}
                       />
                     ))}
@@ -919,19 +932,19 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {/* ── 5. Questionnaire Results ───────────────────────────────────── */}
+        {/* ── 5. Career Quiz Results ─────────────────────────────────────── */}
         <section>
           <SectionHeader
             icon={Sparkles}
-            title="Questionnaire Results"
-            subtitle="Your career match quiz history"
+            title="Career Quiz Results"
+            subtitle="Your Career Quiz history"
           />
 
           {history.length === 0 ? (
             <p className="font-sans text-[13px] text-muted">
               No saved quiz results yet.{' '}
               <Link href="/questionnaire" className="text-teal hover:text-teal-light transition-colors">
-                Take the Career Match Quiz →
+                Take the Career Quiz →
               </Link>
             </p>
           ) : (

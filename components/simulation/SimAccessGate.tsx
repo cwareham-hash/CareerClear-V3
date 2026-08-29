@@ -28,7 +28,7 @@ export default function SimAccessGate({ label, children }: Props) {
             <LogIn size={22} style={{ color: 'var(--color-teal)' }} />
           </div>
           <h1 className="font-serif text-[24px] font-bold text-navy leading-tight mb-2">
-            Log in to continue
+            Create a free account or log in to continue
           </h1>
           <p className="font-sans text-[14px] text-muted leading-relaxed mb-6">
             Create a free account to open <span className="font-medium text-dark">{label}</span> —

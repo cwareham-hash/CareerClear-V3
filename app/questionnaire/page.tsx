@@ -205,7 +205,7 @@ export default function QuestionnairePage() {
 
             {/* Heading */}
             <h1 className="font-serif text-[32px] font-bold text-navy leading-tight mb-3">
-              Career Match Quiz
+              Career Quiz
             </h1>
             <p className="font-sans text-[15px] text-muted leading-relaxed mb-8">
               Answer {totalQuestions} quick questions and we&apos;ll show you which careers

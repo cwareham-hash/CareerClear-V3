@@ -247,7 +247,7 @@ export default function CareerGrid() {
             <input
               id="career-search"
               type="search"
-              placeholder="Search careers..."
+              placeholder="Search careers…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="
