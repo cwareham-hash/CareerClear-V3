@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
@@ -73,6 +74,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<AuthModalMode>('login')
+  // Which user id the `profile` state currently belongs to. Lets the profile
+  // effect tell "a different person just logged in" (must block access
+  // verdicts until their profile resolves) apart from a token refresh for the
+  // same user (quiet background refetch, no loading state).
+  const profileUserIdRef = useRef<string | null>(null)
 
   // Resolve the existing session on mount, and subscribe to auth changes.
   useEffect(() => {
@@ -117,17 +123,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) {
       setProfile(null)
+      profileUserIdRef.current = null
       return
     }
     let active = true
+    // A user we don't have a profile for yet (fresh login or account switch):
+    // flip back to loading so gates (SimAccessGate, Navbar) wait for the real
+    // beta_access value instead of judging from the stale null profile.
+    if (profileUserIdRef.current !== user.id) setIsLoading(true)
     ;(async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('full_name, university, beta_access')
-        .eq('id', user.id)
-        .maybeSingle()
-      if (!active) return
-      setProfile((data as Profile) ?? null)
+      // The first profiles request can race the new session's token right
+      // after login and come back 401 — retry with a short backoff rather
+      // than treating the account as having no beta access.
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name, university, beta_access')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (!active) return
+        if (!error) {
+          setProfile((data as Profile) ?? null)
+          profileUserIdRef.current = user.id
+          setIsLoading(false)
+          return
+        }
+        if (attempt < 3) {
+          await new Promise((resolve) => setTimeout(resolve, 350 * attempt))
+          if (!active) return
+        }
+      }
+      // All retries failed — settle so the app isn't stuck loading forever.
+      profileUserIdRef.current = user.id
+      setProfile(null)
       setIsLoading(false)
     })()
     return () => { active = false }
@@ -195,12 +223,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
   const closeAuthModal = useCallback(() => setAuthModalOpen(false), [])
 
+  // Derived at render time: a logged-in user whose profile hasn't resolved yet
+  // is still "loading". This closes the one-frame gap between "user arrived"
+  // and the profile effect flipping the loading state — the gap where the app
+  // used to render a wrong access verdict right after login.
+  const profilePending = user !== null && profileUserIdRef.current !== user.id
+
   const value: AuthContextType = {
     user,
     session,
     userName:   profile?.full_name ?? null,
     betaAccess: profile?.beta_access ?? false,
-    isLoading,
+    isLoading:  isLoading || profilePending,
     signUp,
     signIn,
     signOut,

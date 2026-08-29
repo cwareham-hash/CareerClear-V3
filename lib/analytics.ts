@@ -237,6 +237,23 @@ export function trackSurveyDismissed(ctx: SimulationContext): void {
   captureEvent('survey_dismissed', simProps(ctx))
 }
 
+// ── Block audio narration (the in-panel player) ────────────────────────────────
+
+/** Playback started on a block's narration audio. */
+export function trackAudioPlayed(blockId: string): void {
+  captureEvent('audio_played', { block_id: blockId })
+}
+
+/** The narration audio played through to the end. */
+export function trackAudioCompleted(blockId: string): void {
+  captureEvent('audio_completed', { block_id: blockId })
+}
+
+/** The listener picked a different playback speed. */
+export function trackAudioSpeedChanged(blockId: string, speed: number): void {
+  captureEvent('audio_speed_changed', { block_id: blockId, speed })
+}
+
 /**
  * Clear the identity on logout so the next anonymous session isn't merged into
  * the person who just signed out (important on shared/library computers).

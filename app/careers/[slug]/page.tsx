@@ -32,7 +32,7 @@ export default function CareerDetailPage({ params }: Props) {
 
         {/* Back link */}
         <Link
-          href="/"
+          href="/explore"
           className="inline-flex items-center gap-1.5 text-[13px] font-medium
             text-muted hover:text-teal transition-colors mb-8"
         >
@@ -62,6 +62,15 @@ export default function CareerDetailPage({ params }: Props) {
               <span className="px-3 py-1 rounded-pill text-[12px] font-medium bg-teal text-white">
                 Simulation Available
               </span>
+            )}
+            {/* Hero door into the simulation — previously the only entry point
+                sat at the very bottom of the page. Sim careers only. */}
+            {career.hasSimulation && (
+              <SimulateCtaLink
+                careerId={career.id}
+                careerSlug={career.slug}
+                label="Jump to Simulation"
+              />
             )}
           </div>
 

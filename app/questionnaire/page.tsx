@@ -19,7 +19,6 @@ import {
   ChevronRight,
   Sparkles,
   RotateCcw,
-  Trophy,
   X,
 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
@@ -37,9 +36,7 @@ import {
   trackQuizNudgeClicked,
   trackQuizNudgeDismissed,
 } from '@/lib/analytics'
-import { CAREERS } from '@/lib/careers'
-import CareerCard from '@/components/CareerCard'
-import { useFavorites } from '@/lib/useFavorites'
+import QuizResultsView from '@/components/QuizResultsView'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -68,26 +65,11 @@ const slideVariants = {
   }),
 }
 
-// ── Match % colour tier (decision #5) ─────────────────────────────────────────
-
-function matchBadgeClass(pct: number): string {
-  if (pct >= 75) return 'bg-teal text-white'
-  if (pct >= 50) return 'bg-navy text-white'
-  return 'bg-border text-muted'
-}
-
-function matchLabel(pct: number): string {
-  if (pct >= 75) return 'Strong Match'
-  if (pct >= 50) return 'Good Match'
-  if (pct >= 30) return 'Some Overlap'
-  return 'Low Match'
-}
-
 // ── Main page ─────────────────────────────────────────────────────────────────
+// (Match % colour tiers — decision #5 — live in components/QuizResultsView.tsx.)
 
 export default function QuestionnairePage() {
   const { user, userName, isLoading: authLoading, openAuthModal } = useAuth()
-  const { isFavorite, toggle } = useFavorites()
 
   const [phase, setPhase] = useState<Phase>('intro')
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -197,12 +179,6 @@ export default function QuestionnairePage() {
 
   const progressPct = ((currentIndex + 1) / totalQuestions) * 100
 
-  // Match results to career objects (sorted descending by matchPct from computeRecommendations)
-  const rankedCareers = results.map((r) => ({
-    ...r,
-    career: CAREERS.find((c) => c.id === r.careerId)!,
-  }))
-
   // ── Intro screen ─────────────────────────────────────────────────────────────
   // DECISION: intro not mentioned in spec — added to provide context before Q1
 
@@ -229,7 +205,7 @@ export default function QuestionnairePage() {
 
             {/* Heading */}
             <h1 className="font-serif text-[32px] font-bold text-navy leading-tight mb-3">
-              Career Match Quiz
+              Career Quiz
             </h1>
             <p className="font-sans text-[15px] text-muted leading-relaxed mb-8">
               Answer {totalQuestions} quick questions and we&apos;ll show you which careers
@@ -281,32 +257,16 @@ export default function QuestionnairePage() {
   }
 
   // ── Results screen ────────────────────────────────────────────────────────────
+  // Rendered by the shared QuizResultsView (also used by /quiz-results/[attemptId]
+  // to reopen a stored attempt); this page contributes the retake button, the
+  // sign-in nudge, and the footer note.
 
   if (phase === 'results') {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-cream px-4 py-12">
-        <div className="max-w-5xl mx-auto">
-
-          {/* Results header */}
-          <motion.div
-            className="text-center mb-10"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-          >
-            <div
-              className="w-14 h-14 rounded-card flex items-center justify-center mx-auto mb-4"
-              style={{ backgroundColor: 'var(--color-tag-bg)' }}
-            >
-              <Trophy size={24} style={{ color: 'var(--color-teal)' }} />
-            </div>
-            <h1 className="font-serif text-[32px] font-bold text-navy mb-2">
-              Your Career Matches
-            </h1>
-            <p className="font-sans text-[15px] text-muted mb-6 max-w-md mx-auto">
-              Based on your answers, here are the careers that align best with your
-              profile — ranked by compatibility.
-            </p>
+      <QuizResultsView
+        results={results}
+        headerExtra={
+          <>
             <button
               onClick={retake}
               className="
@@ -344,49 +304,17 @@ export default function QuestionnairePage() {
                 </button>
               </div>
             )}
-          </motion.div>
-
-          {/* Career grid — all 10, sorted by match %.
-               Each card is the identical §7.6.1 CareerCard; match context
-               sits in a slim label row above the card (outside it). */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.1, ease: 'easeOut' }}
-          >
-            {rankedCareers.map(({ career, matchPct }) => (
-              <div key={career.id} className="flex flex-col gap-1.5">
-                {/* Match label — above the card, not part of it */}
-                <div className="flex items-center justify-between px-1">
-                  <span className="font-sans text-[12px] text-muted font-medium">
-                    {matchLabel(matchPct)}
-                  </span>
-                  <span
-                    className={`px-2.5 py-0.5 rounded-pill font-sans font-semibold text-[12px] ${matchBadgeClass(matchPct)}`}
-                  >
-                    {matchPct}% match
-                  </span>
-                </div>
-                {/* Identical §7.6.1 CareerCard */}
-                <CareerCard
-                  career={career}
-                  isFavorite={isFavorite(career.id)}
-                  onToggleFavorite={() => toggle(career.id)}
-                />
-              </div>
-            ))}
-          </motion.div>
-
-          {/* Footer note */}
+          </>
+        }
+        footer={
           <p className="text-center font-sans text-[13px] text-muted mt-10">
             Results saved to your dashboard.{' '}
             <Link href="/dashboard" className="text-teal hover:text-teal-light transition-colors">
               View history →
             </Link>
           </p>
-        </div>
-      </div>
+        }
+      />
     )
   }
 

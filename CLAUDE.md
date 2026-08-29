@@ -4,6 +4,7 @@
 
 - **Stack:** Next.js 14 (App Router) + TypeScript, Tailwind CSS, Framer Motion, Lucide React. Frontend-only — there is currently no backend or database; all persistence is browser localStorage.
 - **Local dev:** `npm run dev` → http://localhost:3000. The `dev` and `prebuild` scripts intentionally run `rm -rf .next` first (permanent fix for a stale-cache bug that broke all CSS). Never remove that cleanup. If styling ever breaks in dev: `npm run clean`, then restart.
+- **One dev server per repo:** Never run two dev servers for THIS repo at the same time — each dev-server start deletes the shared `.next` cache and breaks the other, causing blank half-rendered pages (nav renders, content stays invisible). Other projects' dev servers on other ports are fine. Before starting a server, check whether one is already running for this repo (e.g. does http://localhost:3000 already respond).
 - **Code layout:** `app/` (pages), `components/` (UI building blocks), `lib/` (data, logic, and per-career simulation content in `lib/content/`).
 - **Repo:** GitHub `cwareham-hash/CareerClear-V3`, main branch `main`.
 - **Deploy:** Connected to Vercel — **every push to `main` auto-deploys to production** at https://careerclear-beta.vercel.app/ (`career-clear-v3.vercel.app` 307-redirects there; the older `career-clear-v3-iy5k.vercel.app` alias is DEAD, left over from deleted duplicate Vercel projects, and returns DEPLOYMENT_NOT_FOUND). This makes the "never commit or push without explicit instruction" rule (Section 5) especially important: a push is a production deploy.

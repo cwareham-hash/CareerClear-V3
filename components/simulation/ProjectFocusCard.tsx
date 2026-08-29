@@ -51,28 +51,31 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
   // a project shipping Full before its Day-in-the-Life shows no blank step.
   const tiers = [
     {
-      key:   'orientation' as TierKey,
-      href:  `/careers/${careerSlug}/simulate/${sc.slug}/orientation`,
-      label: 'Orientation',
-      base:  'Set the scene before the work',
-      Icon:  BookOpen,
-      gated: false,
+      key:      'orientation' as TierKey,
+      href:     `/careers/${careerSlug}/simulate/${sc.slug}/orientation`,
+      label:    'Orientation',
+      base:     'Set the scene before the work',
+      duration: '10–15 min',
+      Icon:     BookOpen,
+      gated:    false,
     },
     {
-      key:   'day-in-life' as TierKey,
-      href:  `/careers/${careerSlug}/simulate/${sc.slug}?experience=day-in-life`,
-      label: 'Day in the Life',
-      base:  'One representative day',
-      Icon:  CalendarDays,
-      gated: true,
+      key:      'day-in-life' as TierKey,
+      href:     `/careers/${careerSlug}/simulate/${sc.slug}?experience=day-in-life`,
+      label:    'Day in the Life',
+      base:     'One representative day',
+      duration: 'About an hour',
+      Icon:     CalendarDays,
+      gated:    true,
     },
     {
-      key:   'full' as TierKey,
-      href:  `/careers/${careerSlug}/simulate/${sc.slug}?experience=full`,
-      label: 'Full Simulation',
-      base:  'The complete multi-day arc',
-      Icon:  CalendarRange,
-      gated: true,
+      key:      'full' as TierKey,
+      href:     `/careers/${careerSlug}/simulate/${sc.slug}?experience=full`,
+      label:    'Full Simulation',
+      base:     'The complete multi-day arc',
+      duration: '3–5 hrs',
+      Icon:     CalendarRange,
+      gated:    true,
     },
   ].filter((t) => sc.tiers[t.key].length > 0)
 
@@ -179,6 +182,10 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
                           >
                             {t.label}
                           </h4>
+                          {/* Duration estimate — small and quiet beside the title */}
+                          <span className="font-sans text-[11px] text-muted whitespace-nowrap">
+                            {t.duration}
+                          </span>
                           {showStartHere && (
                             <span className="inline-flex items-center rounded-pill bg-teal text-white
                               px-2 py-0.5 font-sans text-[10px] font-bold uppercase tracking-wide">

@@ -10,7 +10,7 @@ import { ArrowRight } from 'lucide-react'
 export default function FinalCTA() {
   return (
     <section className="bg-cream" aria-label="Get started">
-      <div className="max-w-3xl mx-auto px-6 py-16 md:py-20 text-center">
+      <div className="max-w-3xl mx-auto px-6 py-9 md:py-11 text-center">
         <motion.h2
           className="font-serif text-[28px] md:text-[32px] font-bold text-navy leading-tight mb-8"
           initial={{ opacity: 0, y: 16 }}

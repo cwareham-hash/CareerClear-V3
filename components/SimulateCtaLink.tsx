@@ -15,9 +15,12 @@ import { trackSimulateCtaClicked } from '@/lib/analytics'
 interface Props {
   careerId:   string
   careerSlug: string
+  /** Button text. Defaults to the original bottom-CTA wording; the career page
+   *  hero passes "Jump to Simulation" so both doors report their clicks. */
+  label?:     string
 }
 
-export default function SimulateCtaLink({ careerId, careerSlug }: Props) {
+export default function SimulateCtaLink({ careerId, careerSlug, label = 'Start Simulation' }: Props) {
   return (
     <Link
       href={`/careers/${careerSlug}/simulate`}
@@ -27,7 +30,7 @@ export default function SimulateCtaLink({ careerId, careerSlug }: Props) {
         transition-colors duration-150"
     >
       <Play size={15} aria-hidden="true" />
-      Start Simulation
+      {label}
     </Link>
   )
 }

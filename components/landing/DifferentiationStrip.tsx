@@ -9,7 +9,7 @@ import { motion } from 'framer-motion'
 export default function DifferentiationStrip() {
   return (
     <section className="bg-navy" aria-label="Why Career Clear is different">
-      <div className="max-w-3xl mx-auto px-6 py-16 md:py-20 text-center">
+      <div className="max-w-3xl mx-auto px-6 py-9 md:py-11 text-center">
         <motion.p
           className="font-serif text-[22px] md:text-[26px] font-bold text-white leading-snug mb-5"
           initial={{ opacity: 0, y: 16 }}

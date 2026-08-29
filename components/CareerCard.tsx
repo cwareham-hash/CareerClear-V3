@@ -10,6 +10,10 @@ interface CareerCardProps {
   isFavorite: boolean
   onToggleFavorite: () => void
   isSimulated?: boolean
+  /** Purple Simulation badge instead of the default teal. Opt-in, used ONLY by
+   *  the Explore "Step into a simulation" featured strip — every other surface
+   *  (grid, quiz results) keeps the teal default. */
+  simBadgePurple?: boolean
 }
 
 /**
@@ -23,12 +27,12 @@ interface CareerCardProps {
  *   2. Title — 16px bold Inter #111827
  *   3. Description — 14px regular #6b7280, 2–3 lines
  *   4. Skill tags — teal filled pills (#2a9d8f bg, white text, 12px)
- *   5. Bottom row: industry badge (outline) + purple Simulation badge (only on
+ *   5. Bottom row: industry badge (outline) + teal Simulation badge (only on
  *      roles with a built sim) | Explore →
  *
  * Hover: shadow-card-hover + translateY(-2px), 200ms ease
  */
-export default function CareerCard({ career, isFavorite, onToggleFavorite, isSimulated }: CareerCardProps) {
+export default function CareerCard({ career, isFavorite, onToggleFavorite, isSimulated, simBadgePurple }: CareerCardProps) {
   const { id, slug, emoji, title, industry, description, skills, hasSimulation } = career
 
   return (
@@ -116,14 +120,17 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
               {industry}
             </span>
 
-            {/* Simulation badge — filled purple pill (the Learning activity-type
-                purple, --color-block-purple) marking the one role that has a built
-                simulation. It reuses career.hasSimulation, the same flag that gates
-                the sim routes. Roles without a sim show no badge here at all. */}
+            {/* Simulation badge — filled teal pill, the same treatment as the
+                career page's "Simulation Available" badge, so one color means
+                simulation everywhere. It reuses career.hasSimulation, the same
+                flag that gates the sim routes. Roles without a sim show no badge
+                here at all. */}
             {hasSimulation && (
               <span
-                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium text-white"
-                style={{ backgroundColor: 'var(--color-block-purple)' }}
+                className={`px-2.5 py-0.5 rounded-pill text-[12px] font-medium text-white ${
+                  simBadgePurple ? '' : 'bg-teal'
+                }`}
+                style={simBadgePurple ? { backgroundColor: 'var(--color-block-purple)' } : undefined}
               >
                 Simulation
               </span>
