@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Search } from 'lucide-react'
+import { Search, SlidersHorizontal, ChevronDown, ChevronUp, ArrowUp } from 'lucide-react'
 import CareerCard from '@/components/CareerCard'
 import {
   CAREERS,
@@ -66,8 +66,20 @@ export default function CareerGrid() {
   const [functionFilters, setFunctionFilters]         = useState<FunctionCategory[]>([])
   const [completedCareerIds, setCompletedCareerIds]   = useState<Set<string>>(new Set())
   const [isHydrated, setIsHydrated]                   = useState(false)
+  // Mobile-only UI state: chips collapse behind a "Filters" button so the first
+  // career cards fit in the first screen; a back-to-top button appears after
+  // roughly two viewport-heights of scroll. Neither affects desktop (md+).
+  const [filtersOpen, setFiltersOpen]                 = useState(false)
+  const [showBackToTop, setShowBackToTop]             = useState(false)
   const { isFavorite, toggle }                        = useFavorites()
   const { user }                                      = useAuth()
+
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > window.innerHeight * 2)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Load "started a simulation" indicators from Supabase for the logged-in user.
   useEffect(() => {
@@ -159,8 +171,13 @@ export default function CareerGrid() {
     <section className="bg-cream py-12 px-6">
       <div className="max-w-7xl mx-auto">
 
-        {/* §5.2.2: Full-width search bar with magnifier icon */}
-        <div className="mb-6">
+        {/* §5.2.2: Full-width search bar with magnifier icon.
+            On mobile it sticks below the fixed navbar (h-16) while the grid
+            scrolls; the -mx/px bleed keeps the cream backdrop edge-to-edge. */}
+        <div
+          className="mb-6 max-md:sticky max-md:top-16 max-md:z-20 max-md:bg-cream
+            max-md:-mx-6 max-md:px-6 max-md:py-3 max-md:mb-3"
+        >
           {/* Visible label — persists after the placeholder disappears.
               Styled like the Industry/Function filter group labels for consistency. */}
           <label
@@ -192,11 +209,43 @@ export default function CareerGrid() {
           </div>
         </div>
 
+        {/* Mobile-only "Filters" toggle — the chip rows below collapse behind it
+            so career cards are reachable on the first screen. Count badge shows
+            how many chips are active. Desktop always shows the chips. */}
+        <div className="mb-4 md:hidden">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((v) => !v)}
+            aria-expanded={filtersOpen}
+            aria-controls="career-filters"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-btn border border-border
+              bg-white font-sans text-[14px] font-medium text-dark hover:border-teal
+              hover:text-teal transition-colors duration-150"
+          >
+            <SlidersHorizontal size={15} aria-hidden="true" />
+            Filters
+            {industryFilters.length + functionFilters.length > 0 && (
+              <span
+                className="min-w-[20px] h-5 px-1.5 rounded-pill bg-teal text-white text-[12px]
+                  font-semibold inline-flex items-center justify-center"
+              >
+                {industryFilters.length + functionFilters.length}
+              </span>
+            )}
+            {filtersOpen
+              ? <ChevronUp size={15} aria-hidden="true" />
+              : <ChevronDown size={15} aria-hidden="true" />}
+          </button>
+        </div>
+
         {/* §5.2.2: Horizontal filter pill row — Industry + Function groups */}
         {/* Decision: split into two labeled rows (Industry / Function) for
             clarity since the spec names both groups explicitly. A flat single
             row of 10 unlabeled pills would be harder to scan. */}
-        <div className="mb-6 space-y-3">
+        <div
+          id="career-filters"
+          className={`mb-6 space-y-3 ${filtersOpen ? '' : 'max-md:hidden'}`}
+        >
 
           {/* Industry filters */}
           <div className="flex flex-wrap items-center gap-2">
@@ -312,6 +361,20 @@ export default function CareerGrid() {
           </div>
         )}
       </div>
+
+      {/* Mobile-only floating back-to-top — the grid runs very long on phones
+          and the filters live at the top. z-30 keeps it under the navbar (z-40). */}
+      {showBackToTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Back to top"
+          className="md:hidden fixed bottom-5 right-5 z-30 w-11 h-11 rounded-full
+            bg-navy text-white shadow-panel flex items-center justify-center"
+        >
+          <ArrowUp size={18} aria-hidden="true" />
+        </button>
+      )}
     </section>
   )
 }

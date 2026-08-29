@@ -32,7 +32,7 @@ export default function CareerDetailPage({ params }: Props) {
 
         {/* Back link */}
         <Link
-          href="/"
+          href="/explore"
           className="inline-flex items-center gap-1.5 text-[13px] font-medium
             text-muted hover:text-teal transition-colors mb-8"
         >

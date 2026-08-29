@@ -141,8 +141,10 @@ function ProgressRow({ role }: { role: RoleProgress }) {
           const pct = Math.round((tier.completedCount / tier.totalCount) * 100)
           return (
             <div key={`${tier.scenarioSlug ?? 'orientation'}-${tier.tier}`} className="flex flex-col gap-1.5">
-              {/* Row 1: pill + status badge + spacer + CTA */}
-              <div className="flex items-center gap-2">
+              {/* Row 1: pill + status badge + spacer + CTA. Wraps on small
+                  screens so the CTA drops below the badges instead of being
+                  pushed past the right edge of the viewport. */}
+              <div className="flex flex-wrap md:flex-nowrap items-center gap-2">
                 <span
                   className="px-2.5 py-0.5 rounded-pill font-sans font-bold text-[14px] text-white shrink-0"
                   style={{ backgroundColor: 'var(--color-navy)' }}

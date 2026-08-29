@@ -46,7 +46,13 @@ const FALLBACK_NATURAL_WIDTH = 1360
 const FALLBACK_NATURAL_HEIGHT = 720
 
 // Breathing room between the expanded artifact and the viewport edges.
+// On phones this margin is what made "Expand" render SMALLER than the inline
+// preview (2×48px eaten out of a 390px viewport), so below the mobile
+// breakpoint the sides go to zero — the artifact fits the full viewport width
+// and only a slim vertical padding remains. Desktop keeps the original 48px.
 const EXPAND_MARGIN = 48
+const MOBILE_BREAKPOINT = 768
+const MOBILE_EXPAND_VPAD = 12
 
 export function HtmlArtifact({ html }: { html: string }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -126,7 +132,10 @@ export function HtmlArtifact({ html }: { html: string }) {
   // ends up taller than the viewport; the overlay scrolls it (see below). One
   // formula covers every artifact type (width is uniform at ~1360), so no
   // per-type branching.
-  const expandAvailW = (viewport?.w ?? 0) - EXPAND_MARGIN * 2
+  const isMobileExpand = (viewport?.w ?? 0) < MOBILE_BREAKPOINT
+  const expandSideMargin = isMobileExpand ? 0 : EXPAND_MARGIN
+  const expandVerticalPad = isMobileExpand ? MOBILE_EXPAND_VPAD : EXPAND_MARGIN
+  const expandAvailW = (viewport?.w ?? 0) - expandSideMargin * 2
   const expandedScale = viewport ? expandAvailW / naturalW : 1
   const expandedW = Math.round(naturalW * expandedScale)
   // Real layout height for the wrapper. A CSS transform does not change layout
@@ -217,7 +226,7 @@ export function HtmlArtifact({ html }: { html: string }) {
             <div
               ref={setScrollRef}
               className="absolute inset-0 overflow-y-auto overflow-x-hidden flex"
-              style={{ paddingTop: EXPAND_MARGIN, paddingBottom: EXPAND_MARGIN }}
+              style={{ paddingTop: expandVerticalPad, paddingBottom: expandVerticalPad }}
             >
               {/* Artifact stage. `margin: auto` inside the flex container centers a
                   short artifact on both axes and collapses to zero once the artifact
