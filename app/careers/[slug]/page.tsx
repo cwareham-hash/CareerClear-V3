@@ -63,6 +63,15 @@ export default function CareerDetailPage({ params }: Props) {
                 Simulation Available
               </span>
             )}
+            {/* Hero door into the simulation — previously the only entry point
+                sat at the very bottom of the page. Sim careers only. */}
+            {career.hasSimulation && (
+              <SimulateCtaLink
+                careerId={career.id}
+                careerSlug={career.slug}
+                label="Jump to Simulation"
+              />
+            )}
           </div>
 
           {/* Skills */}

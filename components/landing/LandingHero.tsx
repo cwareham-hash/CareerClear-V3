@@ -19,7 +19,7 @@ export default function LandingHero() {
       }}
       aria-label="Hero — Test drive a career before you have to choose one."
     >
-      <div className="max-w-3xl mx-auto px-6 py-16 md:py-24 text-center">
+      <div className="max-w-3xl mx-auto px-6 py-9 md:py-14 text-center">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

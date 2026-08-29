@@ -406,9 +406,19 @@ function AttemptCard({
       )}
 
       <div className="px-5 py-4">
-        <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide mb-3">
-          Recommended Careers
-        </p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="font-sans text-[11px] font-semibold text-muted uppercase tracking-wide">
+            Recommended Careers
+          </p>
+          {/* Reopens this attempt's complete ranked results (read-only view). */}
+          <Link
+            href={`/quiz-results/${attempt.id}`}
+            className="font-sans text-[13px] font-semibold text-teal hover:text-teal-light
+              transition-colors duration-150 shrink-0"
+          >
+            View full results →
+          </Link>
+        </div>
         <div className="flex flex-wrap gap-2">
           {topResults.map((result) => {
             const career = CAREERS.find((c) => c.id === result.careerId)

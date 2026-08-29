@@ -64,6 +64,7 @@ export default function CareerGrid() {
   const [search, setSearch]                           = useState('')
   const [industryFilters, setIndustryFilters]         = useState<IndustryCategory[]>([])
   const [functionFilters, setFunctionFilters]         = useState<FunctionCategory[]>([])
+  const [simOnly, setSimOnly]                         = useState(false)
   const [completedCareerIds, setCompletedCareerIds]   = useState<Set<string>>(new Set())
   const [isHydrated, setIsHydrated]                   = useState(false)
   // Mobile-only UI state: chips collapse behind a "Filters" button so the first
@@ -79,6 +80,16 @@ export default function CareerGrid() {
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // /explore?filter=simulations opens with the "Has simulation" filter already
+  // active (the landing-page CTA links here). Read once on mount — deliberately
+  // NOT re-applied later, so the user can still turn the filter off. Reading
+  // window.location instead of useSearchParams keeps this statically
+  // prerenderable without a Suspense boundary.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('filter') === 'simulations') setSimOnly(true)
   }, [])
 
   // Load "started a simulation" indicators from Supabase for the logged-in user.
@@ -118,10 +129,15 @@ export default function CareerGrid() {
     setSearch('')
     setIndustryFilters([])
     setFunctionFilters([])
+    setSimOnly(false)
   }
 
   const hasActiveFilters =
-    search.length > 0 || industryFilters.length > 0 || functionFilters.length > 0
+    search.length > 0 || industryFilters.length > 0 || functionFilters.length > 0 || simOnly
+
+  // Chip count for the mobile Filters button badge.
+  const activeChipCount =
+    industryFilters.length + functionFilters.length + (simOnly ? 1 : 0)
 
   // ── Derived filtered list ───────────────────────────────────────────────────
 
@@ -149,9 +165,12 @@ export default function CareerGrid() {
         if (!overlap) return false
       }
 
+      // "Has simulation" filter — same flag that gates the sim routes.
+      if (simOnly && !career.hasSimulation) return false
+
       return true
     })
-  }, [search, industryFilters, functionFilters])
+  }, [search, industryFilters, functionFilters, simOnly])
 
   // ── Shared pill class helper ────────────────────────────────────────────────
 
@@ -167,9 +186,41 @@ export default function CareerGrid() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
+  const simCareers = CAREERS.filter((c) => c.hasSimulation)
+
   return (
-    <section className="bg-cream py-12 px-6">
+    <section className="bg-cream py-12 px-6 max-md:py-8">
       <div className="max-w-7xl mx-auto">
+
+        {/* Featured strip — the two careers with built simulations, surfaced
+            above the search/grid so they can't be missed. Reuses the standard
+            CareerCard. Desktop: two cards side by side, width-capped so it stays
+            a strip rather than a billboard. Mobile: one horizontally scrollable
+            card row to protect the first-screen space Wave 1 reclaimed. */}
+        <div className="mb-10 max-md:mb-5">
+          <h2 className="font-serif text-[22px] font-bold text-navy leading-tight mb-1">
+            Step into a simulation
+          </h2>
+          <p className="font-sans text-[13px] text-muted mb-4">
+            These careers have full simulations — shadow a real week of the job, with audio.
+          </p>
+          <div
+            className="md:grid md:grid-cols-2 md:gap-5 md:max-w-3xl
+              max-md:flex max-md:gap-4 max-md:overflow-x-auto max-md:pb-2 max-md:-mx-6 max-md:px-6"
+          >
+            {simCareers.map((career) => (
+              <div key={career.id} className="max-md:w-[300px] max-md:shrink-0">
+                <CareerCard
+                  career={career}
+                  isFavorite={isFavorite(career.id)}
+                  onToggleFavorite={() => toggle(career.id)}
+                  isSimulated={completedCareerIds.has(career.id)}
+                  simBadgePurple
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* §5.2.2: Full-width search bar with magnifier icon.
             On mobile it sticks below the fixed navbar (h-16) while the grid
@@ -212,7 +263,7 @@ export default function CareerGrid() {
         {/* Mobile-only "Filters" toggle — the chip rows below collapse behind it
             so career cards are reachable on the first screen. Count badge shows
             how many chips are active. Desktop always shows the chips. */}
-        <div className="mb-4 md:hidden">
+        <div className="mb-3 md:hidden">
           <button
             type="button"
             onClick={() => setFiltersOpen((v) => !v)}
@@ -224,12 +275,12 @@ export default function CareerGrid() {
           >
             <SlidersHorizontal size={15} aria-hidden="true" />
             Filters
-            {industryFilters.length + functionFilters.length > 0 && (
+            {activeChipCount > 0 && (
               <span
                 className="min-w-[20px] h-5 px-1.5 rounded-pill bg-teal text-white text-[12px]
                   font-semibold inline-flex items-center justify-center"
               >
-                {industryFilters.length + functionFilters.length}
+                {activeChipCount}
               </span>
             )}
             {filtersOpen
@@ -288,10 +339,28 @@ export default function CareerGrid() {
               </button>
             ))}
           </div>
+
+          {/* Experience filter — currently just the simulation flag */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="font-sans text-[11px] font-semibold text-muted
+                uppercase tracking-wider shrink-0 w-16"
+            >
+              Experience
+            </span>
+            <button
+              type="button"
+              onClick={() => setSimOnly((v) => !v)}
+              aria-pressed={simOnly}
+              className={pillClass(simOnly)}
+            >
+              Has simulation
+            </button>
+          </div>
         </div>
 
         {/* Results count + clear filters (§5.2.2, §7.6.6) */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 max-md:mb-4">
           <p className="font-sans text-[14px] text-muted">
             {filteredCareers.length === 0
               ? 'No careers match your search'

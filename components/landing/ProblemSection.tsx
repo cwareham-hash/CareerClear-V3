@@ -35,9 +35,9 @@ const BLOCKS: ProblemBlock[] = [
 export default function ProblemSection() {
   return (
     <section className="bg-cream" aria-label="The problem">
-      <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
+      <div className="max-w-5xl mx-auto px-6 py-9 md:py-11">
         <motion.h2
-          className="font-serif text-[28px] md:text-[32px] font-bold text-navy text-center leading-tight mb-12"
+          className="font-serif text-[28px] md:text-[32px] font-bold text-navy text-center leading-tight mb-7"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
