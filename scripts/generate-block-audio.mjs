@@ -15,6 +15,9 @@
 //   - David's lines .............................. Conrad
 //   - Ellen's lines .............................. Eryn (no lines in block 1;
 //     kept in the map for future blocks)
+//   - Gregory's lines (Full Sim guest) ........... Dan   (cast Sep 2026, round 2)
+//   - Diane's lines (Full Sim guest) ............. Tori  (cast Sep 2026, round 2)
+//   - Raymond and Laura: deliberately uncast — skip their blocks.
 //
 // Bracketed stage directions like [Phone rings] are not spoken; each becomes
 // ~2/3 second of silence. Artifacts are never narrated. Output goes to
@@ -44,14 +47,19 @@ const VOICES = {
   Cooper:   { fullName: 'Cooper - Young American Male',          id: 'BcJMy2AClTYRAgDaPpgz' },
   Conrad:   { fullName: 'Conrad Palmer',                         id: 'LkreQVAyh7la0Gj42eBn' },
   Eryn:     { fullName: 'Eryn - Genuine, Friendly and Natural',  id: 'kdnRe2koJdOK4Ovxn2DI' },
+  Dan:      { fullName: 'Dan - Energetic, Emotional and Excited', id: 'PGqDc9SLzJTxDTy8SjYb' },
+  Tori:     { fullName: 'Tori',                                  id: 'lAxf5ma5HGtzxC434SWT' },
 }
 
-// Speaker label in the prose -> cast voice.
+// Speaker label in the prose -> cast voice. Raymond and Laura (Full Sim guests)
+// are deliberately uncast — blocks containing them must be skipped, not guessed.
 const SPEAKER_TO_VOICE = {
-  Carly:  'Claire',
-  Marcus: 'Cooper',
-  David:  'Conrad',
-  Ellen:  'Eryn',
+  Carly:   'Claire',
+  Marcus:  'Cooper',
+  David:   'Conrad',
+  Ellen:   'Eryn',
+  Gregory: 'Dan',
+  Diane:   'Tori',
 }
 
 const NARRATOR_VOICE = 'JayWayne' // before-text + unlabeled connective prose
