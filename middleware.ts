@@ -27,6 +27,13 @@ const COOKIE_NAME = 'cc_gate'
 const UNLOCK_PATH = '/__gate'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30 // ~30 days, in seconds
 
+// Gate retired (October 2026): the site is open to anyone with the link, and
+// simulations still require a free account (Supabase login + beta_access).
+// Everything below is left intact but unreachable so the gate can be restored
+// by flipping this one switch back to true. SITE_PASSWORD and SITE_GATE_SECRET
+// stay configured in .env.local and Vercel; they are simply no longer consulted.
+const GATE_ENABLED = false
+
 // The Career Clear binoculars mark (public/logo-mark.png) embedded as a base64
 // data URI. The gate is served from middleware BEFORE the app loads, so a normal
 // <img src="/logo-mark.png"> can't be relied on — inlining the bytes guarantees
@@ -220,6 +227,9 @@ function safeNext(value: string | null | undefined): string {
 // --- middleware ---------------------------------------------------------------
 
 export async function middleware(req: NextRequest) {
+  // Retired gate: pass every request straight through to the site.
+  if (!GATE_ENABLED) return NextResponse.next()
+
   const password = process.env.SITE_PASSWORD
   const secret = process.env.SITE_GATE_SECRET
 
