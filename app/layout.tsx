@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display } from 'next/font/google'
-import { JetBrains_Mono } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth'
 import PostHogProvider from '@/components/PostHogProvider'
@@ -8,28 +7,34 @@ import Navbar from '@/components/Navbar'
 import AuthModal from '@/components/AuthModal'
 import SiteFooter from '@/components/landing/SiteFooter'
 
-// ── §7.5.2 Google Fonts via next/font/google ─────────────────────────────────
-// Decision: using next/font/google rather than a raw <link> CDN tag.
-// Same fonts, but next/font self-hosts at build time for zero CLS and no
-// external round-trips — the recommended Next.js 14 approach.
+// ── §7.5.2 Fonts, self-hosted via next/font/local ─────────────────────────────
+// Decision (Oct 2026): the font files live in app/fonts/ and ship with the repo,
+// replacing the Google Fonts loader, which fetched font definitions from
+// Google at build time, and that fetch failed repeatedly on Vercel ("Cannot read
+// properties of null (reading '1')" while loading Inter). Now neither the build
+// nor a page load contacts Google. The files are the Fontsource project's
+// latin-subset, variable-weight woff2 builds (SIL Open Font License; each
+// license text sits beside its file). CSS variable names, display: swap and the
+// weights the app uses are unchanged, so tailwind.config.ts and every component
+// keep working as before.
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+const inter = localFont({
+  src: './fonts/inter-latin-wght-normal.woff2',
+  weight: '100 900', // variable font: covers the 400 / 500 / 600 / 700 the app uses
   variable: '--font-inter',
   display: 'swap',
 })
 
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['700', '800'],
+const playfair = localFont({
+  src: './fonts/playfair-display-latin-wght-normal.woff2',
+  weight: '400 900', // variable font: covers the 700 / 800 the app uses
   variable: '--font-playfair',
   display: 'swap',
 })
 
-const jetbrains = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
+const jetbrains = localFont({
+  src: './fonts/jetbrains-mono-latin-wght-normal.woff2',
+  weight: '100 800', // variable font: covers the 400 / 500 the app uses
   variable: '--font-jetbrains',
   display: 'swap',
 })
