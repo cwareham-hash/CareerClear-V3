@@ -1,6 +1,6 @@
 # Meridian Simulation Audio — Coverage Record (V1)
 
-_Last updated: 28 October 2026 (Investment Banking section added)_
+_Last updated: 28 October 2026 (switch to Eleven v4; IB Day in the Life v4 awaiting approval)_
 
 This document is a plain-English record of the audio narration for the Management
 Consultant "Project Meridian" simulation: which blocks have generated audio, who
@@ -58,10 +58,11 @@ written briefing and was never intended to be narrated.
 
 ## Investment Banking — Project Kestrel (added October 2026)
 
-**Model.** All IB audio is generated on **ElevenLabs Eleven v3** (`eleven_v3`), which
-Collin chose after a side-by-side test against Multilingual v2 in October 2026. v3
-is now the default model for all new audio. The Meridian audio above stays on
-Multilingual v2.
+**Model.** On 28 October 2026 Collin switched all new audio to **ElevenLabs Eleven
+v4** (`eleven_v4`, confirmed from ElevenLabs' model documentation), which is now the
+script's default. Before that, Eleven v3 (`eleven_v3`) was chosen after a
+side-by-side test against Multilingual v2 and made the first IB audio. The
+Meridian audio above stays on Multilingual v2.
 
 **The cast**, signed off by Collin on **28 October 2026**. It reuses the consulting
 voices:
@@ -76,36 +77,58 @@ voices:
 
 **Rick (the founder) and Marisol (the CFO) are uncast.** They appear only in the
 Full Simulation's client session (`full-d4-b1`), which waits on their casting.
+Round 3 auditions on Eleven v4 (28 October 2026, `scripts/generate-auditions-round3.mjs`)
+cover Marisol, Rick, and Meridian's Raymond and Laura. They are in
+`audio-samples/auditions-round3/` with an `AUDITIONS.txt`, awaiting Collin's picks.
 
-**Day in the Life: fully covered.** All five blocks were generated on Eleven v3 on
-27 October 2026 and are live in the private `block-audio` bucket:
+**Day in the Life: fully covered, two versions.**
 
-| Block | Title | Length |
-|---|---|---|
-| `ib-analyst-kestrel-dil-d1-b1` | Building the buyer list | 10:35 |
-| `ib-analyst-kestrel-dil-d1-b2` | Drafting the growth and risk sections | 8:20 |
-| `ib-analyst-kestrel-dil-d1-b3` | The weekly process call | 4:47 |
-| `ib-analyst-kestrel-dil-d1-b4` | The buyer-list scrub | 5:24 |
-| `ib-analyst-kestrel-dil-d1-b5` | Turning the MD's marks, past midnight | 9:04 |
+- **Live now: Eleven v3** (generated 27 October 2026), in the private `block-audio`
+  bucket. This is what logged-in users hear.
+- **Awaiting Collin's approval: Eleven v4** (generated 28 October 2026), local only,
+  in `audio-samples/` with v4 cast review clips in `audio-samples/ib-cast-review-v4/`.
+  It is **not uploaded**. The live site keeps v3 until Collin approves the v4 upload.
+  The local v3 files were moved, not deleted: the mp3 and timing files went to
+  `audio-samples/archive/` with a `--v3` suffix, and the segment folders to
+  `audio-samples/archive/work-v3/`. The v3 cast review clips stay in
+  `audio-samples/ib-cast-review/`.
+
+| Block | Title | v3 (live) | v4 (local) |
+|---|---|---|---|
+| `ib-analyst-kestrel-dil-d1-b1` | Building the buyer list | 10:35 | 10:44 |
+| `ib-analyst-kestrel-dil-d1-b2` | Drafting the growth and risk sections | 8:20 | 8:20 |
+| `ib-analyst-kestrel-dil-d1-b3` | The weekly process call | 4:47 | 4:41 |
+| `ib-analyst-kestrel-dil-d1-b4` | The buyer-list scrub | 5:24 | 5:00 |
+| `ib-analyst-kestrel-dil-d1-b5` | Turning the MD's marks, past midnight | 9:04 | 9:00 |
 
 **Full Simulation: not yet generated** (19 blocks).
 
-**Stray text.** The IB Day in the Life commentary contains leftover `---` divider
-lines and a "Connector (not entered)" planning note. The generation script skips
-both, so they are never spoken, but they are still visible on screen until the
-content file is cleaned up.
+**Stray text: fixed.** The leftover `---` divider lines and the "Connector (not
+entered)" planning note were removed from the IB Day in the Life commentary on 28
+October 2026, so students no longer see them. The narration text didn't change,
+because the generation script already skipped them, and it keeps that skip rule
+as a safety net.
 
 **The homepage teaser.** The homepage "See what a simulation feels like" preview
-plays a short public clip: the last minute of the buyer-list scrub (b4), from
-Priya's "On the sponsors..." to Warren's "...made this fast." It lives in a
-separate, deliberately **public** bucket, `teaser-audio`, so logged-out visitors can
-play it. Full block audio never goes there. The current clip,
-`homepage/ib-buyer-list-teaser-v2.mp3` (58.9 seconds), was rebuilt from b4's saved
-segments with **Warren's lines sped up about 12 percent** (pitch kept) for the
-homepage only. The full b4 block audio keeps his generated pace. The original
-61.9-second clip (`homepage/ib-buyer-list-teaser.mp3`) is kept in the bucket. A
-changed clip always gets a new file name, so browsers and the CDN can't serve a
-stale copy.
+plays a short public clip: the end of the buyer-list scrub (b4), from Priya's "On
+the sponsors..." to Warren's "...made this fast." It lives in a separate,
+deliberately **public** bucket, `teaser-audio`, so logged-out visitors can play it.
+Full block audio never goes there.
+
+- **The current clip is `homepage/ib-buyer-list-teaser-v4.mp3` (55.8 seconds).** It
+  is built from the Eleven v4 b4 segments, with **Warren's lines sped up about 12
+  percent** (pitch kept) for the homepage only. The full block audio keeps his
+  generated pace.
+- **The transcript matches the audio.** It shows exactly the clip's five lines,
+  starting with the first words heard. While the clip plays, it scrolls smoothly
+  to keep the spoken line in view, holds still when paused, and returns to the top
+  when the clip ends. Nothing is highlighted.
+- **Older clips are kept in the bucket:**
+  - `homepage/ib-buyer-list-teaser.mp3` (v3, 61.9 seconds)
+  - `homepage/ib-buyer-list-teaser-v2.mp3` (v3 with Warren sped up, 58.9 seconds)
+- **A changed clip always gets a new file name**, so browsers and the CDN can't
+  serve a stale copy. A changed clip also means updating the transcript's lines and
+  start times in `components/landing/SimulationPreview.tsx`.
 
 ## Where the audio lives
 
@@ -144,7 +167,7 @@ speaker segments, calls ElevenLabs for each, and stitches the pieces into one mp
 with a matching timestamps file. It requires an `ELEVENLABS_API_KEY` in `.env.local`
 and `ffmpeg` installed.
 
-Since October 2026 the script generates on **Eleven v3** by default. Add
+Since 28 October 2026 the script generates on **Eleven v4** (`eleven_v4`) by default. Add
 `--model <id>` to use a different model (for example
 `--model eleven_multilingual_v2`). Each block's segment folder records the model
 that made it, so a later re-stitch keeps the right label.
@@ -173,10 +196,14 @@ credits per character**, so use that ratio for future estimates.
 | Guest-speaker auditions (round 2, 12 clips) | 6,984 | ~4,200 |
 | IB Day in the Life, all 5 blocks (Eleven v3, Oct 27) | 35,501 | ~21,300* |
 | Model comparison test, v3 excerpt of Meridian block 1 (Oct 27) | 3,312 | ~2,000* |
+| Eleven v4 test call (Oct 28, 13:27 CDT) | 34 | ~20* |
+| Audition round 3, 15 clips (Eleven v4, Oct 28, 13:31–13:33 CDT) | 8,687 | ~5,200* |
+| IB Day in the Life, all 5 blocks (Eleven v4, Oct 28, 13:34–13:44 CDT) | 35,501 | ~21,300* |
 
-\* Estimated at the v2 ratio. Eleven v3's actual credit rate has not been checked
-yet: the API key can't read account usage, so confirm it on the ElevenLabs
-dashboard's Usage page.
+\* Estimated at the v2 ratio. The real credit rates for Eleven v3 and v4 haven't
+been checked yet: the API key can't read account usage, so confirm them on the
+ElevenLabs dashboard's Usage page. The clock times above make the v4 calls easy
+to find.
 
 (Day-in-the-Life block 1 and the round-1 core-cast auditions were produced in an
 earlier session and are not itemized here; the numbers above are the runs recorded
@@ -187,7 +214,7 @@ For rough future planning, **1 credit ≈ 1.7 characters**, or equivalently
 
 ## Open items
 
-- **Cast Raymond and Laura (round 3), then generate their two blocks** —
+- **Cast Raymond and Laura from the round 3 auditions, then generate their two blocks** —
   `full-d2-b3` and `full-d4-b4`. This is all that stands between the current state
   and a fully-voiced Meridian week.
 - **Collin's listening review** — roughly **three hours** of generated audio
@@ -197,10 +224,11 @@ For rough future planning, **1 credit ≈ 1.7 characters**, or equivalently
   Investment Banking ("Project Kestrel") audio spend (the Full Simulation, about
   131,000 characters), to see whether the per-character cost can be reduced at
   that scale.
-- **Cast Rick and Marisol**, then generate the IB Full Simulation (19 blocks; the
-  client session `full-d4-b1` needs both).
-- **Confirm Eleven v3's credit rate** on the ElevenLabs dashboard.
-- **Clean up the stray text in the IB Day in the Life commentary** (see the
-  Investment Banking section). This is a content fix, not an audio one.
+- **Cast Rick and Marisol** from the round 3 auditions, then generate the IB Full
+  Simulation (19 blocks; the client session `full-d4-b1` needs both).
+- **Review the IB Day in the Life on Eleven v4** (local files and
+  `audio-samples/ib-cast-review-v4/`). If approved, upload the five blocks to the
+  `block-audio` bucket to replace the live v3 audio.
+- **Confirm the Eleven v3 and v4 credit rates** on the ElevenLabs dashboard.
 - **Per-block and per-tier time estimates in the UI** — once block durations are
   final, surface "how long this takes to listen to" in the interface.

@@ -15,8 +15,9 @@ import { trackHomepagePreviewAudioClicked } from '@/lib/analytics'
 //   • a slim audio bar mirroring the narration player. Its play button is the
 //     ONE live control: it plays a short public teaser clip of that block's
 //     real narration (see TEASER_URL), never autoplays
-//   • three consecutive real dialogue lines from the same Kestrel buyer-list
-//     scrub block the artifact comes from, styled like the panel's dialogue
+//   • the teaser's real dialogue lines, from the same Kestrel buyer-list scrub
+//     block the artifact comes from, styled like the panel's dialogue. While
+//     the teaser plays, the transcript scrolls so the spoken line stays in view
 // Everything except the play button is decorative: aria-hidden,
 // pointer-events-none, sandboxed script-less iframe, explicit "Preview"
 // watermark. No image files.
@@ -86,33 +87,50 @@ function ArtifactStage() {
 
 // The homepage teaser: the closing minute of the Kestrel buyer-list scrub (from
 // Priya's "On the sponsors..." to Warren's "...made this fast"), built from that
-// block's Day in the Life narration segments with Warren's lines sped up ~12%
-// for the homepage (v2; the full block audio keeps his generated pace). It sits
-// in the PUBLIC teaser-audio Storage bucket so logged-out visitors can play it;
-// full block audio stays in the private block-audio bucket behind
-// /api/block-audio. A changed clip gets a new file name rather than an
-// overwrite, so browsers and the CDN never serve a stale cached copy.
-const TEASER_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/teaser-audio/homepage/ib-buyer-list-teaser-v2.mp3`
+// block's Day in the Life narration segments (Eleven v4) with Warren's lines
+// sped up ~12% for the homepage (the full block audio keeps his generated
+// pace). It sits in the PUBLIC teaser-audio Storage bucket so logged-out
+// visitors can play it; full block audio stays in the private block-audio
+// bucket behind /api/block-audio. A changed clip gets a new file name rather
+// than an overwrite, so browsers and the CDN never serve a stale cached copy.
+const TEASER_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/teaser-audio/homepage/ib-buyer-list-teaser-v4.mp3`
 function fmtTime(seconds: number): string {
   const s = Math.max(0, Math.floor(seconds))
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
 
-// Three consecutive real dialogue lines from the Kestrel "The buyer-list scrub"
-// Day-in-the-Life block — the very meeting whose spreadsheet is shown above;
-// Sabrina reads back the exact changes visible in the artifact's markup.
-const TRANSCRIPT: { speaker: string; text: string }[] = [
+// The teaser's dialogue lines, verbatim and in order, from the Kestrel "The
+// buyer-list scrub" Day-in-the-Life block — the very meeting whose spreadsheet
+// is shown above; Sabrina reads back the exact changes visible in the
+// artifact's markup. The first line shown is the first line heard.
+// startSeconds is where each line begins in the clip (measured from the clip's
+// stitched pieces, after Warren's speed-up). It only drives the transcript
+// scroll; nothing is highlighted.
+const TRANSCRIPT: { speaker: string; text: string; startSeconds: number }[] = [
+  {
+    speaker: 'Priya',
+    text: "On the sponsors, the ones that own a real center-of-plate platform are the right Tier 1. Add Brightwater, they closed a specialty-foods platform last year that this would slot straight into, they just haven't shown up on a screen yet because the deal was private.",
+    startSeconds: 0,
+  },
+  {
+    speaker: 'Warren',
+    text: "Good add on Brightwater. A fund without a real platform in the category is a slow buyer that asks for too much diligence and pays like a financial buyer, not a strategic one. The ones you flagged as adjacency-that-isn't, keep them low, that's the right read.",
+    startSeconds: 14.9,
+  },
   {
     speaker: 'Priya',
     text: "That's the list, more or less. Sabrina, you've got all of it captured?",
+    startSeconds: 29.93,
   },
   {
     speaker: 'Sabrina',
     text: 'All of it. Coleman and Brightwater into Tier 1, the European group up half a tier with the note kept, the direct competitor cut, the ingredients supplier flagged for Rick, the generalist fund off.',
+    startSeconds: 34.59,
   },
   {
     speaker: 'Warren',
     text: "Good. Get me the clean version and I'll do a last pass before we take contact strategy to Rick. Nice work on the reasons, made this fast.",
+    startSeconds: 48.45,
   },
 ]
 
@@ -122,6 +140,26 @@ export default function SimulationPreview() {
   const [currentTime, setCurrentTime] = useState(0)
   // The clip's length, read from the file's own metadata (0 until it loads).
   const [duration, setDuration] = useState(0)
+  const transcriptRef = useRef<HTMLDivElement>(null)
+  const lineRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  // The line being spoken: the last one whose start time has passed. At rest
+  // (before play, or once the clip ends and rewinds) that is the first line.
+  let currentLine = 0
+  TRANSCRIPT.forEach((line, i) => {
+    if (currentTime >= line.startSeconds) currentLine = i
+  })
+
+  // Keep the spoken line in view by smoothly scrolling the (non-interactive)
+  // transcript to it. Driven by playback time, so it holds still while the
+  // audio is paused and glides back to the top when the clip ends.
+  useEffect(() => {
+    const box = transcriptRef.current
+    const line = lineRefs.current[currentLine]
+    if (!box || !line) return
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    box.scrollTo({ top: line.offsetTop, behavior: reduceMotion ? 'auto' : 'smooth' })
+  }, [currentLine])
 
   function onPlayPause() {
     const a = audioRef.current
@@ -233,22 +271,34 @@ export default function SimulationPreview() {
               }}
             />
 
-            {/* Transcript — the real Priya/Sabrina/Warren exchange, panel
-                dialogue styling, fading out at the bottom */}
+            {/* Transcript — the teaser's lines, panel dialogue styling, fading
+                out at the bottom. It scrolls only programmatically, with the
+                audio; the fade sits outside the scrolling box so it stays put. */}
             <div aria-hidden="true" className="relative px-5 pt-3 pb-5">
-              {/* Slightly taller clamp on phones so all three speakers appear
-                  before the fade — the IB lines run longer than the old ones. */}
-              <div className="relative max-h-[230px] md:max-h-[132px] overflow-hidden">
-                {TRANSCRIPT.map((line, i) => (
-                  <div key={i} className="mb-1.5">
-                    <span className="font-sans font-bold text-[13px] text-dark">
-                      {line.speaker}:
-                    </span>{' '}
-                    <span className="font-sans text-[13px] text-dark leading-relaxed">
-                      {line.text}
-                    </span>
-                  </div>
-                ))}
+              {/* Slightly taller clamp on phones so more lines show before the
+                  fade — the IB lines run long. */}
+              <div className="relative">
+                <div ref={transcriptRef} className="relative max-h-[230px] md:max-h-[132px] overflow-hidden">
+                  {TRANSCRIPT.map((line, i) => (
+                    <div
+                      key={i}
+                      ref={(el) => {
+                        lineRefs.current[i] = el
+                      }}
+                      className="mb-1.5"
+                    >
+                      <span className="font-sans font-bold text-[13px] text-dark">
+                        {line.speaker}:
+                      </span>{' '}
+                      <span className="font-sans text-[13px] text-dark leading-relaxed">
+                        {line.text}
+                      </span>
+                    </div>
+                  ))}
+                  {/* Room below the last line, so it can scroll up to the top
+                      of the window instead of stopping under the fade. */}
+                  <div className="h-[230px] md:h-[132px]" />
+                </div>
                 <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent" />
               </div>
             </div>

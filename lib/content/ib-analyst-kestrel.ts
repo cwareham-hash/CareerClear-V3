@@ -1054,9 +1054,7 @@ Sabrina: It's not a finished list and it's nowhere near it, but it's a real firs
 {{artifact:2}}`,
     commentary: `This is the list of everyone we might take the company to when we launch, the strategics who'd want to own a premium sauce maker and the private equity funds who'd want to own the cash flow. Right now it's a spreadsheet with almost nothing in it. This morning I run the screens, pull the names, and start sorting them into tiers. I will send the first pass to Danny for a look when it holds together, and it goes in front of Priya and Warren later today, when they scrub it and add the names they know personally, the ones a screen won't make stand out.
 
-The list is a first pass now, tiers and rationales, and it turns a few more times before it's real. The contracts folder is handled, executed versions in the room, the draft flagged for Danny. Next it goes to Danny for a first read.
-
----`,
+The list is a first pass now, tiers and rationales, and it turns a few more times before it's real. The contracts folder is handled, executed versions in the room, the draft flagged for Danny. Next it goes to Danny for a first read.`,
     after: ``,
     artifactsHtml: { 1: { type: 'excel', html: artifact04Html }, 2: { type: 'excel', html: artifact05Html } },
   },
@@ -1097,9 +1095,7 @@ Sabrina: Back to the list, and I find the rationale I was mid-cleaning when the 
 Sabrina: With the list settled I go back and finish the risk section, because I left it mid-way for the buyer-list stretch. I add the last couple of risk factors and their mitigants, a note on customer concentration on the retail side beyond the top account, and a line on the ordinary supply-chain exposure, then I read the section through once as a buyer would and make sure every risk named has a mitigant next to it and none of them reads as a company apologizing for itself. It reads right. Growth built, risk built, the list maintained, and the NDA event caught and logged with the right entity.`,
     commentary: `This is my chance to draft the two back sections for real, the growth section and the risk factors, while the book is out of my hands up the chain. They're mostly still skeleton, so this morning is building them out, with a stretch on the buyer list in between. I start on growth, because it's the one that has to carry weight.
 
-The growth and risk sections are drafted and the list's ready for the scrub, and the signed NDA is logged and the release status current. Next is the process call this afternoon, where Priya runs the team through where every workstream stands, and after that the seniors scrub the buyer list. The book's still up the chain, so I'll find out where the comments land later.
-
----`,
+The growth and risk sections are drafted and the list's ready for the scrub, and the signed NDA is logged and the release status current. Next is the process call this afternoon, where Priya runs the team through where every workstream stands, and after that the seniors scrub the buyer list. The book's still up the chain, so I'll find out where the comments land later.`,
     after: ``,
     artifactsHtml: { 1: { type: 'powerpoint', html: artifact10Html }, 2: { type: 'excel', html: artifact11Html } },
   },
@@ -1150,9 +1146,7 @@ Priya: Good. Short one. Back to it.
 
 {{artifact:1}}
 
-Nothing on the call moved off what I already had, everyone's read of where things stand matches mine. The one thing to hold is that the outstanding tracker items don't block tomorrow, which I confirmed in the room. Next is the buyer-list scrub with Priya and Warren this afternoon, where the names I tiered meet the relationships only they can see.
-
----`,
+Nothing on the call moved off what I already had, everyone's read of where things stand matches mine. The one thing to hold is that the outstanding tracker items don't block tomorrow, which I confirmed in the room. Next is the buyer-list scrub with Priya and Warren this afternoon, where the names I tiered meet the relationships only they can see.`,
     after: ``,
     artifactsHtml: { 1: { type: 'document', html: artifact12Html } },
   },
@@ -1201,13 +1195,7 @@ Warren: Good. Get me the clean version and I'll do a last pass before we take co
 [Warren closes the list on his screen. Priya stays on to sort the next thing with Sabrina.]`,
     commentary: `My job for the next hour is to hold the pen, not to defend my list. Warren and Priya add and cut on relationships and judgment a screen never had, and I capture every change exactly as it lands and keep the sheet clean while they decide. If I get a single change down wrong, the seniors act on the wrong list later, so the whole job is getting it exactly right in the moment.
 
-The list is the seniors' list now, their names added and their cuts made, and the two things I'm carrying out of it are the clean version for Warren's last pass and the one name flagged for Rick to decide. Next I clean it up and get it back to Warren, and the book's still up the chain with him for tonight.
-
----
-
-> Connector (not entered). Late afternoon into evening. The VP-cleared book goes up to Warren, who gets to it only after his external appointments; his top-of-chain markup lands a little after seven, and dinner is at the desk before the turn.
-
----`,
+The list is the seniors' list now, their names added and their cuts made, and the two things I'm carrying out of it are the clean version for Warren's last pass and the one name flagged for Rick to decide. Next I clean it up and get it back to Warren, and the book's still up the chain with him for tonight.`,
     after: ``,
     artifactsHtml: { 1: { type: 'excel', html: artifact13Html } },
   },
@@ -1252,9 +1240,7 @@ Sabrina: Now the close, and tonight it's heavier than a normal turn, because thi
 Sabrina: Last thing, the note up, and tonight it carries more than the usual "here's what changed," because there were so many marks. I write Danny and Priya exactly what moved: Warren's re-cut of the open, the pricing pulled out of the base per his mark and flagged in the margin at that spot, the base re-tied through the model and schedule after pricing came out, his exact wording on the customer sentence, the business-description re-order with its references chased, and the ten o'clock risk-section mark. The bigger moves I name specifically, so that whoever reads it next sees them on the first read instead of finding them after the client already has the book. Everything's turned. The book's clean, and it's the version that goes to the client in the morning.`,
     commentary: `This is the clearance turn, and it's the last one before the client sees the book, so every one of Warren's marks has to turn tonight. His marks are fewer than Danny's were but they're bigger, blunt, each one pulling to a whole section instead of a line, and there are a lot of them. I work down his markup and turn every one of them, and this one doesn't end when I decide it's done. It ends when the book's clean and Warren's marks are all turned, whatever time that is.
 
-The book's cleared Warren, which means it's the version that goes to Rick tomorrow, and the note up names what moved so it reads clean first thing. I'll check with Danny that nothing else is landing before I go, because even at this hour you don't just leave, and then it's the car home. Tomorrow the book's in front of the client.
-
----`,
+The book's cleared Warren, which means it's the version that goes to Rick tomorrow, and the note up names what moved so it reads clean first thing. I'll check with Danny that nothing else is landing before I go, because even at this hour you don't just leave, and then it's the car home. Tomorrow the book's in front of the client.`,
     after: ``,
     artifactsHtml: { 1: { type: 'powerpoint', html: artifact14Html } },
   },

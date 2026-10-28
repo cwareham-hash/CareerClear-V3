@@ -7,9 +7,10 @@
 // Usage:  node scripts/generate-block-audio.mjs <block-id> [--model <id>] [--stitch-only]
 //   e.g.  node scripts/generate-block-audio.mjs management-consultant-meridian-dil-d1-b1
 //
-// Model: Eleven v3 (eleven_v3) is the default for all new audio (chosen by
-// Collin, Oct 2026). Pass --model <id> to generate on a different model. All
-// Meridian audio before that was made on eleven_multilingual_v2.
+// Model: Eleven v4 (eleven_v4) is the default for all new audio (chosen by
+// Collin, Oct 28 2026; it replaced Eleven v3, which made the first IB Day in
+// the Life audio). Pass --model <id> to generate on a different model. All
+// Meridian audio was made on eleven_multilingual_v2.
 //
 // Voice casting (recast by Collin after auditions, Aug 2026):
 //   - before / setting-the-scene text ........... Jay Wayne
@@ -46,7 +47,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CONTENT_DIR = path.join(ROOT, 'lib', 'content')
 const OUT_DIR = path.join(ROOT, 'audio-samples')
 
-const DEFAULT_MODEL = 'eleven_v3'
+const DEFAULT_MODEL = 'eleven_v4'
 // Label for segment folders made before the model was recorded alongside them
 // (every one of those was generated on Multilingual v2).
 const LEGACY_MODEL = 'eleven_multilingual_v2'
@@ -287,7 +288,7 @@ function fmtTime(seconds) {
 // ---------- Main ----------
 // --stitch-only re-stitches from the segment WAVs of a previous run without
 // calling ElevenLabs (fails if any segment file is missing).
-// --model <id> generates on a model other than the default (eleven_v3).
+// --model <id> generates on a model other than the default (eleven_v4).
 const cliArgs = process.argv.slice(2)
 const stitchOnly = cliArgs.includes('--stitch-only')
 const modelFlag = cliArgs.indexOf('--model')
