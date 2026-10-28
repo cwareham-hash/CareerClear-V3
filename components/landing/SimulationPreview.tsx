@@ -3,19 +3,23 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Play } from 'lucide-react'
+import { Pause, Play } from 'lucide-react'
 import { artifact13Html } from '@/lib/content/artifacts/artifact-13-buyerlist-scrub'
+import { trackHomepagePreviewAudioClicked } from '@/lib/analytics'
 
 // Visual-proof section: a zoomed-in, non-interactive "screenshot" of the
 // product in action, composed from real simulation material:
 //   • the REAL Buyer List Scrub artifact from the Investment Banking (Kestrel)
 //     simulation — the spreadsheet working file, cropped to its top-left so the
 //     Excel chrome, column headers and first buyer rows read as real work
-//   • a slim audio bar mirroring the narration player (9:14 is the real length)
+//   • a slim audio bar mirroring the narration player. Its play button is the
+//     ONE live control: it plays a short public teaser clip of that block's
+//     real narration (see TEASER_URL), never autoplays
 //   • three consecutive real dialogue lines from the same Kestrel buyer-list
 //     scrub block the artifact comes from, styled like the panel's dialogue
-// Everything is decorative: aria-hidden, pointer-events-none, sandboxed
-// script-less iframe, explicit "Preview" watermark. No image files.
+// Everything except the play button is decorative: aria-hidden,
+// pointer-events-none, sandboxed script-less iframe, explicit "Preview"
+// watermark. No image files.
 
 // Geometry of the artifact document (see the artifact's own stylesheet):
 // .page is 1180px wide with 20px side / 24px top padding; a one-line context
@@ -80,6 +84,20 @@ function ArtifactStage() {
   )
 }
 
+// The homepage teaser: the closing minute of the Kestrel buyer-list scrub (from
+// Priya's "On the sponsors..." to Warren's "...made this fast"), built from that
+// block's Day in the Life narration segments with Warren's lines sped up ~12%
+// for the homepage (v2; the full block audio keeps his generated pace). It sits
+// in the PUBLIC teaser-audio Storage bucket so logged-out visitors can play it;
+// full block audio stays in the private block-audio bucket behind
+// /api/block-audio. A changed clip gets a new file name rather than an
+// overwrite, so browsers and the CDN never serve a stale cached copy.
+const TEASER_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/teaser-audio/homepage/ib-buyer-list-teaser-v2.mp3`
+function fmtTime(seconds: number): string {
+  const s = Math.max(0, Math.floor(seconds))
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
+
 // Three consecutive real dialogue lines from the Kestrel "The buyer-list scrub"
 // Day-in-the-Life block — the very meeting whose spreadsheet is shown above;
 // Sabrina reads back the exact changes visible in the artifact's markup.
@@ -99,6 +117,33 @@ const TRANSCRIPT: { speaker: string; text: string }[] = [
 ]
 
 export default function SimulationPreview() {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [playing, setPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  // The clip's length, read from the file's own metadata (0 until it loads).
+  const [duration, setDuration] = useState(0)
+
+  function onPlayPause() {
+    const a = audioRef.current
+    if (!a) return
+    if (a.paused) {
+      trackHomepagePreviewAudioClicked()
+      a.play().catch(() => setPlaying(false))
+    } else {
+      a.pause()
+    }
+  }
+
+  function readDuration(a: HTMLAudioElement) {
+    if (Number.isFinite(a.duration) && a.duration > 0) setDuration(a.duration)
+  }
+
+  // The audio tag is in the server HTML, so its metadata can finish loading
+  // before React attaches onLoadedMetadata; catch that case on mount.
+  useEffect(() => {
+    if (audioRef.current) readDuration(audioRef.current)
+  }, [])
+
   return (
     <section className="bg-navy" aria-label="Simulation preview">
       <div className="max-w-5xl mx-auto px-6 py-9 md:py-11">
@@ -118,9 +163,11 @@ export default function SimulationPreview() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}
         >
-          {/* ── The mock panel — artifact dominant, player + transcript below ── */}
+          {/* ── The mock panel — artifact dominant, player + transcript below.
+              The panel ignores clicks (pointer-events-none) and every part
+              except the play button is hidden from screen readers; the button
+              opts back in with pointer-events-auto. ── */}
           <div
-            aria-hidden="true"
             className="relative max-w-2xl mx-auto bg-white rounded-card border border-border
               shadow-panel overflow-hidden select-none pointer-events-none"
           >
@@ -129,31 +176,66 @@ export default function SimulationPreview() {
                 low-contrast uppercase text in the bottom corner, over the
                 transcript fade so it never covers content at any width */}
             <span
+              aria-hidden="true"
               className="absolute bottom-2.5 right-4 z-10 font-sans text-[10px]
                 font-semibold uppercase tracking-[0.18em] text-navy/40 select-none"
             >
               Preview
             </span>
 
-            {/* The real consulting slide, zoomed in */}
-            <ArtifactStage />
-
-            {/* Slim audio bar */}
-            <div className="flex items-center gap-2.5 px-5 py-2 border-t border-b border-border">
-              <span className="shrink-0 w-7 h-7 rounded-pill bg-teal text-white flex items-center justify-center">
-                <Play size={12} className="ml-[1px]" />
-              </span>
-              <span className="shrink-0 font-sans text-[11px] text-muted tabular-nums">0:00</span>
-              <span className="relative flex-1 h-1 min-w-0 rounded-pill bg-border">
-                <span className="absolute left-0 top-0 h-full w-2 rounded-pill bg-teal" />
-              </span>
-              <span className="shrink-0 font-sans text-[11px] text-muted tabular-nums">9:14</span>
-              <span className="shrink-0 font-sans text-[11px] font-medium text-muted">1×</span>
+            {/* The real buyer-list spreadsheet, zoomed in */}
+            <div aria-hidden="true">
+              <ArtifactStage />
             </div>
 
-            {/* Transcript — real Marcus/Carly exchange, panel dialogue styling,
-                fading out at the bottom */}
-            <div className="relative px-5 pt-3 pb-5">
+            {/* Slim audio bar — the play button is live, the rest mirrors it */}
+            <div className="flex items-center gap-2.5 px-5 py-2 border-t border-b border-border">
+              <button
+                type="button"
+                onClick={onPlayPause}
+                aria-label={playing ? 'Pause audio preview' : 'Play audio preview'}
+                className="pointer-events-auto shrink-0 w-7 h-7 rounded-pill bg-teal hover:bg-teal-light
+                  text-white flex items-center justify-center transition-colors duration-150
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50
+                  focus-visible:ring-offset-2"
+              >
+                {playing ? <Pause size={12} /> : <Play size={12} className="ml-[1px]" />}
+              </button>
+              <span aria-hidden="true" className="shrink-0 font-sans text-[11px] text-muted tabular-nums">
+                {fmtTime(currentTime)}
+              </span>
+              <span aria-hidden="true" className="relative flex-1 h-1 min-w-0 rounded-pill bg-border">
+                <span
+                  className="absolute left-0 top-0 h-full rounded-pill bg-teal"
+                  style={{ width: `max(8px, ${duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0}%)` }}
+                />
+              </span>
+              <span aria-hidden="true" className="shrink-0 font-sans text-[11px] text-muted tabular-nums">
+                {duration > 0 ? fmtTime(duration) : '-:--'}
+              </span>
+              <span aria-hidden="true" className="shrink-0 font-sans text-[11px] font-medium text-muted">1×</span>
+            </div>
+
+            {/* The teaser itself: plain HTML5 audio, no native controls, never
+                autoplays. At the end it rewinds so the bar resets to the start. */}
+            <audio
+              ref={audioRef}
+              src={TEASER_URL}
+              preload="metadata"
+              onPlay={() => setPlaying(true)}
+              onPause={() => setPlaying(false)}
+              onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+              onLoadedMetadata={(e) => readDuration(e.currentTarget)}
+              onDurationChange={(e) => readDuration(e.currentTarget)}
+              onEnded={(e) => {
+                setPlaying(false)
+                e.currentTarget.currentTime = 0
+              }}
+            />
+
+            {/* Transcript — the real Priya/Sabrina/Warren exchange, panel
+                dialogue styling, fading out at the bottom */}
+            <div aria-hidden="true" className="relative px-5 pt-3 pb-5">
               {/* Slightly taller clamp on phones so all three speakers appear
                   before the fade — the IB lines run longer than the old ones. */}
               <div className="relative max-h-[230px] md:max-h-[132px] overflow-hidden">

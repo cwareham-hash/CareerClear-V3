@@ -4,8 +4,12 @@
 // Generates one stitched narration mp3 (plus a segment-timing JSON) for a single
 // simulation block, using the ElevenLabs text-to-speech API and ffmpeg.
 //
-// Usage:  node scripts/generate-block-audio.mjs <block-id>
+// Usage:  node scripts/generate-block-audio.mjs <block-id> [--model <id>] [--stitch-only]
 //   e.g.  node scripts/generate-block-audio.mjs management-consultant-meridian-dil-d1-b1
+//
+// Model: Eleven v3 (eleven_v3) is the default for all new audio (chosen by
+// Collin, Oct 2026). Pass --model <id> to generate on a different model. All
+// Meridian audio before that was made on eleven_multilingual_v2.
 //
 // Voice casting (recast by Collin after auditions, Aug 2026):
 //   - before / setting-the-scene text ........... Jay Wayne
@@ -18,6 +22,16 @@
 //   - Gregory's lines (Full Sim guest) ........... Dan   (cast Sep 2026, round 2)
 //   - Diane's lines (Full Sim guest) ............. Tori  (cast Sep 2026, round 2)
 //   - Raymond and Laura: deliberately uncast — skip their blocks.
+//
+// Investment Banking (Kestrel) cast, approved by Collin Oct 2026, reusing the
+// consulting voices above:
+//   - before / setting-the-scene text + unlabeled prose ... Jay Wayne
+//   - Sabrina's lines + over-the-shoulder commentary ...... Claire (the IB
+//     commentary is Sabrina's own first-person view, same rule as Carly)
+//   - Warren's lines ...................................... Conrad
+//   - Priya's lines ....................................... Eryn
+//   - Danny's lines ....................................... Cooper
+//   - Rick and Marisol (Full Sim client session): uncast — skip their block.
 //
 // Bracketed stage directions like [Phone rings] are not spoken; each becomes
 // ~2/3 second of silence. Artifacts are never narrated. Output goes to
@@ -32,7 +46,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CONTENT_DIR = path.join(ROOT, 'lib', 'content')
 const OUT_DIR = path.join(ROOT, 'audio-samples')
 
-const MODEL_ID = 'eleven_multilingual_v2'
+const DEFAULT_MODEL = 'eleven_v3'
+// Label for segment folders made before the model was recorded alongside them
+// (every one of those was generated on Multilingual v2).
+const LEGACY_MODEL = 'eleven_multilingual_v2'
 const OUTPUT_FORMAT = 'mp3_44100_128'
 const PAUSE_SECONDS = 0.67
 // Extra air inserted wherever the speaker changes between two directly-adjacent
@@ -60,6 +77,11 @@ const SPEAKER_TO_VOICE = {
   Ellen:   'Eryn',
   Gregory: 'Dan',
   Diane:   'Tori',
+  // Investment Banking (Kestrel)
+  Sabrina: 'Claire',
+  Warren:  'Conrad',
+  Priya:   'Eryn',
+  Danny:   'Cooper',
 }
 
 const NARRATOR_VOICE = 'JayWayne' // before-text + unlabeled connective prose
@@ -158,8 +180,35 @@ function pushText(tokens, voice, text) {
   if (tail) tokens.push({ type: 'speech', voice, text: tail })
 }
 
+// Stray markdown left over from the content-planning workflow, never spoken:
+//   - a horizontal-rule divider line made only of dashes ("---")
+//   - a planning-note blockquote that opens "> Connector (not entered)"
+// Deliberately narrow: other blockquotes are real content and stay. Text with
+// no stray lines is returned untouched, byte for byte.
+const DIVIDER_RE = /^[ \t]*-{3,}[ \t]*$/
+const BLOCKQUOTE_RE = /^[ \t]*>/
+const PLANNING_NOTE_RE = /^[ \t]*>[ \t]*Connector \(not entered\)/
+
+function stripStrayMarkdown(text) {
+  const lines = text.split('\n')
+  const kept = []
+  let inPlanningNote = false
+  for (const line of lines) {
+    if (DIVIDER_RE.test(line)) continue
+    if (PLANNING_NOTE_RE.test(line) || (inPlanningNote && BLOCKQUOTE_RE.test(line))) {
+      inPlanningNote = true
+      continue
+    }
+    inPlanningNote = false
+    kept.push(line)
+  }
+  if (kept.length === lines.length) return text
+  // Removed lines leave runs of blank lines behind; fold them to one break.
+  return kept.join('\n').replace(/\n[ \t]*(?:\n[ \t]*){2,}/g, '\n\n')
+}
+
 function segment(content, blockId) {
-  const clean = (s) => (s || '').trim()
+  const clean = (s) => stripStrayMarkdown(s || '').trim()
   const before = clean(content.before)
   const scene = clean(content.simulatedWork)
   const commentary = clean(content.commentary)
@@ -204,13 +253,13 @@ function segment(content, blockId) {
 }
 
 // ---------- Audio generation ----------
-async function ttsToFile(apiKey, voiceId, text, outFile) {
+async function ttsToFile(apiKey, modelId, voiceId, text, outFile) {
   const res = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=${OUTPUT_FORMAT}`,
     {
       method: 'POST',
       headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, model_id: MODEL_ID }),
+      body: JSON.stringify({ text, model_id: modelId }),
     }
   )
   if (!res.ok) {
@@ -238,10 +287,15 @@ function fmtTime(seconds) {
 // ---------- Main ----------
 // --stitch-only re-stitches from the segment WAVs of a previous run without
 // calling ElevenLabs (fails if any segment file is missing).
+// --model <id> generates on a model other than the default (eleven_v3).
 const cliArgs = process.argv.slice(2)
 const stitchOnly = cliArgs.includes('--stitch-only')
-const blockId = cliArgs.find((a) => !a.startsWith('--'))
-if (!blockId) fail('Usage: node scripts/generate-block-audio.mjs <block-id> [--stitch-only]')
+const modelFlag = cliArgs.indexOf('--model')
+const modelArg = modelFlag === -1 ? null : cliArgs[modelFlag + 1]
+if (modelFlag !== -1 && (!modelArg || modelArg.startsWith('--'))) fail('--model needs a model id, e.g. --model eleven_multilingual_v2')
+if (modelArg && stitchOnly) fail('--model cannot be combined with --stitch-only: re-stitching reuses the existing segments and never calls ElevenLabs.')
+const blockId = cliArgs.find((a, i) => !a.startsWith('--') && (modelFlag === -1 || i !== modelFlag + 1))
+if (!blockId) fail('Usage: node scripts/generate-block-audio.mjs <block-id> [--model <id>] [--stitch-only]')
 
 const apiKey = stitchOnly ? null : readApiKey()
 const { file, src } = findBlock(blockId)
@@ -251,11 +305,26 @@ const segments = segment(content, blockId)
 const workDir = path.join(OUT_DIR, '.work', blockId)
 mkdirSync(workDir, { recursive: true })
 
+// Which model made this block's segments. A generation run records it in the
+// segment folder; a re-stitch reads it back (falling back to the block's
+// previous metadata, then to Multilingual v2 for folders from before v3).
+const modelFile = path.join(workDir, 'model.txt')
+let MODEL_ID
+if (stitchOnly) {
+  const prevJson = path.join(OUT_DIR, `${blockId}.json`)
+  MODEL_ID = existsSync(modelFile) ? readFileSync(modelFile, 'utf8').trim()
+    : existsSync(prevJson) ? (JSON.parse(readFileSync(prevJson, 'utf8')).model || LEGACY_MODEL)
+    : LEGACY_MODEL
+} else {
+  MODEL_ID = modelArg || DEFAULT_MODEL
+  writeFileSync(modelFile, MODEL_ID + '\n')
+}
+
 const speechCount = segments.filter((s) => s.type === 'speech').length
 const pauseCount = segments.filter((s) => s.type === 'pause').length
 const artifactCount = segments.filter((s) => s.type === 'artifact').length
 const charCount = segments.reduce((n, s) => n + (s.text?.length || 0), 0)
-console.log(`Block: ${blockId} (from lib/content/${file})`)
+console.log(`Block: ${blockId} (from lib/content/${file}), model ${MODEL_ID}`)
 console.log(`Segments: ${speechCount} speech + ${pauseCount} pause(s) + ${artifactCount} artifact marker(s), ${charCount} characters${stitchOnly ? ' (re-stitch only, no TTS calls)' : ' to synthesize'}.`)
 
 // Generate each piece as a 44.1kHz mono WAV so stitching is exact. Artifact
@@ -274,7 +343,7 @@ for (const seg of segments) {
   } else {
     const mp3 = wav.replace(/\.wav$/, '.mp3')
     process.stdout.write(`  [${wavIndex}/${speechCount + pauseCount}] ${seg.voice}: "${seg.text.split(/\s+/).slice(0, 8).join(' ')}..."\n`)
-    await ttsToFile(apiKey, VOICES[seg.voice].id, seg.text, mp3)
+    await ttsToFile(apiKey, MODEL_ID, VOICES[seg.voice].id, seg.text, mp3)
     ffmpeg(['-i', mp3, '-ar', '44100', '-ac', '1', wav])
   }
   wavFiles.push(wav)

@@ -254,6 +254,16 @@ export function trackAudioSpeedChanged(blockId: string, speed: number): void {
   captureEvent('audio_speed_changed', { block_id: blockId, speed })
 }
 
+// ── Homepage ──────────────────────────────────────────────────────────────────
+
+/**
+ * A visitor pressed play on the homepage simulation preview (the public teaser
+ * clip). Open to anonymous visitors. Fires on each press of play, not on pause.
+ */
+export function trackHomepagePreviewAudioClicked(): void {
+  captureEvent('homepage_preview_audio_clicked', { action: 'play' })
+}
+
 /**
  * Clear the identity on logout so the next anonymous session isn't merged into
  * the person who just signed out (important on shared/library computers).
