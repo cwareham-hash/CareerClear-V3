@@ -94,6 +94,11 @@ function ArtifactStage() {
 // bucket behind /api/block-audio. A changed clip gets a new file name rather
 // than an overwrite, so browsers and the CDN never serve a stale cached copy.
 const TEASER_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/teaser-audio/homepage/ib-buyer-list-teaser-v4.mp3`
+// Each move of the transcript to a new line is a slow glide, easing in and out.
+// (The browser's built-in smooth scroll is quicker and can't be timed.)
+const GLIDE_MS = 1500
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+
 function fmtTime(seconds: number): string {
   const s = Math.max(0, Math.floor(seconds))
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -150,15 +155,31 @@ export default function SimulationPreview() {
     if (currentTime >= line.startSeconds) currentLine = i
   })
 
-  // Keep the spoken line in view by smoothly scrolling the (non-interactive)
-  // transcript to it. Driven by playback time, so it holds still while the
-  // audio is paused and glides back to the top when the clip ends.
+  // Keep the spoken line in view by gliding the (non-interactive) transcript to
+  // it. Driven by playback time, so it holds still while the audio is paused
+  // and glides back to the top when the clip ends. Reduced-motion users get an
+  // instant move. A new line cancels any glide still in progress and starts
+  // from wherever the transcript is.
   useEffect(() => {
     const box = transcriptRef.current
     const line = lineRefs.current[currentLine]
     if (!box || !line) return
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    box.scrollTo({ top: line.offsetTop, behavior: reduceMotion ? 'auto' : 'smooth' })
+    const target = line.offsetTop
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      box.scrollTop = target
+      return
+    }
+    const from = box.scrollTop
+    if (from === target) return
+    const startedAt = performance.now()
+    let frame = 0
+    const step = (now: number) => {
+      const t = Math.min(1, (now - startedAt) / GLIDE_MS)
+      box.scrollTop = from + (target - from) * easeInOut(t)
+      if (t < 1) frame = requestAnimationFrame(step)
+    }
+    frame = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(frame)
   }, [currentLine])
 
   function onPlayPause() {

@@ -22,7 +22,8 @@
 //     kept in the map for future blocks)
 //   - Gregory's lines (Full Sim guest) ........... Dan   (cast Sep 2026, round 2)
 //   - Diane's lines (Full Sim guest) ............. Tori  (cast Sep 2026, round 2)
-//   - Raymond and Laura: deliberately uncast — skip their blocks.
+//   - Raymond's lines (Full Sim guest) ........... Gerard (cast Oct 2026, round 3)
+//   - Laura's lines (Full Sim guest) ............. Carol  (cast Oct 2026, round 3)
 //
 // Investment Banking (Kestrel) cast, approved by Collin Oct 2026, reusing the
 // consulting voices above:
@@ -32,7 +33,10 @@
 //   - Warren's lines ...................................... Conrad
 //   - Priya's lines ....................................... Eryn
 //   - Danny's lines ....................................... Cooper
-//   - Rick and Marisol (Full Sim client session): uncast — skip their block.
+//   - Rick's lines (Full Sim client session) .............. Dan (the same voice
+//     as Gregory in Meridian; they never share a scene)
+//   - Marisol's lines (Full Sim client session) ........... Elise
+//   (Rick and Marisol cast by Collin from audition round 3, Oct 2026.)
 //
 // Bracketed stage directions like [Phone rings] are not spoken; each becomes
 // ~2/3 second of silence. Artifacts are never narrated. Output goes to
@@ -57,6 +61,10 @@ const PAUSE_SECONDS = 0.67
 // speech segments (conversational feel). Stage-direction pauses keep their own
 // length and get no extra gap around them.
 const GAP_SECONDS = 0.5
+// Per-request character limits from ElevenLabs' model docs. A segment longer
+// than its model's limit is generated in pieces (see splitForRequest).
+const REQUEST_LIMITS = { eleven_v3: 5000 }
+const DEFAULT_REQUEST_LIMIT = 10000 // eleven_v4, eleven_multilingual_v2
 
 // Full ElevenLabs voice names + ids, matched from My Voices by name prefix.
 const VOICES = {
@@ -67,10 +75,13 @@ const VOICES = {
   Eryn:     { fullName: 'Eryn - Genuine, Friendly and Natural',  id: 'kdnRe2koJdOK4Ovxn2DI' },
   Dan:      { fullName: 'Dan - Energetic, Emotional and Excited', id: 'PGqDc9SLzJTxDTy8SjYb' },
   Tori:     { fullName: 'Tori',                                  id: 'lAxf5ma5HGtzxC434SWT' },
+  Carol:    { fullName: 'Carol - Relatable, Real, Likeable Grandma', id: '5u41aNhyCU6hXOcjPPv0' },
+  Elise:    { fullName: 'Elise Hart - Warm, Clear & Engaging',   id: '8fwYhwfiWkLjR4FKLHSQ' },
+  Gerard:   { fullName: 'Gerard',                                id: 'yJYX0af9YgTf8sOP8vbP' },
 }
 
-// Speaker label in the prose -> cast voice. Raymond and Laura (Full Sim guests)
-// are deliberately uncast — blocks containing them must be skipped, not guessed.
+// Speaker label in the prose -> cast voice. Every speaker in both simulations
+// is cast (Oct 2026); an unknown label still stops the run rather than guess.
 const SPEAKER_TO_VOICE = {
   Carly:   'Claire',
   Marcus:  'Cooper',
@@ -83,6 +94,11 @@ const SPEAKER_TO_VOICE = {
   Warren:  'Conrad',
   Priya:   'Eryn',
   Danny:   'Cooper',
+  // Round 3 casting (Oct 2026)
+  Laura:   'Carol',
+  Raymond: 'Gerard',
+  Marisol: 'Elise',
+  Rick:    'Dan',
 }
 
 const NARRATOR_VOICE = 'JayWayne' // before-text + unlabeled connective prose
@@ -270,6 +286,32 @@ async function ttsToFile(apiKey, modelId, voiceId, text, outFile) {
   writeFileSync(outFile, Buffer.from(await res.arrayBuffer()))
 }
 
+// Split text that is over the model's per-request limit into roughly equal
+// pieces at paragraph breaks (sentence breaks if a paragraph alone is too
+// long). Text within the limit comes back as a single piece, untouched.
+function splitForRequest(text, limit) {
+  if (text.length <= limit) return [text]
+  const units = []
+  for (const para of text.split(/\n\s*\n/)) {
+    if (para.length <= limit) units.push(para)
+    else units.push(...para.split(/(?<=[.?!])\s+/))
+  }
+  const target = text.length / Math.ceil(text.length / limit)
+  const pieces = []
+  let current = ''
+  for (const unit of units) {
+    const joined = current ? `${current}\n\n${unit}` : unit
+    if (current && (current.length >= target || joined.length > limit)) {
+      pieces.push(current)
+      current = unit
+    } else {
+      current = joined
+    }
+  }
+  if (current) pieces.push(current)
+  return pieces
+}
+
 function ffmpeg(args) {
   execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], { stdio: ['ignore', 'inherit', 'inherit'] })
 }
@@ -344,8 +386,25 @@ for (const seg of segments) {
   } else {
     const mp3 = wav.replace(/\.wav$/, '.mp3')
     process.stdout.write(`  [${wavIndex}/${speechCount + pauseCount}] ${seg.voice}: "${seg.text.split(/\s+/).slice(0, 8).join(' ')}..."\n`)
-    await ttsToFile(apiKey, MODEL_ID, VOICES[seg.voice].id, seg.text, mp3)
-    ffmpeg(['-i', mp3, '-ar', '44100', '-ac', '1', wav])
+    const pieces = splitForRequest(seg.text, REQUEST_LIMITS[MODEL_ID] ?? DEFAULT_REQUEST_LIMIT)
+    if (pieces.length === 1) {
+      await ttsToFile(apiKey, MODEL_ID, VOICES[seg.voice].id, seg.text, mp3)
+      ffmpeg(['-i', mp3, '-ar', '44100', '-ac', '1', wav])
+    } else {
+      // Over the per-request limit: generate each piece, then join them
+      // seamlessly (same voice, no gap) into this one segment's WAV.
+      const partWavs = []
+      for (let k = 0; k < pieces.length; k++) {
+        const partMp3 = wav.replace(/\.wav$/, `-part${k + 1}.mp3`)
+        const partWav = partMp3.replace(/\.mp3$/, '.wav')
+        await ttsToFile(apiKey, MODEL_ID, VOICES[seg.voice].id, pieces[k], partMp3)
+        ffmpeg(['-i', partMp3, '-ar', '44100', '-ac', '1', partWav])
+        partWavs.push(partWav)
+      }
+      const partList = wav.replace(/\.wav$/, '-parts.txt')
+      writeFileSync(partList, partWavs.map((f) => `file '${f}'`).join('\n') + '\n')
+      ffmpeg(['-f', 'concat', '-safe', '0', '-i', partList, wav])
+    }
   }
   wavFiles.push(wav)
 }
