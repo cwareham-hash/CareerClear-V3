@@ -2,6 +2,8 @@
 
 import type { CSSProperties } from 'react'
 import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock, type ConnectorSlot } from '@/lib/simulation'
+import { blockMinutes } from '@/lib/audioTime'
+import BlockDuration, { BlockTimeLabel } from './BlockDuration'
 
 // Indexed by day number directly: day 0 = Sunday (the full sim opens Sunday night).
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -432,8 +434,8 @@ function TimeBlockCard({
           {block.title}
         </p>
 
-        {/* Time range */}
-        <p className="font-sans text-[11px] text-muted mt-1">{formatTimeRange(block.timeRange)}</p>
+        {/* Time range + narration length */}
+        <p className="font-sans text-[11px] text-muted mt-1"><BlockTimeLabel block={block} /></p>
       </div>
     </button>
   )
@@ -515,6 +517,11 @@ function TimelineRow({
               <h3 className="font-serif text-[17px] font-bold text-navy leading-snug">
                 {block.title}
               </h3>
+              {blockMinutes(block.id) !== null && (
+                <p className="font-sans text-[12px] text-muted mt-0.5">
+                  <BlockDuration blockId={block.id} />
+                </p>
+              )}
           </div>
         </button>
       </div>

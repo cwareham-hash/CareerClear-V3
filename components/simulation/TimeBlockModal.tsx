@@ -3,9 +3,10 @@
 import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import { ACTIVITY_COLORS, ACTIVITY_LABELS, formatTimeRange, type TimeBlock } from '@/lib/simulation'
+import { ACTIVITY_COLORS, ACTIVITY_LABELS, type TimeBlock } from '@/lib/simulation'
 import { BlockBody } from './BlockContent'
 import BlockAudioPlayer from './BlockAudioPlayer'
+import { BlockTimeLabel } from './BlockDuration'
 import { useDialog } from './useDialog'
 
 const TITLE_ID = 'timeblock-modal-title'
@@ -101,7 +102,7 @@ export default function TimeBlockModal({
                   <h2 id={TITLE_ID} className="font-sans font-bold text-[16px] text-dark leading-snug">
                     {block.title}
                   </h2>
-                  <p className="font-sans text-[12px] text-muted mt-0.5">{formatTimeRange(block.timeRange)}</p>
+                  <p className="font-sans text-[12px] text-muted mt-0.5"><BlockTimeLabel block={block} /></p>
                 </div>
                 <button
                   ref={closeBtnRef}

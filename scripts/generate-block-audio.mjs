@@ -41,6 +41,11 @@
 // Bracketed stage directions like [Phone rings] are not spoken; each becomes
 // ~2/3 second of silence. Artifacts are never narrated. Output goes to
 // audio-samples/ in the repo root (gitignored).
+//
+// Orientation readings (block ids ending "-orientation-bN", added Oct 29 2026)
+// are written briefings, not scenes: every word is read by the narrator, Jay
+// Wayne, speaker labels are never parsed, and the markdown is turned into
+// natural speech (see orientationTokens below).
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
@@ -224,6 +229,143 @@ function stripStrayMarkdown(text) {
   return kept.join('\n').replace(/\n[ \t]*(?:\n[ \t]*){2,}/g, '\n\n')
 }
 
+// ---------- Orientation readings ----------
+// Orientation readings are short written briefings (glossaries, headings,
+// bullets), so they skip the screenplay rules entirely. Every word is read by
+// the narrator, and speaker labels are NEVER parsed: a glossary line such as
+// "CIM: the confidential marketing document..." is a definition, not dialogue,
+// and must not trip the unknown-speaker stop. The markdown becomes speech:
+//   - "### Heading" ........... the heading as a short phrase, then a pause
+//   - "- item" ................ each bullet read as its own sentence
+//   - "- **Term:** definition"  the term, a sentence break, then the definition
+//   - a table ................. read row by row ("Column: value, Column: value.")
+//   - **bold**, *italic*, `code`, [link](url): the symbols go, the words stay
+// {{artifact:N}} markers are never narrated, the same as every other block.
+const ORIENTATION_ID_RE = /-orientation-b\d+$/
+const HEADING_RE = /^[ \t]*#{1,6}[ \t]+(.*)$/
+const BULLET_RE = /^[ \t]*(?:[-*+]|\d+[.)])[ \t]+(.*)$/
+const TABLE_ROW_RE = /^[ \t]*\|.*\|[ \t]*$/
+const TABLE_RULE_RE = /^[ \t]*\|?(?:[ \t]*:?-{3,}:?[ \t]*\|)+(?:[ \t]*:?-{3,}:?[ \t]*)?\|?[ \t]*$/
+// "**Term:** definition", or "**Term** (aside): definition".
+const GLOSSARY_RE = /^\*\*([^*]+?):\*\*[ \t]+(.+)$|^\*\*([^*]+?)\*\*([ \t]*\([^)]*\))?:[ \t]+(.+)$/s
+
+function stripInline(text) {
+  return text
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')                       // [link](url)
+    .replace(/\*\*([^*]+)\*\*/g, '$1')                              // **bold**
+    .replace(/(^|[^\w*])\*([^*\n]+)\*(?=[^\w*]|$)/g, '$1$2')        // *italic*
+    .replace(/`([^`]*)`/g, '$1')                                    // `code`
+    .replace(/[[\]]/g, '')                    // stray brackets: keep the words
+    .replace(/[ \t]+/g, ' ')
+    .trim()
+}
+
+// A bullet, heading, or glossary term read as a sentence of its own.
+function asSentence(text) {
+  const t = text.trim().replace(/[:;,]$/, '')
+  if (!t) return ''
+  return /[.!?]["')]*$/.test(t) ? t : `${t}.`
+}
+
+const capitalize = (t) => t.charAt(0).toUpperCase() + t.slice(1)
+
+function bulletSpeech(item) {
+  const g = item.match(GLOSSARY_RE)
+  if (!g) return asSentence(stripInline(item))
+  const term = g[1] !== undefined ? g[1] : g[3] + (g[4] || '')
+  const definition = g[1] !== undefined ? g[2] : g[5]
+  return `${asSentence(stripInline(term))} ${asSentence(capitalize(stripInline(definition)))}`
+}
+
+function tableSpeech(rows) {
+  const cells = (row) => row.trim().replace(/^\||\|$/g, '').split('|').map((c) => stripInline(c))
+  const hasHeader = rows.length > 1 && TABLE_RULE_RE.test(rows[1])
+  const header = hasHeader ? cells(rows[0]) : null
+  const body = hasHeader ? rows.slice(2) : rows
+  return body
+    .filter((row) => !TABLE_RULE_RE.test(row))
+    .map((row) => cells(row)
+      .map((c, i) => (header?.[i] && c ? `${header[i]}: ${c}` : c))
+      .filter(Boolean)
+      .join(', '))
+    .filter(Boolean)
+    .map(asSentence)
+}
+
+// Narrator speech for one piece of text; {{artifact:N}} markers become silent
+// artifact events (the player's auto-scroll cues), exactly as in pushText.
+function pushNarration(tokens, text) {
+  const re = /\{\{artifact:(\d+)\}\}/g
+  let last = 0
+  let m
+  while ((m = re.exec(text)) !== null) {
+    const t = text.slice(last, m.index).trim()
+    if (t) tokens.push({ type: 'speech', voice: NARRATOR_VOICE, text: t })
+    tokens.push({ type: 'artifact', n: Number(m[1]) })
+    last = re.lastIndex
+  }
+  const tail = text.slice(last).trim()
+  if (tail) tokens.push({ type: 'speech', voice: NARRATOR_VOICE, text: tail })
+}
+
+function orientationTokens(texts) {
+  const tokens = []
+  for (const text of texts) {
+    if (!text) continue
+    // Group the lines into units: paragraphs, bullets, headings, tables.
+    const units = []
+    let open = null // the paragraph or bullet that continuation lines join
+    for (const line of text.split('\n')) {
+      if (!line.trim()) { open = null; continue }
+      const heading = line.match(HEADING_RE)
+      const bullet = line.match(BULLET_RE)
+      if (heading) {
+        units.push({ kind: 'heading', text: heading[1] })
+        open = null
+      } else if (TABLE_ROW_RE.test(line)) {
+        const prev = units[units.length - 1]
+        if (prev?.kind === 'table' && open === prev) prev.rows.push(line)
+        else { open = { kind: 'table', rows: [line] }; units.push(open) }
+      } else if (bullet) {
+        open = { kind: 'bullet', text: bullet[1].trim() }
+        units.push(open)
+      } else if (open && open.kind !== 'table') {
+        open.text += ` ${line.trim()}`
+      } else {
+        open = { kind: 'paragraph', text: line.trim() }
+        units.push(open)
+      }
+    }
+    for (const unit of units) {
+      if (unit.kind === 'heading') {
+        pushNarration(tokens, asSentence(stripInline(unit.text)))
+        tokens.push({ type: 'pause' })
+      } else if (unit.kind === 'table') {
+        for (const row of tableSpeech(unit.rows)) pushNarration(tokens, row)
+      } else if (unit.kind === 'bullet') {
+        pushNarration(tokens, bulletSpeech(unit.text))
+      } else {
+        pushNarration(tokens, stripInline(unit.text))
+      }
+    }
+  }
+  return tokens
+}
+
+// Merge consecutive speech tokens with the same voice into one segment.
+function mergeSpeech(tokens) {
+  const merged = []
+  for (const tok of tokens) {
+    const prev = merged[merged.length - 1]
+    if (tok.type === 'speech' && prev?.type === 'speech' && prev.voice === tok.voice) {
+      prev.text += '\n\n' + tok.text
+    } else {
+      merged.push({ ...tok })
+    }
+  }
+  return merged
+}
+
 function segment(content, blockId) {
   const clean = (s) => stripStrayMarkdown(s || '').trim()
   const before = clean(content.before)
@@ -233,6 +375,9 @@ function segment(content, blockId) {
 
   if (after) fail(`Block "${blockId}" has non-empty "after" text, which the voice map does not cover. Report to Collin before generating.`)
   if (!before && !scene && !commentary) fail(`Block "${blockId}" has no narratable prose.`)
+
+  // Orientation readings: all narrator, no speaker labels (see above).
+  if (ORIENTATION_ID_RE.test(blockId)) return mergeSpeech(orientationTokens([before, scene, commentary]))
 
   const tokens = []
   if (before) pushText(tokens, NARRATOR_VOICE, before)
@@ -256,17 +401,7 @@ function segment(content, blockId) {
 
   if (commentary) pushText(tokens, COMMENTARY_VOICE, commentary)
 
-  // Merge consecutive speech tokens with the same voice into one segment.
-  const merged = []
-  for (const tok of tokens) {
-    const prev = merged[merged.length - 1]
-    if (tok.type === 'speech' && prev?.type === 'speech' && prev.voice === tok.voice) {
-      prev.text += '\n\n' + tok.text
-    } else {
-      merged.push({ ...tok })
-    }
-  }
-  return merged
+  return mergeSpeech(tokens)
 }
 
 // ---------- Audio generation ----------
