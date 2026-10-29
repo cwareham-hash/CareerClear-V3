@@ -250,9 +250,8 @@ missing). If it is not re-run, the site keeps showing the old lengths.
   record, but not the mp3s.
 - **Uploading a file to the bucket is the whole "publish" step**, with no code
   deployment. Since 28 October 2026, replacements are uploaded with a 60-second
-  cache setting so the new file reaches listeners quickly. **But see the first open
-  item:** the live endpoint itself currently caches its answers, which can delay or
-  break this.
+  cache setting so the new file reaches listeners quickly. (The endpoint's own
+  caching bug, which used to delay or break this, is resolved; see Open items.)
 - The homepage teaser clip is the one exception: it lives in a separate,
   deliberately **public** bucket, `teaser-audio`. Full block audio never goes there.
 
@@ -360,9 +359,12 @@ or roughly 182,000 credits.
 
 ## Open items
 
-- **Fix the live audio endpoint's caching (important).** The live `/api/block-audio/`
-  endpoint (Next.js 14) keeps its Supabase answers between requests. Three effects
-  seen on 28 October 2026:
+- **Resolved: the audio endpoint's caching bug.** Fixed by the one-line change below
+  (`export const fetchCache = 'force-no-store'` in
+  `app/api/block-audio/[blockId]/route.ts`) and **released to production in
+  259d852** (29 October 2026). Kept here for the record. Before the fix, the live
+  `/api/block-audio/` endpoint (Next.js 14) kept its Supabase answers between
+  requests. Three effects seen on 28 October 2026:
   - **Expired links.** Once a block's one-hour signed link is cached, the endpoint can
     keep handing out the same link after it expires, so playback fails until the
     cache refreshes. This affects any block, independent of the audio upload.
@@ -371,10 +373,9 @@ or roughly 182,000 credits.
     90 minutes after upload.
   - **Stale timing files.** Replaced blocks can be served their old
     `timestamps.json`, which only affects the artifact auto-scroll cues.
-  - **Suggested fix:** one line in `app/api/block-audio/[blockId]/route.ts`
-    (`export const fetchCache = 'force-no-store'`). Then purge the Vercel Data Cache
-    once so the stuck answers clear. This needs Collin's approval, because that route
-    is protected.
+  - **The fix:** one line in `app/api/block-audio/[blockId]/route.ts`
+    (`export const fetchCache = 'force-no-store'`), made on dev in 3f7f81a and
+    released to production in 259d852.
 - **Collin's listening review** of the v4 audio, about 7 hours 14 minutes across all
   six tiers (the Orientation readings add about 22 minutes).
 - **Cosmetic:** the `totalTime` text label in a timestamps file can read like
