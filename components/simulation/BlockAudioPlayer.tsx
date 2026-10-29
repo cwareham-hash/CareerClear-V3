@@ -5,14 +5,24 @@
 // blocks without audio render nothing at all, so every non-audio block looks
 // exactly as it did before this component existed.
 //
+// Instant bar: a block listed in lib/audioDurations.ts is known to have audio,
+// so its bar renders the moment the panel opens, total length already shown,
+// while the signed link is fetched in the background. Pressing play before the
+// link arrives shows a brief loading state, then plays as soon as it lands. If
+// the fetch says no audio (or the user is logged out / lacks beta access), the
+// bar disappears quietly. Blocks not in the file keep the original behavior,
+// fetch first, then show, so newly uploaded audio works before the file is
+// regenerated.
+//
 // Playback is a plain HTML5 <audio> element (so phone background / lock-screen
 // playback works), driven by custom controls — no native controls bar, no
 // download affordance, never autoplay. The signed URL expires after ~an hour;
 // pressing play on a stale panel transparently fetches a fresh one and resumes.
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Pause, Play } from 'lucide-react'
+import { Loader2, Pause, Play } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { AUDIO_DURATIONS } from '@/lib/audioDurations'
 import { trackAudioCompleted, trackAudioPlayed, trackAudioSpeedChanged } from '@/lib/analytics'
 
 const SPEEDS = [0.75, 1, 1.25, 1.5, 2]
@@ -79,36 +89,50 @@ interface Props {
 }
 
 export default function BlockAudioPlayer({ blockId, scrollRef }: Props) {
+  // A fresh player per block: Next/Previous remounts it, so no state and no
+  // <audio> source carry over from the previous block (the bar can now stay on
+  // screen between two listed blocks).
+  return <PlayerBar key={blockId} blockId={blockId} scrollRef={scrollRef} />
+}
+
+function PlayerBar({ blockId, scrollRef }: Props) {
+  // Known length from lib/audioDurations.ts (0 = not listed: wait for the fetch).
+  const listedSeconds = AUDIO_DURATIONS[blockId] ?? 0
   const [info, setInfo] = useState<AudioInfo | null>(null)
+  // The fetch said no audio, logged out, or no beta access: render nothing.
+  const [unavailable, setUnavailable] = useState(false)
+  // Play was pressed before the signed link arrived.
+  const [loading, setLoading] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [rate, setRate] = useState(1)
 
   const audioRef = useRef<HTMLAudioElement>(null)
+  const mounted = useRef(true)
   const playedTracked = useRef(false)
-  const refreshTried = useRef(false)
   // Artifact auto-scroll bookkeeping.
   const firedCues = useRef<Set<number>>(new Set())
   const lastUserScrollAt = useRef(0)
   const programmaticScrollUntil = useRef(0)
   const lastTime = useRef(0)
 
-  // Quietly ask whether this block has audio. No audio -> render nothing.
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false }
+  }, [])
+
+  // Quietly ask whether this block has audio (and fetch its signed link). No
+  // audio -> render nothing; a listed block's bar is already showing meanwhile.
   useEffect(() => {
     let active = true
-    setInfo(null)
-    setPlaying(false)
-    setCurrentTime(0)
-    setDuration(0)
-    setRate(1)
-    playedTracked.current = false
-    refreshTried.current = false
-    firedCues.current = new Set()
-    lastTime.current = 0
-    fetchAudioInfo(blockId).then((result) => {
-      if (active && result && result !== 'none') setInfo(result)
-    })
+    fetchAudioInfo(blockId)
+      .catch(() => null)
+      .then((result) => {
+        if (!active) return
+        if (result && result !== 'none') setInfo(result)
+        else setUnavailable(true)
+      })
     return () => { active = false }
   }, [blockId])
 
@@ -150,12 +174,29 @@ export default function BlockAudioPlayer({ blockId, scrollRef }: Props) {
 
   const onPlayPause = useCallback(async () => {
     const a = audioRef.current
-    if (!a || !info) return
+    if (!a || loading) return
     if (!a.paused) {
       a.pause()
       return
     }
-    if (Date.now() - info.fetchedAt > URL_STALE_MS) await refreshUrl()
+    let current = info
+    if (!current) {
+      // Pressed before the signed link arrived (listed blocks only): show the
+      // loading state and wait for the request that is already in flight.
+      setLoading(true)
+      let result: AudioInfo | 'none' | null = null
+      try { result = await fetchAudioInfo(blockId) } catch { /* treated as no audio */ }
+      if (!mounted.current) return // panel closed meanwhile: never play off-screen
+      setLoading(false)
+      if (!result || result === 'none') {
+        setUnavailable(true)
+        return
+      }
+      current = result
+      setInfo(result)
+      if (!a.src) a.src = result.url
+    }
+    if (Date.now() - current.fetchedAt > URL_STALE_MS) await refreshUrl()
     a.playbackRate = rate
     try {
       await a.play()
@@ -165,7 +206,7 @@ export default function BlockAudioPlayer({ blockId, scrollRef }: Props) {
         try { await audioRef.current?.play() } catch { /* leave paused */ }
       }
     }
-  }, [info, rate, refreshUrl])
+  }, [blockId, info, loading, rate, refreshUrl])
 
   const onScrub = useCallback((value: number) => {
     const a = audioRef.current
@@ -209,18 +250,22 @@ export default function BlockAudioPlayer({ blockId, scrollRef }: Props) {
     })
   }, [info, scrollRef])
 
-  if (!info) return null
+  // Listed blocks show at once; unlisted blocks wait for the fetch (as before).
+  if (unavailable || (!info && !listedSeconds)) return null
 
   return (
     <div className="shrink-0 flex items-center gap-2.5 px-5 py-2 lg:px-6 border-b border-border bg-white">
       <button
         onClick={onPlayPause}
-        aria-label={playing ? 'Pause narration' : 'Play narration'}
+        aria-label={loading ? 'Loading narration' : playing ? 'Pause narration' : 'Play narration'}
+        aria-busy={loading}
         className="shrink-0 w-7 h-7 rounded-pill flex items-center justify-center text-white
           transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2"
         style={{ backgroundColor: 'var(--color-teal)' }}
       >
-        {playing ? <Pause size={12} /> : <Play size={12} className="ml-[1px]" />}
+        {loading
+          ? <Loader2 size={12} className="animate-spin" />
+          : playing ? <Pause size={12} /> : <Play size={12} className="ml-[1px]" />}
       </button>
 
       <span className="shrink-0 font-sans text-[11px] text-muted tabular-nums w-9 text-right">
@@ -240,8 +285,9 @@ export default function BlockAudioPlayer({ blockId, scrollRef }: Props) {
         style={{ accentColor: 'var(--color-teal)' }}
       />
 
+      {/* Total length: from the file until the audio's own metadata loads. */}
       <span className="shrink-0 font-sans text-[11px] text-muted tabular-nums w-9">
-        {fmtTime(duration)}
+        {fmtTime(duration || listedSeconds)}
       </span>
 
       <select
