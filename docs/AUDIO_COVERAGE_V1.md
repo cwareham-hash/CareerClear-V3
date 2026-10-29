@@ -1,6 +1,6 @@
 # Career Clear Simulation Audio — Coverage Record (V1)
 
-_Last updated: 28 October 2026 (all audio moved to Eleven v4; full cast; every block covered)_
+_Last updated: 29 October 2026 (Orientation readings narrated; real time estimates in the app from the audio lengths)_
 
 This document is a plain-English record of the audio narration for both live
 simulations, Management Consultant ("Project Meridian") and Investment Banking
@@ -28,6 +28,9 @@ and the same day every block was generated (or regenerated) on it and uploaded:
 - the 24 other Meridian blocks, migrated from Multilingual v2
 - the five Kestrel Day in the Life blocks, replacing a short-lived Eleven v3 version
 
+On 29 October 2026 the eight Orientation readings (four per simulation) were
+narrated on v4 as well, so every block in both simulations now has v4 audio.
+
 History: Meridian was first voiced on Multilingual v2 (`eleven_multilingual_v2`,
 August–September 2026). The Kestrel Day in the Life was briefly on Eleven v3
 (`eleven_v3`, 27–28 October 2026) after a side-by-side test against v2.
@@ -42,7 +45,7 @@ know stops the run rather than being guessed.
 
 | Role in the story | Voice | What they narrate |
 |---|---|---|
-| The narrator | **Jay Wayne** (Wise University Professor) | Scene-setting "before" text and any unlabeled prose in a scene |
+| The narrator | **Jay Wayne** (Wise University Professor) | Scene-setting "before" text, any unlabeled prose in a scene, and every word of the Orientation readings |
 | Carly (the first-year consultant we shadow) | **Claire** (Ultra Real & Natural) | All of Carly's lines **and** all of the over-the-shoulder commentary |
 | Marcus (Carly's manager) | **Cooper** (Young American Male) | Marcus's lines |
 | David (Senior Manager) | **Conrad** (Conrad Palmer) | David's lines |
@@ -56,7 +59,7 @@ know stops the run rather than being guessed.
 
 | Role in the story | Voice | What they narrate |
 |---|---|---|
-| The narrator | **Jay Wayne** | Setting-the-scene text and any unlabeled prose |
+| The narrator | **Jay Wayne** | Setting-the-scene text, any unlabeled prose, and every word of the Orientation readings |
 | Sabrina (the first-year Analyst we shadow) | **Claire** | All of Sabrina's lines **and** all of the over-the-shoulder commentary (it is her own first-person view, the same rule as Carly) |
 | Warren (the MD) | **Conrad** | Warren's lines |
 | Priya (the VP) | **Eryn** | Priya's lines |
@@ -79,17 +82,28 @@ v4, in October 2026 (`scripts/generate-auditions-round3.mjs`).
 
 ## Coverage — every block
 
-**Every Day in the Life and Full Simulation block in both simulations has Eleven v4
-audio.** Orientation readings have no audio by design: they are short written
-briefings that were never meant to be narrated.
+**Every block in both simulations has Eleven v4 audio: the Orientation readings,
+the Day in the Life, and the Full Simulation.** The Orientation readings were added
+on 29 October 2026 (they had no audio before then).
 
 | Tier | Blocks | Total listening time |
 |---|---|---|
+| Meridian Orientation | 4 | 7:34 |
 | Meridian Day in the Life | 6 | 1:01:18 |
 | Meridian Full Simulation | 20 | 2:54:25 |
+| Kestrel Orientation | 4 | 14:08 |
 | Kestrel Day in the Life | 5 | 37:45 |
 | Kestrel Full Simulation | 19 | 2:18:25 |
-| **All audio** | **50** | **6:51:53** |
+| **All audio** | **58** | **7:13:34** |
+
+**Meridian Orientation** (4 of 4 readings on v4, 7:34 total)
+
+| Block | Title | Length | Characters | Model |
+|---|---|---|---|---|
+| `orientation-b1` | The client and its world | 1:16 | 1,246 | v4 |
+| `orientation-b2` | The situation and why we are here | 1:55 | 1,820 | v4 |
+| `orientation-b3` | The engagement and the cast | 1:53 | 1,868 | v4 |
+| `orientation-b4` | Your seat and the vocabulary | 2:31 | 2,370 | v4 |
 
 **Meridian Day in the Life** (6 of 6 blocks on v4, 1:01:18 total)
 
@@ -127,6 +141,15 @@ briefings that were never meant to be narrated.
 | `full-d5-b3` | Learning block | 11:23 | 10,803 | v4 |
 | `full-d5-b4` | Week wrap | 4:14 | 3,836 | v4 |
 
+**Kestrel Orientation** (4 of 4 readings on v4, 14:08 total)
+
+| Block | Title | Length | Characters | Model |
+|---|---|---|---|---|
+| `orientation-b1` | The industry and the firm | 2:36 | 2,573 | v4 |
+| `orientation-b2` | The deal | 2:55 | 2,808 | v4 |
+| `orientation-b3` | The people | 3:19 | 3,130 | v4 |
+| `orientation-b4` | The language of the work | 5:18 | 4,760 | v4 |
+
 **Kestrel Day in the Life** (5 of 5 blocks on v4, 37:45 total)
 
 | Block | Title | Length | Characters | Model |
@@ -160,6 +183,58 @@ briefings that were never meant to be narrated.
 | `full-d5-b2` | Buyer-list finalization, model refresh, tracker close-out | 6:02 | 5,717 | v4 |
 | `full-d5-b3` | Danny release check and lighter Friday finish | 2:40 | 2,503 | v4 |
 | `full-d6-b1` | Saturday production touch | 3:14 | 3,044 | v4 |
+
+## How the Orientation readings are narrated
+
+Orientation readings are written briefings (glossaries, headings, bullet lists), not
+scenes, so the generation script reads them by a separate set of rules. A block is
+treated as an Orientation reading when its id ends in `-orientation-b` plus a number.
+Nothing about the Day in the Life or Full Simulation blocks changed: on 29 October
+2026 the text sent for all 50 of them was checked before and after this change and
+was byte-for-byte identical (including the dinner and learning blocks, which are
+also laid out as briefings).
+
+- **One voice.** Every word is read by the narrator, Jay Wayne.
+- **No speaker labels.** A glossary line such as "CIM: the confidential marketing
+  document..." is a definition, not dialogue, so it never stops the run as an
+  unknown speaker.
+- **No symbols read aloud.** Bold, italics, heading marks and bullet marks are removed;
+  the words stay.
+- **Headings** are read as a short phrase, followed by a brief pause (about 2/3 of a
+  second).
+- **Bullets** are each read as a sentence of their own.
+- **Glossary entries** are read as the term, a sentence break, then the definition
+  ("EBITDA. A standard measure of a company's operating profit...").
+- **Tables** (none in today's readings) are read row by row, for example "Role:
+  Analyst, Rate: $100."
+- **Artifacts are never narrated**, the same as everywhere else.
+
+## Time estimates in the app
+
+The app shows real listening times based on the audio itself:
+
+- **The hub cards** show each tier's total for the project, rounded: under an hour,
+  "About N min" (to the nearest 5 minutes); an hour or more, "About N hrs" (to the
+  nearest half hour, for example "About 2.5 hrs"; exactly one hour reads "About 1 hr").
+- **Each block** shows its own length to the nearest minute (at least 1), for example
+  "9 min": on the Orientation reading list (in place of the old "~3 min read"), on
+  the Day in the Life timeline cards, on the Full Simulation calendar cards, and in
+  the header of every block's panel. Screen readers hear "about 9 minutes".
+- Blocks without audio, and the greyed connector slots, show no time.
+
+**Where the numbers come from:** `lib/audioDurations.ts`, a generated file that lists
+every block's audio length in seconds, keyed by block id. It is committed to git and
+read when the site is built, so the app never asks for durations while running.
+
+**Whenever audio is generated or regenerated, re-run**
+
+```
+node scripts/build-audio-durations.mjs
+```
+
+**and commit the updated `lib/audioDurations.ts`.** The script reads the local files
+in `audio-samples/` (the timestamps file for each block, or the mp3 itself if that is
+missing). If it is not re-run, the site keeps showing the old lengths.
 
 ## Where the audio lives
 
@@ -247,6 +322,11 @@ and `ffmpeg` installed.
   ElevenLabs credits**.
 - **Uploading** the finished `audio-samples/<block-id>.mp3` and `.json` to the
   bucket (as `audio.mp3` and `timestamps.json`) is a separate step.
+- **Orientation readings** use the same command (for example
+  `node scripts/generate-block-audio.mjs ib-analyst-kestrel-orientation-b4`) and
+  follow the narration rules above.
+- **After any regeneration**, re-run `node scripts/build-audio-durations.mjs` and
+  commit `lib/audioDurations.ts` so the time estimates in the app stay right.
 
 ## Cost record
 
@@ -269,13 +349,14 @@ confirmed.
 | Kestrel Full Simulation, 19 blocks (Oct 28, 14:55–15:30 CDT) | v4 | 131,513 | ~57,900 |
 | Meridian gap blocks, 2 (Oct 28, 15:31–15:40 CDT) | v4 | 36,051 | ~15,900 |
 | Meridian migration, 24 blocks (Oct 28, 15:40–16:29 CDT) | v4 | 189,368 | ~83,300 |
+| Orientation readings, 8 (Oct 29, 16:12–16:18 CDT) | v4 | 20,575 | ~9,100 |
 
 (Meridian Day in the Life block 1 and the round 1 core-cast auditions were made in
 an earlier session and are not itemized.)
 
 For rough future planning on v4: **1,000 characters ≈ 440 credits**. Regenerating
-every block in both simulations is about 392,000 characters, or roughly 173,000
-credits.
+every block in both simulations, Orientation included, is about 413,000 characters,
+or roughly 182,000 credits.
 
 ## Open items
 
@@ -294,10 +375,8 @@ credits.
     (`export const fetchCache = 'force-no-store'`). Then purge the Vercel Data Cache
     once so the stuck answers clear. This needs Collin's approval, because that route
     is protected.
-- **Collin's listening review** of the v4 audio, about 6 hours 52 minutes across all
-  four tiers.
-- **Time estimates in the UI.** Block lengths are now final (see the tables above)
-  and can drive "how long this takes to listen to" in the interface.
+- **Collin's listening review** of the v4 audio, about 7 hours 14 minutes across all
+  six tiers (the Orientation readings add about 22 minutes).
 - **Cosmetic:** the `totalTime` text label in a timestamps file can read like
   "14:60.0" when a length rounds up to a whole minute. The real length
   (`totalSeconds`) is correct, and the player doesn't use the label.

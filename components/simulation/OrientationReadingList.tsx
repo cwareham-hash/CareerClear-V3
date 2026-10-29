@@ -4,7 +4,9 @@
 // list, NOT a calendar. No day header, no activity-type legend. Clicking a
 // reading opens it in the same block-detail panel/modal used everywhere else.
 import { Check } from 'lucide-react'
-import { formatTimeRange, type TimeBlock } from '@/lib/simulation'
+import { type TimeBlock } from '@/lib/simulation'
+import { blockMinutes } from '@/lib/audioTime'
+import { BlockTimeLabel } from './BlockDuration'
 
 interface Props {
   blocks:       TimeBlock[]
@@ -51,8 +53,13 @@ export default function OrientationReadingList({
                 {block.title}
               </h3>
               <p className="font-sans text-[12px] text-muted mt-0.5">
-                {formatTimeRange(block.timeRange)}
-                {isActive && !isCompleted && <span style={{ color: 'var(--color-teal)' }}> · Start here</span>}
+                {/* Real narration length; it replaces the authored "~3 min read". */}
+                <BlockTimeLabel block={block} />
+                {isActive && !isCompleted && (
+                  <span style={{ color: 'var(--color-teal)' }}>
+                    {blockMinutes(block.id) === null ? 'Start here' : ' · Start here'}
+                  </span>
+                )}
               </p>
             </div>
           </button>

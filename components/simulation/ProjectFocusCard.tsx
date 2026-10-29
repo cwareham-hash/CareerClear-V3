@@ -13,6 +13,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { BookOpen, CalendarDays, CalendarRange, ChevronDown, ChevronUp, Check, ArrowRight } from 'lucide-react'
 import type { Scenario, TimeBlock } from '@/lib/simulation'
+import { tierSeconds, tierTotalLabel } from '@/lib/audioTime'
 
 type TierKey = 'orientation' | 'day-in-life' | 'full'
 
@@ -55,7 +56,6 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
       href:     `/careers/${careerSlug}/simulate/${sc.slug}/orientation`,
       label:    'Orientation',
       base:     'Set the scene before the work',
-      duration: '10–15 min',
       Icon:     BookOpen,
       gated:    false,
     },
@@ -64,7 +64,6 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
       href:     `/careers/${careerSlug}/simulate/${sc.slug}?experience=day-in-life`,
       label:    'Day in the Life',
       base:     'One representative day',
-      duration: 'About an hour',
       Icon:     CalendarDays,
       gated:    true,
     },
@@ -73,11 +72,17 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
       href:     `/careers/${careerSlug}/simulate/${sc.slug}?experience=full`,
       label:    'Full Simulation',
       base:     'The complete multi-day arc',
-      duration: '3–5 hrs',
       Icon:     CalendarRange,
       gated:    true,
     },
   ].filter((t) => sc.tiers[t.key].length > 0)
+
+  // Real listening time per tier, summed from the narration lengths in
+  // lib/audioDurations.ts. A tier without audio on every block shows no estimate.
+  const durations = tiers.map((t) => {
+    const seconds = tierSeconds(sc.tiers[t.key].map((b) => b.id))
+    return seconds === null ? null : tierTotalLabel(seconds)
+  })
 
   const states = tiers.map((t) => tierStateOf(sc.tiers[t.key], completed))
   // Current (lit) step = earliest incomplete tier (among those present), in order.
@@ -133,6 +138,7 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
             const prominent  = t.key === currentKey
             const done       = state === 'completed'
             const sub        = subLine(i)
+            const duration   = durations[i]
             // "Start here" marks the current (lit) step — Orientation while it is
             // the first incomplete tier, otherwise the next tier in sequence.
             const showStartHere = prominent
@@ -183,9 +189,12 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
                             {t.label}
                           </h4>
                           {/* Duration estimate — small and quiet beside the title */}
-                          <span className="font-sans text-[11px] text-muted whitespace-nowrap">
-                            {t.duration}
-                          </span>
+                          {duration && (
+                            <span className="font-sans text-[11px] text-muted whitespace-nowrap">
+                              <span aria-hidden="true">{duration.text}</span>
+                              <span className="sr-only">{duration.spoken}</span>
+                            </span>
+                          )}
                           {showStartHere && (
                             <span className="inline-flex items-center rounded-pill bg-teal text-white
                               px-2 py-0.5 font-sans text-[10px] font-bold uppercase tracking-wide">
