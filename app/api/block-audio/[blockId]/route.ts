@@ -19,6 +19,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
+// Never cache this route's Supabase calls (the file check, the signed link,
+// the timestamps download). Next.js 14 caches server-side fetch by default,
+// and supabase-js goes through that fetch, so without this the route kept
+// reusing one signed link past its one-hour expiry, kept saying "no audio"
+// after a file was uploaded, and served replaced timestamps files.
+export const fetchCache = 'force-no-store'
 
 const BUCKET = 'block-audio'
 // Signed URLs die after roughly an hour — long enough for any listening
