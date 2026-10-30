@@ -36,6 +36,8 @@ import {
   trackQuizNudgeClicked,
   trackQuizNudgeDismissed,
 } from '@/lib/analytics'
+import { buttonClasses, BUTTON_ARROW, BUTTON_ICON } from '@/components/ui/buttons'
+import { badgeClasses } from '@/components/ui/badges'
 import QuizResultsView from '@/components/QuizResultsView'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -219,10 +221,7 @@ export default function QuestionnairePage() {
                 '~3 minutes',
                 'No wrong answers',
               ].map((label) => (
-                <span
-                  key={label}
-                  className="px-3 py-1 rounded-pill border border-border font-sans text-[12px] text-muted font-medium"
-                >
+                <span key={label} className={badgeClasses({ kind: 'outline' })}>
                   {label}
                 </span>
               ))}
@@ -231,23 +230,9 @@ export default function QuestionnairePage() {
             {/* CTA */}
             <button
               onClick={startQuiz}
-              className="
-                inline-flex items-center gap-2 px-8 py-3.5 rounded-btn
-                font-sans font-semibold text-[14px] text-white
-                transition-colors duration-150
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-              "
-              style={{ backgroundColor: 'var(--color-teal)' }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                  'var(--color-teal-light)')
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                  'var(--color-teal)')
-              }
+              className={buttonClasses({ variant: 'primary', size: 'lg' })}
             >
-              <Sparkles size={16} aria-hidden="true" />
+              <Sparkles size={BUTTON_ICON.lg} aria-hidden="true" />
               Start Quiz
             </button>
           </div>
@@ -269,13 +254,9 @@ export default function QuestionnairePage() {
           <>
             <button
               onClick={retake}
-              className="
-                inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
-                border border-border font-sans font-medium text-[14px] text-dark
-                hover:border-teal hover:text-teal transition-colors duration-150
-              "
+              className={buttonClasses({ variant: 'secondary', size: 'md' })}
             >
-              <RotateCcw size={14} aria-hidden="true" />
+              <RotateCcw size={BUTTON_ICON.md} aria-hidden="true" />
               Retake Quiz
             </button>
 
@@ -287,8 +268,7 @@ export default function QuestionnairePage() {
                 <p className="font-sans text-[13px] text-muted">
                   <button
                     onClick={openSignIn}
-                    className="font-medium text-teal hover:text-teal-light
-                      underline underline-offset-2 transition-colors duration-150"
+                    className={buttonClasses({ variant: 'tertiary', size: 'inline' })}
                   >
                     Sign in or sign up
                   </button>{' '}
@@ -309,7 +289,7 @@ export default function QuestionnairePage() {
         footer={
           <p className="text-center font-sans text-[13px] text-muted mt-10">
             Results saved to your dashboard.{' '}
-            <Link href="/dashboard" className="text-teal hover:text-teal-light transition-colors">
+            <Link href="/dashboard" className={buttonClasses({ variant: 'tertiary', size: 'inline' })}>
               View history →
             </Link>
           </p>
@@ -330,10 +310,7 @@ export default function QuestionnairePage() {
             <span className="font-sans text-[12px] text-muted font-medium">
               Question {currentIndex + 1} of {totalQuestions}
             </span>
-            <span
-              className="px-2.5 py-0.5 rounded-pill font-sans text-[11px] font-semibold text-white"
-              style={{ backgroundColor: 'var(--color-teal)' }}
-            >
+            <span className={badgeClasses({ kind: 'label', size: 'sm' })}>
               {DIMENSION_LABELS[question.dimension]}
             </span>
           </div>
@@ -425,14 +402,10 @@ export default function QuestionnairePage() {
             {/* Back button */}
             <button
               onClick={goBack}
-              className="
-                flex items-center gap-1.5 font-sans font-medium text-[14px]
-                text-muted hover:text-dark transition-colors duration-150
-                focus-visible:outline-none focus-visible:ring-2 rounded-btn px-2 py-1
-              "
+              className={buttonClasses({ variant: 'quiet', size: 'md' })}
               aria-label="Go back"
             >
-              <ChevronLeft size={16} aria-hidden="true" />
+              <ChevronLeft size={BUTTON_ICON.md} aria-hidden="true" />
               Back
             </button>
 
@@ -440,26 +413,10 @@ export default function QuestionnairePage() {
             <button
               onClick={goNext}
               disabled={!selectedValue}
-              className="
-                flex items-center gap-2 px-6 py-2.5 rounded-btn
-                font-sans font-semibold text-[14px] text-white
-                transition-all duration-150
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1
-                disabled:opacity-40 disabled:cursor-not-allowed
-              "
-              style={{ backgroundColor: 'var(--color-teal)' }}
-              onMouseEnter={(e) => {
-                if (selectedValue)
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                    'var(--color-teal-light)'
-              }}
-              onMouseLeave={(e) => {
-                ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                  'var(--color-teal)'
-              }}
+              className={buttonClasses({ variant: 'primary', size: 'md' })}
             >
               {isLastQuestion ? 'See My Results' : 'Continue'}
-              {!isLastQuestion && <ChevronRight size={16} aria-hidden="true" />}
+              {!isLastQuestion && <ChevronRight size={BUTTON_ICON.md} aria-hidden="true" className={BUTTON_ARROW} />}
             </button>
           </div>
         </div>

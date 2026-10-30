@@ -15,6 +15,7 @@ import { ArrowLeft, LogIn } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { getQuizHistory, type SavedQuizResult } from '@/lib/quizResults'
 import QuizResultsView from '@/components/QuizResultsView'
+import { buttonClasses, BUTTON_ICON } from '@/components/ui/buttons'
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -28,11 +29,9 @@ function BackToDashboardLink() {
   return (
     <Link
       href="/dashboard"
-      className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-btn
-        border border-border font-sans font-medium text-[14px] text-dark
-        hover:border-teal hover:text-teal transition-colors duration-150"
+      className={buttonClasses({ variant: 'secondary', size: 'md' })}
     >
-      <ArrowLeft size={14} aria-hidden="true" />
+      <ArrowLeft size={BUTTON_ICON.md} aria-hidden="true" />
       Back to Dashboard
     </Link>
   )
@@ -81,8 +80,7 @@ export default function QuizAttemptResultsPage() {
           </p>
           <button
             onClick={() => openAuthModal('login')}
-            className="px-5 py-2.5 rounded-btn bg-teal text-white font-sans font-semibold
-              text-[14px] transition-colors duration-150 hover:bg-teal-light"
+            className={buttonClasses({ variant: 'primary', size: 'lg' })}
           >
             Log in
           </button>

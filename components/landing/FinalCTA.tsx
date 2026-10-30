@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import { buttonClasses, BUTTON_ARROW, BUTTON_ICON } from '@/components/ui/buttons'
 
 /**
  * Final CTA — cream background, centered closing prompt into /explore.
@@ -29,12 +30,10 @@ export default function FinalCTA() {
         >
           <Link
             href="/explore"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-btn bg-teal text-white
-              font-sans font-semibold text-[15px] transition-colors duration-150 hover:bg-teal-light
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
+            className={buttonClasses({ variant: 'primary', size: 'lg' })}
           >
             Start Exploring
-            <ArrowRight size={16} />
+            <ArrowRight size={BUTTON_ICON.lg} aria-hidden="true" className={BUTTON_ARROW} />
           </Link>
         </motion.div>
       </div>

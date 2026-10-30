@@ -4,16 +4,14 @@ import Link from 'next/link'
 import { Heart } from 'lucide-react'
 import type { Career } from '@/lib/careers'
 import { trackCareerCardClicked } from '@/lib/analytics'
+import { buttonClasses } from '@/components/ui/buttons'
+import { badgeClasses } from '@/components/ui/badges'
 
 interface CareerCardProps {
   career: Career
   isFavorite: boolean
   onToggleFavorite: () => void
   isSimulated?: boolean
-  /** Purple Simulation badge instead of the default teal. Opt-in, used ONLY by
-   *  the Explore "Step into a simulation" featured strip — every other surface
-   *  (grid, quiz results) keeps the teal default. */
-  simBadgePurple?: boolean
 }
 
 /**
@@ -26,13 +24,13 @@ interface CareerCardProps {
  *   1. Row: emoji (32px, left) + heart favorite (right)
  *   2. Title — 16px bold Inter #111827
  *   3. Description — 14px regular #6b7280, 2–3 lines
- *   4. Skill tags — teal filled pills (#2a9d8f bg, white text, 12px)
- *   5. Bottom row: industry badge (outline) + teal Simulation badge (only on
+ *   4. Skill tags — neutral grey labels (Wave A: teal is reserved for clicks)
+ *   5. Bottom row: industry badge (outline) + purple Simulation badge (only on
  *      roles with a built sim) | Explore →
  *
  * Hover: shadow-card-hover + translateY(-2px), 200ms ease
  */
-export default function CareerCard({ career, isFavorite, onToggleFavorite, isSimulated, simBadgePurple }: CareerCardProps) {
+export default function CareerCard({ career, isFavorite, onToggleFavorite, isSimulated }: CareerCardProps) {
   const { id, slug, emoji, title, industry, description, skills, hasSimulation } = career
 
   return (
@@ -95,14 +93,10 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
           {description}
         </p>
 
-        {/* Skill tags — §7.6.1: teal filled pills, white text, 12px, flex-wrap */}
+        {/* Skill tags — neutral labels, 12px, flex-wrap */}
         <div className="flex flex-wrap gap-1.5 mb-4">
           {skills.map((skill) => (
-            <span
-              key={skill}
-              className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium text-white"
-              style={{ backgroundColor: 'var(--color-teal)' }}
-            >
+            <span key={skill} className={badgeClasses({ kind: 'label' })}>
               {skill}
             </span>
           ))}
@@ -112,35 +106,24 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
         <div className="flex items-center justify-between gap-2 pt-3 border-t border-border mt-auto">
           <div className="flex items-center gap-1.5 flex-wrap">
 
-            {/* Industry badge — outline pill (§7.6.1) */}
-            <span
-              className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium
-                border border-teal text-teal"
-            >
+            {/* Industry badge — neutral outline pill (§7.6.1) */}
+            <span className={badgeClasses({ kind: 'outline' })}>
               {industry}
             </span>
 
-            {/* Simulation badge — filled teal pill, the same treatment as the
-                career page's "Simulation Available" badge, so one color means
-                simulation everywhere. It reuses career.hasSimulation, the same
-                flag that gates the sim routes. Roles without a sim show no badge
-                here at all. */}
+            {/* Simulation badge — purple, the same treatment as the career
+                page's "Simulation Available" badge, so one colour means
+                simulation everywhere (Explore strip, Explore grid, quiz results).
+                It reuses career.hasSimulation, the same flag that gates the sim
+                routes. Roles without a sim show no badge here at all. */}
             {hasSimulation && (
-              <span
-                className={`px-2.5 py-0.5 rounded-pill text-[12px] font-medium text-white ${
-                  simBadgePurple ? '' : 'bg-teal'
-                }`}
-                style={simBadgePurple ? { backgroundColor: 'var(--color-block-purple)' } : undefined}
-              >
+              <span className={badgeClasses({ kind: 'sim' })}>
                 Simulation
               </span>
             )}
 
             {isSimulated && (
-              <span
-                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium"
-                style={{ backgroundColor: 'var(--color-tag-bg)', color: 'var(--color-teal)' }}
-              >
+              <span className={badgeClasses({ kind: 'done' })}>
                 ✓ Done
               </span>
             )}
@@ -153,9 +136,7 @@ export default function CareerCard({ career, isFavorite, onToggleFavorite, isSim
           <Link
             href={`/careers/${slug}`}
             onClick={() => trackCareerCardClicked(id, hasSimulation)}
-            className="font-sans text-[13px] font-semibold text-teal
-              hover:text-teal-light transition-colors duration-150 shrink-0
-              rounded focus-visible:outline-none focus-visible:ring-2"
+            className={buttonClasses({ variant: 'tertiary', size: 'inline', className: 'shrink-0 text-[13px]' })}
           >
             Explore →
           </Link>

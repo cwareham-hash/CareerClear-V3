@@ -14,13 +14,16 @@ import { CAREERS } from '@/lib/careers'
 import type { CareerResult } from '@/lib/recommendations'
 import CareerCard from '@/components/CareerCard'
 import { useFavorites } from '@/lib/useFavorites'
+import { badgeClasses } from '@/components/ui/badges'
 
 // ── Match % colour tier (questionnaire decision #5) ───────────────────────────
+// Three levels from the shared badge set; never teal, since teal means
+// "clickable" (Wave A). Strong = navy, good = grey, weaker = white outline.
 
 function matchBadgeClass(pct: number): string {
-  if (pct >= 75) return 'bg-teal text-white'
-  if (pct >= 50) return 'bg-navy text-white'
-  return 'bg-border text-muted'
+  if (pct >= 75) return badgeClasses({ kind: 'count' })
+  if (pct >= 50) return badgeClasses({ kind: 'label' })
+  return badgeClasses({ kind: 'outline' })
 }
 
 function matchLabel(pct: number): string {
@@ -100,9 +103,7 @@ export default function QuizResultsView({
                 <span className="font-sans text-[12px] text-muted font-medium">
                   {matchLabel(matchPct)}
                 </span>
-                <span
-                  className={`px-2.5 py-0.5 rounded-pill font-sans font-semibold text-[12px] ${matchBadgeClass(matchPct)}`}
-                >
+                <span className={matchBadgeClass(matchPct)}>
                   {matchPct}% match
                 </span>
               </div>

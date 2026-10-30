@@ -18,6 +18,7 @@ import { useAuth } from '@/lib/auth'
 import { getProgressByCareer } from '@/lib/userProgress'
 import ProjectFocusCard from './ProjectFocusCard'
 import SoftGateDialog from './SoftGateDialog'
+import { buttonClasses } from '@/components/ui/buttons'
 
 interface Props {
   careerSim: CareerSim
@@ -365,8 +366,7 @@ export default function SimulationLanding({ careerSim }: Props) {
             <button
               type="button"
               onClick={viewAllProjects}
-              className="font-sans text-[12px] font-semibold text-muted hover:text-teal shrink-0
-                transition-colors duration-150 rounded focus-visible:outline-none focus-visible:ring-2"
+              className={buttonClasses({ variant: 'quiet', size: 'inline', className: 'shrink-0 text-[12px]' })}
             >
               View all projects
             </button>

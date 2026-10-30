@@ -11,7 +11,7 @@ import {
   Heart,
   ChevronDown,
   ChevronUp,
-  Play,
+  ArrowRight,
   Star,
   BookOpen,
   CheckCircle2,
@@ -25,6 +25,8 @@ import { CAREER_SIMS, getCareerTierBlocks, TIERS, type Tier } from '@/lib/simula
 import { getProgressByCareer } from '@/lib/userProgress'
 import { getVerdicts, verdictKey, type RoleVerdict } from '@/lib/roleVerdicts'
 import { useFavorites } from '@/lib/useFavorites'
+import { buttonClasses, BUTTON_ARROW, BUTTON_ICON } from '@/components/ui/buttons'
+import { badgeClasses } from '@/components/ui/badges'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -36,10 +38,12 @@ function formatDate(iso: string): string {
   })
 }
 
+// Match % badge: three levels from the shared badge set, never teal (teal
+// means "clickable"). Strong = navy, good = grey, weaker = white outline.
 function matchBadgeClass(pct: number): string {
-  if (pct >= 75) return 'bg-teal text-white'
-  if (pct >= 50) return 'bg-navy text-white'
-  return 'bg-border text-muted'
+  if (pct >= 75) return badgeClasses({ kind: 'count', size: 'sm' })
+  if (pct >= 50) return badgeClasses({ kind: 'label', size: 'sm' })
+  return badgeClasses({ kind: 'outline', size: 'sm' })
 }
 
 function tierLabel(t: Tier): string {
@@ -97,20 +101,11 @@ function StatCard({
 
 // ── Rating Badge ──────────────────────────────────────────────────────────────
 
+// One score style everywhere (Wave A): navy, with the gold rating star.
 function RatingBadge({ rating }: { rating: number }) {
-  const bg =
-    rating >= 8
-      ? 'var(--color-teal)'
-      : rating >= 5
-      ? 'var(--color-navy)'
-      : 'var(--color-muted)'
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-pill
-        font-sans font-semibold text-[12px] text-white shrink-0"
-      style={{ backgroundColor: bg }}
-    >
-      <Star size={10} fill="white" strokeWidth={0} />
+    <span className={badgeClasses({ kind: 'count', className: 'shrink-0' })}>
+      <Star size={10} fill="var(--color-gold)" strokeWidth={0} aria-hidden="true" />
       {rating}/10
     </span>
   )
@@ -145,20 +140,10 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                   screens so the CTA drops below the badges instead of being
                   pushed past the right edge of the viewport. */}
               <div className="flex flex-wrap md:flex-nowrap items-center gap-2">
-                <span
-                  className="px-2.5 py-0.5 rounded-pill font-sans font-bold text-[14px] text-white shrink-0"
-                  style={{ backgroundColor: 'var(--color-navy)' }}
-                >
+                <span className={badgeClasses({ kind: 'count', className: 'shrink-0' })}>
                   {tier.display}
                 </span>
-                <span
-                  className="px-2 py-0.5 rounded-pill font-sans text-[11px] font-semibold shrink-0"
-                  style={
-                    tier.isCompleted
-                      ? { backgroundColor: 'var(--color-tag-bg)', color: 'var(--color-teal)' }
-                      : { backgroundColor: '#fef3c7', color: '#92400e' }
-                  }
-                >
+                <span className={badgeClasses({ kind: tier.isCompleted ? 'done' : 'progress', size: 'sm', className: 'shrink-0' })}>
                   {tier.isCompleted ? '✓ Completed' : 'In Progress'}
                 </span>
                 {/* Most recent role verdict for this tier — shown only while the
@@ -187,20 +172,18 @@ function ProgressRow({ role }: { role: RoleProgress }) {
                       ? `/careers/${career.slug}/simulate`
                       : `/careers/${career.slug}/simulate/${tier.scenarioSlug}?experience=${tier.tier}`
                   }
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-btn
-                    font-sans font-semibold text-[12px] text-white transition-colors duration-150"
-                  style={{ backgroundColor: 'var(--color-teal)' }}
-                  onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal-light)')
-                  }
-                  onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal)')
-                  }
+                  className={buttonClasses({
+                    // Finished tiers get the quieter secondary; in-progress ones
+                    // keep the primary, so "Continue" is what stands out.
+                    variant: tier.isCompleted ? 'secondary' : 'primary',
+                    size: 'md',
+                    className: 'shrink-0',
+                  })}
                 >
-                  <Play size={10} aria-hidden="true" />
                   {/* "Revisit" (not "View Results"): the link reopens the tier's
                       experience — there is no separate results panel to land on. */}
                   {tier.isCompleted ? 'Revisit' : 'Continue'}
+                  <ArrowRight size={BUTTON_ICON.md} aria-hidden="true" className={BUTTON_ARROW} />
                 </Link>
               </div>
 
@@ -255,7 +238,7 @@ function FavoriteCareerCard({
         <h4 className="font-sans font-bold text-[15px] text-dark leading-snug mb-1.5">
           {career.title}
         </h4>
-        <span className="px-2 py-0.5 rounded-pill text-[11px] font-medium border border-teal text-teal">
+        <span className={badgeClasses({ kind: 'outline', size: 'sm' })}>
           {career.industry}
         </span>
       </div>
@@ -263,19 +246,17 @@ function FavoriteCareerCard({
       <div className="flex items-center gap-2 pt-2 mt-auto border-t border-border">
         <Link
           href={`/careers/${career.slug}`}
-          className="font-sans text-[13px] font-semibold text-teal hover:text-teal-light
-            transition-colors duration-150"
+          className={buttonClasses({ variant: 'tertiary', size: 'inline', className: 'text-[13px]' })}
         >
           Explore →
         </Link>
         {career.hasSimulation && (
           <Link
             href={`/careers/${career.slug}/simulate`}
-            className="ml-auto inline-flex items-center gap-1 font-sans text-[12px] font-medium
-              text-muted hover:text-teal transition-colors duration-150"
+            className={buttonClasses({ variant: 'quiet', size: 'inline', className: 'ml-auto text-[12px]' })}
           >
-            <Play size={11} aria-hidden="true" />
             {simLabel}
+            <ArrowRight size={12} aria-hidden="true" className={BUTTON_ARROW} />
           </Link>
         )}
       </div>
@@ -300,10 +281,7 @@ function VerdictCard({ verdict }: { verdict: RoleVerdict }) {
         <h3 className="font-sans font-bold text-[15px] text-dark">
           {career?.title ?? verdict.careerId}
         </h3>
-        <span
-          className="px-2.5 py-0.5 rounded-pill font-sans text-[11px] font-semibold text-white shrink-0"
-          style={{ backgroundColor: 'var(--color-navy)' }}
-        >
+        <span className={badgeClasses({ kind: 'count', size: 'sm', className: 'shrink-0' })}>
           {tierLabel(verdict.tier)}
         </span>
         <span className="inline-flex items-center gap-1.5 shrink-0 font-sans text-[11px] text-muted">
@@ -417,8 +395,7 @@ function AttemptCard({
           {/* Reopens this attempt's complete ranked results (read-only view). */}
           <Link
             href={`/quiz-results/${attempt.id}`}
-            className="font-sans text-[13px] font-semibold text-teal hover:text-teal-light
-              transition-colors duration-150 shrink-0"
+            className={buttonClasses({ variant: 'tertiary', size: 'inline', className: 'shrink-0 text-[13px]' })}
           >
             View full results →
           </Link>
@@ -431,15 +408,16 @@ function AttemptCard({
               <Link
                 key={result.careerId}
                 href={`/careers/${career.slug}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill border
-                  font-sans text-[13px] font-medium transition-colors duration-150 hover:border-teal hover:text-teal"
-                style={{ borderColor: 'var(--color-border)', color: 'var(--color-dark)' }}
+                // Colours live in classes (not an inline style) so the hover
+                // and focus states actually apply.
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill border border-border
+                  font-sans text-[13px] font-medium text-dark transition-colors duration-150
+                  hover:border-action hover:text-action focus-visible:outline focus-visible:outline-2
+                  focus-visible:outline-offset-2 focus-visible:outline-teal"
               >
                 <span aria-hidden="true">{career.emoji}</span>
                 {career.title}
-                <span
-                  className={`px-1.5 py-0.5 rounded-pill text-[11px] font-semibold ${matchBadgeClass(result.matchPct)}`}
-                >
+                <span className={matchBadgeClass(result.matchPct)}>
                   {result.matchPct}%
                 </span>
               </Link>
@@ -647,15 +625,13 @@ export default function DashboardPage() {
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => openAuthModal('signup')}
-              className="px-5 py-2.5 rounded-btn bg-teal text-white font-sans font-semibold
-                text-[14px] transition-colors duration-150 hover:bg-teal-light"
+              className={buttonClasses({ variant: 'primary', size: 'lg' })}
             >
               Create account
             </button>
             <button
               onClick={() => openAuthModal('login')}
-              className="px-5 py-2.5 rounded-btn border border-border font-sans font-medium
-                text-[14px] text-dark hover:border-teal hover:text-teal transition-colors duration-150"
+              className={buttonClasses({ variant: 'secondary', size: 'lg' })}
             >
               Log in
             </button>
@@ -721,23 +697,13 @@ export default function DashboardPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
                   href="/explore"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
-                    font-sans font-semibold text-[14px] text-white transition-colors duration-150"
-                  style={{ backgroundColor: 'var(--color-teal)' }}
-                  onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal-light)')
-                  }
-                  onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal)')
-                  }
+                  className={buttonClasses({ variant: 'primary', size: 'lg' })}
                 >
                   Explore Careers →
                 </Link>
                 <Link
                   href="/questionnaire"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
-                    font-sans font-semibold text-[14px] transition-colors duration-150
-                    border border-teal text-teal hover:bg-teal hover:text-white"
+                  className={buttonClasses({ variant: 'secondary', size: 'lg' })}
                 >
                   Take the Career Quiz
                 </Link>
@@ -774,17 +740,9 @@ export default function DashboardPage() {
               </p>
               <Link
                 href="/explore"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
-                  font-sans font-semibold text-[14px] text-white transition-colors duration-150"
-                style={{ backgroundColor: 'var(--color-teal)' }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal-light)')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal)')
-                }
+                className={buttonClasses({ variant: 'primary', size: 'md' })}
               >
-                <BookOpen size={14} aria-hidden="true" />
+                <BookOpen size={BUTTON_ICON.md} aria-hidden="true" />
                 Explore Careers
               </Link>
             </div>
@@ -820,8 +778,7 @@ export default function DashboardPage() {
                 <div className="flex justify-center pt-1">
                   <Link
                     href="/my-ratings"
-                    className="inline-flex items-center gap-1 font-sans text-[13px] font-semibold
-                      text-teal hover:text-teal-light transition-colors duration-150"
+                    className={buttonClasses({ variant: 'tertiary', size: 'md' })}
                   >
                     View all ratings →
                   </Link>
@@ -855,17 +812,9 @@ export default function DashboardPage() {
               </p>
               <Link
                 href="/explore"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
-                  font-sans font-semibold text-[14px] text-white transition-colors duration-150"
-                style={{ backgroundColor: 'var(--color-teal)' }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal-light)')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.backgroundColor = 'var(--color-teal)')
-                }
+                className={buttonClasses({ variant: 'primary', size: 'md' })}
               >
-                <Sparkles size={14} aria-hidden="true" />
+                <Sparkles size={BUTTON_ICON.md} aria-hidden="true" />
                 Explore Careers
               </Link>
             </div>
@@ -943,7 +892,7 @@ export default function DashboardPage() {
           {history.length === 0 ? (
             <p className="font-sans text-[13px] text-muted">
               No saved quiz results yet.{' '}
-              <Link href="/questionnaire" className="text-teal hover:text-teal-light transition-colors">
+              <Link href="/questionnaire" className={buttonClasses({ variant: 'tertiary', size: 'inline' })}>
                 Take the Career Quiz →
               </Link>
             </p>
@@ -967,11 +916,11 @@ export default function DashboardPage() {
                 <div className="flex justify-center">
                   <button
                     onClick={() => setShowPreviousAttempts((v) => !v)}
-                    className="inline-flex items-center gap-1 font-sans text-[13px] font-medium
-                      transition-colors duration-150"
-                    style={{ color: 'var(--color-teal)' }}
+                    className={buttonClasses({ variant: 'tertiary', size: 'md' })}
                   >
-                    {showPreviousAttempts ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    {showPreviousAttempts
+                      ? <ChevronUp size={BUTTON_ICON.md} aria-hidden="true" />
+                      : <ChevronDown size={BUTTON_ICON.md} aria-hidden="true" />}
                     {showPreviousAttempts
                       ? 'Hide previous attempts'
                       : `Show previous attempts (${history.length - 1})`}
@@ -983,11 +932,9 @@ export default function DashboardPage() {
               <div className="flex justify-center pt-2">
                 <Link
                   href="/questionnaire"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-btn
-                    font-sans font-semibold text-[14px] transition-colors duration-150
-                    border border-teal text-teal hover:bg-teal hover:text-white"
+                  className={buttonClasses({ variant: 'secondary', size: 'md' })}
                 >
-                  <RotateCcw size={14} aria-hidden="true" />
+                  <RotateCcw size={BUTTON_ICON.md} aria-hidden="true" />
                   Retake Quiz
                 </Link>
               </div>

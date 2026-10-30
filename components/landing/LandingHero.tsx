@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import { buttonClasses, BUTTON_ARROW, BUTTON_ICON } from '@/components/ui/buttons'
 
 /**
  * Landing hero — full-width navy→teal gradient with the core value
@@ -60,21 +61,19 @@ export default function LandingHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut', delay: 0.3 }}
         >
+          {/* Shared button system, on-navy variants (Wave A) */}
           <Link
             href="/explore"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-btn bg-teal text-white
-              font-sans font-semibold text-[15px] transition-colors duration-150 hover:bg-teal-light
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            className={buttonClasses({ variant: 'primary', size: 'lg', surface: 'dark' })}
           >
             Start Exploring
-            <ArrowRight size={16} />
+            <ArrowRight size={BUTTON_ICON.lg} aria-hidden="true" className={BUTTON_ARROW} />
           </Link>
 
           <p className="mt-5">
             <Link
               href="/questionnaire"
-              className="font-sans text-[14px] font-medium text-white/80 underline underline-offset-4
-                decoration-white/40 transition-colors duration-150 hover:text-white"
+              className={buttonClasses({ variant: 'tertiary', size: 'inline', surface: 'dark', className: 'text-[14px]' })}
             >
               Take the Career Quiz
             </Link>

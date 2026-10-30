@@ -14,6 +14,8 @@ import Link from 'next/link'
 import { BookOpen, CalendarDays, CalendarRange, ChevronDown, ChevronUp, Check, ArrowRight } from 'lucide-react'
 import type { Scenario, TimeBlock } from '@/lib/simulation'
 import { tierSeconds, tierTotalLabel } from '@/lib/audioTime'
+import { buttonClasses, BUTTON_ARROW, BUTTON_ICON } from '@/components/ui/buttons'
+import { badgeClasses } from '@/components/ui/badges'
 
 type TierKey = 'orientation' | 'day-in-life' | 'full'
 
@@ -120,10 +122,7 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
         </p>
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="self-start inline-flex items-center gap-1 mt-1 font-sans text-[12px] font-semibold
-            transition-colors duration-150 hover:opacity-80 rounded
-            focus-visible:outline-none focus-visible:ring-2"
-          style={{ color: 'var(--color-teal)' }}
+          className={buttonClasses({ variant: 'tertiary', size: 'inline', className: 'self-start mt-1 text-[12px]' })}
           aria-expanded={expanded}
         >
           {expanded ? 'Show less' : 'Read more'}
@@ -195,14 +194,15 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
                               <span className="sr-only">{duration.spoken}</span>
                             </span>
                           )}
+                          {/* Labels, not buttons: navy and a teal tint, never solid
+                              teal (Wave A — solid teal means "clickable"). */}
                           {showStartHere && (
-                            <span className="inline-flex items-center rounded-pill bg-teal text-white
-                              px-2 py-0.5 font-sans text-[10px] font-bold uppercase tracking-wide">
+                            <span className={badgeClasses({ kind: 'count', size: 'sm', className: 'uppercase tracking-wide' })}>
                               Start here
                             </span>
                           )}
                           {done && (
-                            <span className="inline-flex items-center gap-1 font-sans text-[11px] font-medium text-teal">
+                            <span className={badgeClasses({ kind: 'done', size: 'sm' })}>
                               <Check size={12} strokeWidth={3} aria-hidden="true" /> Completed
                             </span>
                           )}
@@ -214,16 +214,17 @@ export default function ProjectFocusCard({ scenario: sc, careerSlug, completed, 
                       <Link
                         href={t.href}
                         onClick={t.gated ? (e) => onTierClick?.(e, t.href) : undefined}
-                        className={`shrink-0 self-start sm:self-auto inline-flex items-center gap-1.5 rounded-btn px-4 py-2
-                          font-sans font-semibold text-[13px] transition-colors duration-150
-                          focus-visible:outline-none focus-visible:ring-2
-                          ${prominent
-                            ? 'bg-teal text-white hover:bg-teal-light'
-                            : 'border border-border text-dark hover:border-teal hover:text-teal'}`}
+                        className={buttonClasses({
+                          // The lit (current) tier gets the one primary button;
+                          // the others are secondary.
+                          variant: prominent ? 'primary' : 'secondary',
+                          size: 'md',
+                          className: 'shrink-0 self-start sm:self-auto',
+                        })}
                       >
-                        <t.Icon size={14} aria-hidden="true" />
+                        <t.Icon size={BUTTON_ICON.md} aria-hidden="true" />
                         {actionLabel}
-                        <ArrowRight size={14} aria-hidden="true" />
+                        <ArrowRight size={BUTTON_ICON.md} aria-hidden="true" className={BUTTON_ARROW} />
                       </Link>
                     </div>
                   </div>
