@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Pause, Play } from 'lucide-react'
 import { artifact13Html } from '@/lib/content/artifacts/artifact-13-buyerlist-scrub'
 import { trackHomepagePreviewAudioClicked } from '@/lib/analytics'
+import { buttonClasses } from '@/components/ui/buttons'
 
 // Visual-proof section: a zoomed-in, non-interactive "screenshot" of the
 // product in action, composed from real simulation material:
@@ -253,10 +254,11 @@ export default function SimulationPreview() {
                 type="button"
                 onClick={onPlayPause}
                 aria-label={playing ? 'Pause audio preview' : 'Play audio preview'}
-                className="pointer-events-auto shrink-0 w-7 h-7 rounded-pill bg-teal hover:bg-teal-light
+                className="pointer-events-auto relative shrink-0 w-7 h-7 rounded-pill bg-action hover:bg-action-hover
                   text-white flex items-center justify-center transition-colors duration-150
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50
-                  focus-visible:ring-offset-2"
+                  after:absolute after:-inset-2 after:content-['']
+                  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+                  focus-visible:outline-teal"
               >
                 {playing ? <Pause size={12} /> : <Play size={12} className="ml-[1px]" />}
               </button>
@@ -333,9 +335,7 @@ export default function SimulationPreview() {
           <div className="flex justify-center">
             <Link
               href="/explore?filter=simulations"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-btn
-                font-sans font-semibold text-[14px] text-white bg-teal hover:bg-teal-light
-                transition-colors duration-150"
+              className={buttonClasses({ variant: 'primary', size: 'lg', surface: 'dark' })}
             >
               See the simulations
             </Link>

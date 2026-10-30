@@ -259,9 +259,12 @@ function PlayerBar({ blockId, scrollRef }: Props) {
         onClick={onPlayPause}
         aria-label={loading ? 'Loading narration' : playing ? 'Pause narration' : 'Play narration'}
         aria-busy={loading}
-        className="shrink-0 w-7 h-7 rounded-pill flex items-center justify-center text-white
-          transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2"
-        style={{ backgroundColor: 'var(--color-teal)' }}
+        // Same 28px circle as before; the invisible ::after layer extends the tap
+        // target to 44×44px for phones without changing the look (Wave A).
+        className="relative shrink-0 w-7 h-7 rounded-pill flex items-center justify-center text-white
+          bg-action hover:bg-action-hover transition-colors duration-150
+          after:absolute after:-inset-2 after:content-['']
+          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
       >
         {loading
           ? <Loader2 size={12} className="animate-spin" />

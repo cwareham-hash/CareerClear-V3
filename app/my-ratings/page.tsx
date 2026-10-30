@@ -17,6 +17,8 @@ import { CAREERS } from '@/lib/careers'
 import { TIERS, type Tier } from '@/lib/simulation'
 import { getVerdicts, type RoleVerdict } from '@/lib/roleVerdicts'
 import { trackMyRatingsViewed } from '@/lib/analytics'
+import { buttonClasses } from '@/components/ui/buttons'
+import { badgeClasses } from '@/components/ui/badges'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -50,16 +52,11 @@ const TIER_FILTERS: { value: TierValue; label: string }[] = [
 
 // ── Score badge ───────────────────────────────────────────────────────────────
 
+// One score style everywhere (Wave A): navy, with the gold rating star.
 function ScoreBadge({ score }: { score: number }) {
-  const bg =
-    score >= 8 ? 'var(--color-teal)' : score >= 5 ? 'var(--color-navy)' : 'var(--color-muted)'
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-pill
-        font-sans font-semibold text-[12px] text-white shrink-0"
-      style={{ backgroundColor: bg }}
-    >
-      <Star size={10} fill="white" strokeWidth={0} aria-hidden="true" />
+    <span className={badgeClasses({ kind: 'count', className: 'shrink-0' })}>
+      <Star size={10} fill="var(--color-gold)" strokeWidth={0} aria-hidden="true" />
       {score}/10
     </span>
   )
@@ -130,10 +127,7 @@ function VerdictCard({ verdict }: { verdict: RoleVerdict }) {
         <h3 className="font-sans font-bold text-[15px] text-dark">
           {career?.title ?? verdict.careerId}
         </h3>
-        <span
-          className="px-2.5 py-0.5 rounded-pill font-sans text-[11px] font-semibold text-white shrink-0"
-          style={{ backgroundColor: 'var(--color-navy)' }}
-        >
+        <span className={badgeClasses({ kind: 'count', size: 'sm', className: 'shrink-0' })}>
           {tierLabel(verdict.tier)}
         </span>
         <ScoreBadge score={verdict.score} />
@@ -245,15 +239,13 @@ export default function MyRatingsPage() {
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => openAuthModal('signup')}
-              className="px-5 py-2.5 rounded-btn bg-teal text-white font-sans font-semibold
-                text-[14px] transition-colors duration-150 hover:bg-teal-light"
+              className={buttonClasses({ variant: 'primary', size: 'lg' })}
             >
               Create account
             </button>
             <button
               onClick={() => openAuthModal('login')}
-              className="px-5 py-2.5 rounded-btn border border-border font-sans font-medium
-                text-[14px] text-dark hover:border-teal hover:text-teal transition-colors duration-150"
+              className={buttonClasses({ variant: 'secondary', size: 'lg' })}
             >
               Log in
             </button>
@@ -270,8 +262,7 @@ export default function MyRatingsPage() {
         {/* Back link */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium
-            text-muted hover:text-teal transition-colors mb-8"
+          className={buttonClasses({ variant: 'quiet', size: 'inline', className: 'mb-8 text-[13px]' })}
         >
           <ArrowLeft size={14} />
           Back to Dashboard

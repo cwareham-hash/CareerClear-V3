@@ -8,6 +8,7 @@ import { BlockBody } from './BlockContent'
 import BlockAudioPlayer from './BlockAudioPlayer'
 import { BlockTimeLabel } from './BlockDuration'
 import { useDialog } from './useDialog'
+import { buttonClasses } from '@/components/ui/buttons'
 
 const TITLE_ID = 'timeblock-panel-title'
 
@@ -165,46 +166,32 @@ export default function TimeBlockPanel({
                   <button
                     onClick={() => onToggleComplete(block.id, true)}
                     aria-label={`Mark "${block.title}" as completed`}
-                    className="w-full py-2.5 rounded-btn font-sans font-semibold text-[14px] text-white
-                      transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2"
-                    style={{ backgroundColor: 'var(--color-teal)' }}
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                        'var(--color-teal-light)')
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                        'var(--color-teal)')
-                    }
+                    className={buttonClasses({ variant: 'primary', size: 'lg', fullWidth: true })}
                   >
                     Mark as Completed
                   </button>
                 )}
 
-                {/* Secondary navigation */}
+                {/* Secondary navigation — tertiary text buttons (the desktop panel
+                    keeps them text-sized; the hit area is padded invisibly). */}
                 <div className="flex items-center justify-between">
                   <button
                     onClick={onPreviousBlock}
                     disabled={!hasPrevious}
-                    className="font-sans text-[13px] font-medium transition-colors duration-150
-                      disabled:opacity-30 disabled:cursor-default"
-                    style={{ color: hasPrevious ? 'var(--color-teal)' : 'var(--color-muted)' }}
+                    className={buttonClasses({ variant: 'tertiary', size: 'inline', className: 'text-[13px] disabled:opacity-40' })}
                   >
                     ← Previous
                   </button>
                   <button
                     onClick={onClose}
-                    className="font-sans text-[13px] font-medium text-muted hover:text-dark
-                      transition-colors duration-150"
+                    className={buttonClasses({ variant: 'quiet', size: 'inline', className: 'text-[13px]' })}
                   >
                     Close
                   </button>
                   <button
                     onClick={onNextBlock}
                     disabled={!hasNext}
-                    className="font-sans text-[13px] font-medium transition-colors duration-150
-                      disabled:opacity-30 disabled:cursor-default"
-                    style={{ color: hasNext ? 'var(--color-teal)' : 'var(--color-muted)' }}
+                    className={buttonClasses({ variant: 'tertiary', size: 'inline', className: 'text-[13px] disabled:opacity-40' })}
                   >
                     Next →
                   </button>

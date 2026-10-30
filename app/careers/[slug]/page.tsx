@@ -6,6 +6,8 @@ import { ArrowLeft, ChevronRight, Hourglass } from 'lucide-react'
 import { CAREERS } from '@/lib/careers'
 import { CAREER_DETAIL } from '@/lib/careerDetail'
 import SimulateCtaLink from '@/components/SimulateCtaLink'
+import { buttonClasses, BUTTON_ICON } from '@/components/ui/buttons'
+import { badgeClasses } from '@/components/ui/badges'
 
 interface Props {
   params: { slug: string }
@@ -33,8 +35,7 @@ export default function CareerDetailPage({ params }: Props) {
         {/* Back link */}
         <Link
           href="/explore"
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium
-            text-muted hover:text-teal transition-colors mb-8"
+          className={buttonClasses({ variant: 'quiet', size: 'inline', className: 'mb-8 text-[13px]' })}
         >
           <ArrowLeft size={14} />
           Back to Explore
@@ -53,35 +54,37 @@ export default function CareerDetailPage({ params }: Props) {
             {career.description}
           </p>
 
-          {/* Badges */}
-          <div className="flex items-center justify-center gap-2 flex-wrap mb-6">
-            <span className="px-3 py-1 rounded-pill text-[12px] font-medium border border-teal text-teal">
+          {/* Badges — labels only. The button sits on its own line below so it
+              reads as the page's action rather than a third badge (Wave A). */}
+          <div className={`flex items-center justify-center gap-2 flex-wrap ${career.hasSimulation ? 'mb-4' : 'mb-6'}`}>
+            <span className={badgeClasses({ kind: 'outline' })}>
               {career.industry}
             </span>
             {career.hasSimulation && (
-              <span className="px-3 py-1 rounded-pill text-[12px] font-medium bg-teal text-white">
+              <span className={badgeClasses({ kind: 'sim' })}>
                 Simulation Available
               </span>
             )}
-            {/* Hero door into the simulation — previously the only entry point
-                sat at the very bottom of the page. Sim careers only. */}
-            {career.hasSimulation && (
+          </div>
+
+          {/* Hero door into the simulation — previously the only entry point
+              sat at the very bottom of the page. Sim careers only. Centred on
+              the title's line; full width on phones. */}
+          {career.hasSimulation && (
+            <div className="flex justify-center mb-6">
               <SimulateCtaLink
                 careerId={career.id}
                 careerSlug={career.slug}
                 label="Jump to Simulation"
+                className="w-full sm:w-auto"
               />
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Skills */}
+          {/* Skills — neutral labels; teal is reserved for things you can click */}
           <div className="flex flex-wrap justify-center gap-1.5">
             {career.skills.map((skill) => (
-              <span
-                key={skill}
-                className="px-2.5 py-0.5 rounded-pill text-[12px] font-medium text-white"
-                style={{ backgroundColor: 'var(--color-teal)' }}
-              >
+              <span key={skill} className={badgeClasses({ kind: 'label' })}>
                 {skill}
               </span>
             ))}
@@ -277,13 +280,7 @@ export default function CareerDetailPage({ params }: Props) {
                           </p>
                         </div>
                         {/* Years pill */}
-                        <span
-                          className="self-start font-sans text-[11px] font-semibold rounded-pill px-2 py-0.5"
-                          style={{
-                            backgroundColor: 'var(--color-tag-bg)',
-                            color: 'var(--color-teal)',
-                          }}
-                        >
+                        <span className={badgeClasses({ kind: 'label', size: 'sm', className: 'self-start' })}>
                           {stage.years}
                         </span>
                         {/* Description */}
@@ -343,11 +340,9 @@ export default function CareerDetailPage({ params }: Props) {
                 </div>
                 <span
                   aria-disabled="true"
-                  className="shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-btn
-                    font-sans font-semibold text-[14px] text-muted bg-[#f3f4f6]
-                    border border-border cursor-not-allowed select-none"
+                  className={buttonClasses({ size: 'lg', disabled: true, className: 'shrink-0' })}
                 >
-                  <Hourglass size={15} aria-hidden="true" />
+                  <Hourglass size={BUTTON_ICON.lg} aria-hidden="true" />
                   Simulation Coming Soon
                 </span>
               </div>

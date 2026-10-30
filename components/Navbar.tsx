@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, LogOut } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { buttonClasses } from '@/components/ui/buttons'
 
 const NAV_LINKS = [
   { href: '/explore',       label: 'Explore Careers' },
@@ -113,8 +114,7 @@ export default function Navbar() {
                 </button>
                 <button
                   onClick={() => openAuthModal('signup')}
-                  className="px-4 py-2 rounded-btn bg-teal text-white font-sans
-                    font-semibold text-[14px] transition-colors duration-150 hover:bg-teal-light"
+                  className={buttonClasses({ variant: 'primary', size: 'md' })}
                 >
                   Sign up
                 </button>
@@ -194,17 +194,13 @@ export default function Navbar() {
                   <div className="px-6 py-4 flex items-center gap-3">
                     <button
                       onClick={() => openAuthModal('login')}
-                      className="flex-1 px-4 py-2.5 rounded-btn border border-border
-                        font-sans text-[14px] font-medium text-dark hover:border-teal
-                        hover:text-teal transition-colors duration-150"
+                      className={buttonClasses({ variant: 'secondary', size: 'md', className: 'flex-1' })}
                     >
                       Log in
                     </button>
                     <button
                       onClick={() => openAuthModal('signup')}
-                      className="flex-1 px-4 py-2.5 rounded-btn bg-teal text-white
-                        font-sans font-semibold text-[14px] transition-colors duration-150
-                        hover:bg-teal-light"
+                      className={buttonClasses({ variant: 'primary', size: 'md', className: 'flex-1' })}
                     >
                       Sign up
                     </button>

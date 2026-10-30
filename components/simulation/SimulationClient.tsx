@@ -11,6 +11,7 @@ import { type Simulation } from '@/lib/simulation'
 import BlockExperience from './BlockExperience'
 import Breadcrumb from './Breadcrumb'
 import ExperienceToggle, { type Experience } from './ExperienceToggle'
+import { buttonClasses, BUTTON_ARROW, BUTTON_ICON } from '@/components/ui/buttons'
 
 // ADJUST DAY-IN-LIFE WIDTH here — match the hub: ~two-thirds of the viewport on
 // wide screens, capped so it never gets absurdly wide; fills width on mobile.
@@ -95,24 +96,18 @@ export default function SimulationClient({ simulation, initialExperience = 'day-
           <button
             type="button"
             onClick={() => changeExperience('full')}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-btn text-white
-              font-sans font-semibold text-[14px] transition-opacity duration-150 hover:opacity-90
-              focus-visible:outline-none focus-visible:ring-2"
-            style={{ backgroundColor: 'var(--color-teal)' }}
+            className={buttonClasses({ variant: 'primary', size: 'lg' })}
           >
-            <CalendarRange size={16} aria-hidden="true" />
+            <CalendarRange size={BUTTON_ICON.lg} aria-hidden="true" />
             Continue to the Full Simulation
-            <ArrowRight size={16} aria-hidden="true" />
+            <ArrowRight size={BUTTON_ICON.lg} aria-hidden="true" className={BUTTON_ARROW} />
           </button>
 
           {/* Lower-emphasis back to this project on the hub. */}
           <div className="mt-4">
             <Link
               href={hubHref}
-              className="inline-flex items-center justify-center px-5 py-2 rounded-btn
-                border border-border text-dark font-sans font-semibold text-[13px]
-                transition-colors duration-150 hover:border-teal hover:text-teal
-                focus-visible:outline-none focus-visible:ring-2"
+              className={buttonClasses({ variant: 'secondary', size: 'md' })}
             >
               Back to project
             </Link>

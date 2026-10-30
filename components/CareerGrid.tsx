@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Search, SlidersHorizontal, ChevronDown, ChevronUp, ArrowUp } from 'lucide-react'
 import CareerCard from '@/components/CareerCard'
+import { buttonClasses, BUTTON_ICON } from '@/components/ui/buttons'
+import { badgeClasses } from '@/components/ui/badges'
 import {
   CAREERS,
   INDUSTRY_FILTERS,
@@ -215,7 +217,6 @@ export default function CareerGrid() {
                   isFavorite={isFavorite(career.id)}
                   onToggleFavorite={() => toggle(career.id)}
                   isSimulated={completedCareerIds.has(career.id)}
-                  simBadgePurple
                 />
               </div>
             ))}
@@ -269,17 +270,12 @@ export default function CareerGrid() {
             onClick={() => setFiltersOpen((v) => !v)}
             aria-expanded={filtersOpen}
             aria-controls="career-filters"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-btn border border-border
-              bg-white font-sans text-[14px] font-medium text-dark hover:border-teal
-              hover:text-teal transition-colors duration-150"
+            className={buttonClasses({ variant: 'secondary', size: 'md' })}
           >
-            <SlidersHorizontal size={15} aria-hidden="true" />
+            <SlidersHorizontal size={BUTTON_ICON.md} aria-hidden="true" />
             Filters
             {activeChipCount > 0 && (
-              <span
-                className="min-w-[20px] h-5 px-1.5 rounded-pill bg-teal text-white text-[12px]
-                  font-semibold inline-flex items-center justify-center"
-              >
+              <span className={badgeClasses({ kind: 'count', size: 'sm', className: 'min-w-[20px] justify-center' })}>
                 {activeChipCount}
               </span>
             )}
@@ -371,8 +367,7 @@ export default function CareerGrid() {
             <button
               type="button"
               onClick={clearAll}
-              className="font-sans text-[13px] font-medium text-teal
-                hover:text-teal-light transition-colors duration-150"
+              className={buttonClasses({ variant: 'tertiary', size: 'inline', className: 'text-[13px]' })}
             >
               Clear filters
             </button>
@@ -421,9 +416,7 @@ export default function CareerGrid() {
             <button
               type="button"
               onClick={clearAll}
-              className="font-sans text-[14px] font-medium text-teal
-                hover:text-teal-light transition-colors duration-150 underline
-                underline-offset-2"
+              className={buttonClasses({ variant: 'tertiary', size: 'md' })}
             >
               Clear filters
             </button>

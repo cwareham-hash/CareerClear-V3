@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { buttonClasses } from '@/components/ui/buttons'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -26,7 +27,7 @@ export default function ContactPage() {
         <p className="font-sans text-[16px] text-dark leading-relaxed">
           <a
             href="mailto:cwareham@chicagobooth.edu"
-            className="text-teal hover:text-teal-light transition-colors font-medium"
+            className={buttonClasses({ variant: 'tertiary', size: 'inline' })}
           >
             cwareham@chicagobooth.edu
           </a>

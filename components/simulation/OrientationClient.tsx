@@ -11,6 +11,7 @@ import { type TimeBlock } from '@/lib/simulation'
 import BlockExperience from './BlockExperience'
 import Breadcrumb from './Breadcrumb'
 import SoftGateDialog from './SoftGateDialog'
+import { buttonClasses, BUTTON_ARROW, BUTTON_ICON } from '@/components/ui/buttons'
 
 interface Props {
   careerId:     string
@@ -93,24 +94,18 @@ export default function OrientationClient({
               orientation completion checkmark circle (var(--color-teal)). */}
           <Link
             href={dayHref}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-btn text-white
-              font-sans font-semibold text-[14px] transition-opacity duration-150 hover:opacity-90
-              focus-visible:outline-none focus-visible:ring-2"
-            style={{ backgroundColor: 'var(--color-teal)' }}
+            className={buttonClasses({ variant: 'primary', size: 'lg' })}
           >
-            <CalendarDays size={16} aria-hidden="true" />
+            <CalendarDays size={BUTTON_ICON.lg} aria-hidden="true" />
             Continue to Day in the Life
-            <ArrowRight size={16} aria-hidden="true" />
+            <ArrowRight size={BUTTON_ICON.lg} aria-hidden="true" className={BUTTON_ARROW} />
           </Link>
 
           {/* 2 — lower-emphasis back to this project on the hub. */}
           <div className="mt-4">
             <Link
               href={hubHref}
-              className="inline-flex items-center justify-center px-5 py-2 rounded-btn
-                border border-border text-dark font-sans font-semibold text-[13px]
-                transition-colors duration-150 hover:border-teal hover:text-teal
-                focus-visible:outline-none focus-visible:ring-2"
+              className={buttonClasses({ variant: 'secondary', size: 'md' })}
             >
               Back to project
             </Link>
@@ -121,9 +116,7 @@ export default function OrientationClient({
             <button
               type="button"
               onClick={() => setSkipOpen(true)}
-              className="font-sans text-[12px] text-muted underline underline-offset-2
-                transition-colors duration-150 hover:text-dark
-                rounded focus-visible:outline-none focus-visible:ring-2"
+              className={buttonClasses({ variant: 'quiet', size: 'inline', className: 'text-[12px]' })}
             >
               Skip to the full simulation
             </button>
@@ -133,12 +126,10 @@ export default function OrientationClient({
         <div className="text-center pt-2">
           <Link
             href={hubHref}
-            className="inline-flex items-center gap-1.5 font-sans text-[13px] font-medium
-              transition-colors duration-150 hover:text-teal"
-            style={{ color: 'var(--color-muted)' }}
+            className={buttonClasses({ variant: 'quiet', size: 'inline', className: 'text-[13px]' })}
           >
             Skip ahead
-            <ArrowRight size={14} aria-hidden="true" />
+            <ArrowRight size={14} aria-hidden="true" className={BUTTON_ARROW} />
           </Link>
         </div>
       )}

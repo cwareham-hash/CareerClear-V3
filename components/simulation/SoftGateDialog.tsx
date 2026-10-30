@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useDialog } from './useDialog'
+import { buttonClasses, BUTTON_ICON } from '@/components/ui/buttons'
 
 // Gentle, non-locking confirm dialog. The defaults reproduce the original
 // "start with Orientation" hub gate; every string and both actions are
@@ -108,21 +109,15 @@ export default function SoftGateDialog({
                   ref={initialFocusRef}
                   type="button"
                   onClick={onPrimary}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-btn
-                    bg-teal text-white font-sans font-semibold text-[13px]
-                    transition-colors duration-150 hover:bg-teal-light
-                    focus-visible:outline-none focus-visible:ring-2"
+                  className={buttonClasses({ variant: 'primary', size: 'md', className: 'flex-1' })}
                 >
-                  {PrimaryIcon && <PrimaryIcon size={14} aria-hidden="true" />}
+                  {PrimaryIcon && <PrimaryIcon size={BUTTON_ICON.md} aria-hidden="true" />}
                   {primaryLabel}
                 </button>
                 <button
                   type="button"
                   onClick={onSecondary}
-                  className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-btn
-                    border border-border text-dark font-sans font-semibold text-[13px]
-                    transition-colors duration-150 hover:border-teal hover:text-teal
-                    focus-visible:outline-none focus-visible:ring-2"
+                  className={buttonClasses({ variant: 'secondary', size: 'md', className: 'flex-1' })}
                 >
                   {secondaryLabel}
                 </button>

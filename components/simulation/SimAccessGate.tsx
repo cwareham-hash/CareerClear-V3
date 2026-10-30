@@ -9,6 +9,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { LogIn, Hourglass } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { buttonClasses } from '@/components/ui/buttons'
 
 interface Props {
   // Used in the gate copy, e.g. "open the Project Fresca simulation".
@@ -37,15 +38,13 @@ export default function SimAccessGate({ label, children }: Props) {
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => openAuthModal('signup')}
-              className="px-5 py-2.5 rounded-btn bg-teal text-white font-sans font-semibold
-                text-[14px] transition-colors duration-150 hover:bg-teal-light"
+              className={buttonClasses({ variant: 'primary', size: 'lg' })}
             >
               Create account
             </button>
             <button
               onClick={() => openAuthModal('login')}
-              className="px-5 py-2.5 rounded-btn border border-border font-sans font-medium
-                text-[14px] text-dark hover:border-teal hover:text-teal transition-colors duration-150"
+              className={buttonClasses({ variant: 'secondary', size: 'lg' })}
             >
               Log in
             </button>
@@ -73,8 +72,7 @@ export default function SimAccessGate({ label, children }: Props) {
           </p>
           <Link
             href="/explore"
-            className="inline-block px-5 py-2.5 rounded-btn bg-teal text-white font-sans
-              font-semibold text-[14px] transition-colors duration-150 hover:bg-teal-light"
+            className={buttonClasses({ variant: 'primary', size: 'lg' })}
           >
             Keep exploring careers
           </Link>

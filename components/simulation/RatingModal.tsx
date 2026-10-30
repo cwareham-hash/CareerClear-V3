@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import type { Tier } from '@/lib/simulation'
+import { buttonClasses } from '@/components/ui/buttons'
 
 interface Props {
   show:        boolean
@@ -143,24 +144,14 @@ function ModalContent({
       <div className="shrink-0 px-6 py-4 border-t border-border flex items-center justify-between gap-3">
         <button
           onClick={onDismiss}
-          className="font-sans text-[13px] font-medium text-muted hover:text-dark transition-colors duration-150"
+          className={buttonClasses({ variant: 'quiet', size: 'md' })}
         >
           Skip for now
         </button>
         <button
           onClick={() => rating !== null && onSubmit(rating, liked, disliked)}
           disabled={rating === null}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-btn
-            font-sans font-semibold text-[14px] text-white transition-colors duration-150
-            disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ backgroundColor: 'var(--color-teal)' }}
-          onMouseEnter={(e) => {
-            if (rating !== null)
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--color-teal-light)'
-          }}
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--color-teal)')
-          }
+          className={buttonClasses({ variant: 'primary', size: 'md' })}
         >
           Save Feedback
         </button>

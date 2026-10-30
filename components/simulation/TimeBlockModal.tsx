@@ -8,6 +8,7 @@ import { BlockBody } from './BlockContent'
 import BlockAudioPlayer from './BlockAudioPlayer'
 import { BlockTimeLabel } from './BlockDuration'
 import { useDialog } from './useDialog'
+import { buttonClasses } from '@/components/ui/buttons'
 
 const TITLE_ID = 'timeblock-modal-title'
 
@@ -146,38 +147,33 @@ export default function TimeBlockModal({
                 <button
                   onClick={() => onToggleComplete(block.id, true)}
                   aria-label={`Mark "${block.title}" as completed`}
-                  className="w-full py-3 rounded-btn font-sans font-semibold text-[14px] text-white
-                    transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2"
-                  style={{ backgroundColor: 'var(--color-teal)' }}
+                  className={buttonClasses({ variant: 'primary', size: 'lg', fullWidth: true })}
                 >
                   Mark as Completed
                 </button>
               )}
 
-              {/* Secondary navigation */}
+              {/* Secondary navigation — this sheet only renders on phones and
+                  tablets, so these use the medium size: a 44px tap target on
+                  phones (Wave A). */}
               <div className="flex items-center justify-between">
                 <button
                   onClick={onPreviousBlock}
                   disabled={!hasPrevious}
-                  className="font-sans text-[13px] font-medium transition-colors duration-150
-                    disabled:opacity-30 disabled:cursor-default"
-                  style={{ color: hasPrevious ? 'var(--color-teal)' : 'var(--color-muted)' }}
+                  className={buttonClasses({ variant: 'tertiary', size: 'md', className: 'disabled:opacity-40' })}
                 >
                   ← Previous
                 </button>
                 <button
                   onClick={onClose}
-                  className="font-sans text-[13px] font-medium text-muted
-                    hover:text-dark transition-colors duration-150"
+                  className={buttonClasses({ variant: 'quiet', size: 'md' })}
                 >
                   Close
                 </button>
                 <button
                   onClick={onNextBlock}
                   disabled={!hasNext}
-                  className="font-sans text-[13px] font-medium transition-colors duration-150
-                    disabled:opacity-30 disabled:cursor-default"
-                  style={{ color: hasNext ? 'var(--color-teal)' : 'var(--color-muted)' }}
+                  className={buttonClasses({ variant: 'tertiary', size: 'md', className: 'disabled:opacity-40' })}
                 >
                   Next →
                 </button>

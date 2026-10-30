@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, X, MailCheck } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { captureEvent } from '@/lib/analytics'
+import { buttonClasses, BUTTON_ICON } from '@/components/ui/buttons'
 
 /**
  * Single global auth modal. Rendered once in the root layout; opened from
@@ -164,8 +165,7 @@ export default function AuthModal() {
                 </p>
                 <button
                   onClick={() => switchMode('login')}
-                  className="mt-6 w-full px-6 py-3 rounded-btn bg-teal text-white font-sans
-                    font-semibold text-[14px] transition-colors duration-150 hover:bg-teal-light"
+                  className={buttonClasses({ variant: 'primary', size: 'lg', fullWidth: true, className: 'mt-6' })}
                 >
                   Back to log in
                 </button>
@@ -246,13 +246,9 @@ export default function AuthModal() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="mt-1 w-full flex items-center justify-center gap-2
-                      px-6 py-3 rounded-btn bg-teal text-white font-sans font-semibold
-                      text-[14px] transition-colors duration-150 hover:bg-teal-light
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
+                    className={buttonClasses({ variant: 'primary', size: 'lg', fullWidth: true, className: 'mt-1' })}
                   >
-                    <Sparkles size={16} />
+                    <Sparkles size={BUTTON_ICON.lg} aria-hidden="true" />
                     {submitting
                       ? 'Please wait…'
                       : mode === 'signup' ? 'Create account' : 'Log in'}
@@ -264,7 +260,7 @@ export default function AuthModal() {
                   {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
                   <button
                     onClick={() => switchMode(mode === 'signup' ? 'login' : 'signup')}
-                    className="font-medium text-teal hover:text-teal-light transition-colors"
+                    className={buttonClasses({ variant: 'tertiary', size: 'inline' })}
                   >
                     {mode === 'signup' ? 'Log in' : 'Sign up'}
                   </button>

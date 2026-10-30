@@ -64,6 +64,13 @@
     font-family: var(--font-inter), system-ui, sans-serif;
     color: var(--color-navy);
   }
+
+  /* Wave A: headings get display line spacing instead of inheriting the body's
+     1.7 (which left a visible gap in two-line titles). Headings that set their
+     own leading-* class keep it. */
+  h1, h2, h3, h4 {
+    line-height: 1.2;
+  }
 }
 
 /* ── Shimmer animation for skeleton screens (§7.6.7) ───────────────────────── */
